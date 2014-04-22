@@ -7,6 +7,7 @@
 from logger.logger import Logger
 # Importar la librería configparser (para obtener datos de un archivo .cfg)
 import configparser
+import os  # Importar la librería os (para trabajar con directorios y archivos
 import re  # Importar la librería re (para trabajar con expresiones regulares)
 
 
@@ -205,8 +206,15 @@ class CfgParser:
     cfg = None
     conn_vars = {}
     bkp_vars = {}
+    kill_vars = {}
 
-    def __init__(self, cfg_file, logger=None):
+    def __init__(self, logger=None):
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = Logger()
+
+    def load_cfg(self, cfg_file):
         '''
     Objetivo:
         - cargar el archivo de configuración con todas sus variables.
@@ -221,19 +229,17 @@ class CfgParser:
         - un diccionario con las variables cargadas del archivo de
         configuración.
     '''
-        if logger:
-            self.logger = logger
-        else:
-            self.logger = Logger()
-
         try:  # Probar si hay excepciones en...
             self.cfg = configparser.ConfigParser()  # Crear un Parser
-            self.cfg.read(cfg_file)  # Parsear el archivo .cfg
+            if os.path.exists(cfg_file):
+                self.cfg.read(cfg_file)  # Parsear el archivo .cfg
+            else:
+                raise Exception()
         except Exception as e:  # Si salta una excepción...
             self.logger.debug('Error en la función "load_cfg": {}.'.format(
                 str(e)))
-            self.logger.stop_exe('La ruta del archivo de configuración es '
-                                 'incorrecta.')
+            self.logger.stop_exe('La ruta de alguno de los archivos de '
+                                 'configuración es incorrecta.')
 
     def parse_pgconn(self):
 
@@ -251,9 +257,9 @@ class CfgParser:
         except Exception as e:
             self.logger.debug('Error en la función "parse_pg": {}.'.format(
                 str(e)))
-            self.logger.stop_exe('El archivo de configuración tiene '
-                                 'parámetros con valores incorrectos en la '
-                                 'sección [postgres].')
+            self.logger.stop_exe('El archivo de configuración de la conexión '
+                                 'a PostgreSQL tiene parámetros con valores '
+                                 'incorrectos.')
 
     def parse_dump(self):
         '''
@@ -340,8 +346,9 @@ class CfgParser:
         except Exception as e:
             self.logger.debug('Error en la función "parse_dump": {}.'.format(
                 str(e)))
-            self.logger.stop_exe('El archivo de configuración tiene '
-                                 'parámetros con valores incorrectos.')
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de las copias de seguridad '
+                                 'tiene parámetros con valores incorrectos.')
 
     def parse_dumpall(self):
         '''
@@ -382,8 +389,9 @@ class CfgParser:
         except Exception as e:
             self.logger.debug('Error en la función "parse_dumpall": '
                               '{}.'.format(str(e)))
-            self.logger.stop_exe('El archivo de configuración tiene '
-                                 'parámetros con valores incorrectos.')
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de las copias de seguridad '
+                                 'tiene parámetros con valores incorrectos.')
 
     def parse_vacuum(self):
         '''
@@ -442,8 +450,9 @@ class CfgParser:
         except Exception as e:
             self.logger.debug('Error en la función "parse_vacuum": {}.'.format(
                 str(e)))
-            self.logger.stop_exe('El archivo de configuración tiene '
-                                 'parámetros con valores incorrectos.')
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de la limpieza en PostgreSQL '
+                                 'tiene parámetros con valores incorrectos.')
 
     def parse_clean(self):
         '''
@@ -505,8 +514,10 @@ class CfgParser:
         except Exception as e:
             self.logger.debug('Error en la función "parse_cleaner": '
                               '{}.'.format(str(e)))
-            self.logger.stop_exe('El archivo de configuración tiene '
-                                 'parámetros con valores incorrectos.')
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de la limpieza de copias de '
+                                 'seguridad tiene parámetros con valores '
+                                 'incorrectos.')
 
     def parse_cleanall(self):
         '''
@@ -545,5 +556,37 @@ class CfgParser:
         except Exception as e:
             self.logger.debug('Error en la función "parse_cleaner": '
                               '{}.'.format(str(e)))
-            self.logger.stop_exe('El archivo de configuración tiene '
-                                 'parámetros con valores incorrectos.')
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de la limpieza de copias de '
+                                 'seguridad tiene parámetros con valores '
+                                 'incorrectos.')
+
+    def parse_kill(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
+    '''
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.kill_vars = {
+                'kill_all': Casting.str_to_bool(
+                    self.cfg.get('settings', 'kill_all').strip()),
+                'kill_user': self.cfg.get('settings', 'kill_user').strip(),
+                'kill_dbs': Casting.str_to_list(
+                    self.cfg.get('settings', 'kill_dbs').strip()),
+            }
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_kill": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de desconexiones de PostgreSQL '
+                                 'tiene parámetros con valores incorrectos.')

@@ -32,19 +32,22 @@ if __name__ == "__main__":
     Dir.is_root(logger)  # Parar la ejecución si el programa lo ejecuta "root"
 
     # Asignar ruta por defecto al archivo de configuración
-    cfg_path = Dir.default_cfg_path('cleaner/cleanerall.cfg')
+    cleanall_cfg_path = Dir.default_cfg_path('cleaner/cleanall.cfg')
     # Crear parseador para obtener fácilmente los parámetros enviados desde
     # consola
-    parser = argparse.ArgumentParser()
+    arg_parser = argparse.ArgumentParser()
     # Crear un parámetro personalizado para enviar al programa desde consola
-    parser.add_argument('-c', '--config',
-                        help='load a configuration file (.cfg)',
-                        default=cfg_path)
-    args = parser.parse_args()  # Guardar los parámetros creados
+    arg_parser.add_argument('-T', '--tidyall',
+                            help='load a configuration file (.cfg) to get the '
+                                 'cleaner conditions',
+                                 default=cleanall_cfg_path)
 
-    # Cargar variables del archivo .cfg
-    parser = CfgParser(args.config, logger)
+    args = arg_parser.parse_args()  # Guardar los parámetros creados
+
+    parser = CfgParser(logger)
+
     # Cargar variables generales del archivo .cfg obtenido a través de args
+    parser.load_cfg(args.tidyall)
     parser.parse_cleanall()
 
     # Asegurar la existencia de un directorio donde almacenar las copias de

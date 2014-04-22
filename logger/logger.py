@@ -170,5 +170,5 @@ class Logger:
     '''
         self.__highlight_msg('white', 'red', 'bold')
         self.logger.error(message)  # Mostrar y registrar el error
-        self.__default_msg()
+        self.__reset_msg_colors()
         sys.exit(1)  # Interrumpir la ejecución del programa

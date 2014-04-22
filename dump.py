@@ -39,20 +39,29 @@ if __name__ == "__main__":
     Dir.is_root(logger)  # Parar la ejecución si el programa lo ejecuta "root"
 
     # Asignar ruta por defecto al archivo de configuración
-    cfg_path = Dir.default_cfg_path('dumper/dump.cfg')
+    conn_cfg_path = Dir.default_cfg_path('connection/connection.cfg')
+    dump_cfg_path = Dir.default_cfg_path('dumper/dump.cfg')
     # Crear parseador para obtener fácilmente los parámetros enviados desde
     # consola
-    parser = argparse.ArgumentParser()
+    arg_parser = argparse.ArgumentParser()
     # Crear un parámetro personalizado para enviar al programa desde consola
-    parser.add_argument('-c', '--config',
-                        help='load a configuration file (.cfg)',
-                        default=cfg_path)
-    args = parser.parse_args()  # Guardar los parámetros creados
+    arg_parser.add_argument('-c', '--conn',
+                            help='load a configuration file (.cfg) to get the '
+                                 'PostgreSQL connection parameters',
+                                 default=conn_cfg_path)
+    arg_parser.add_argument('-d', '--dump',
+                            help='load a configuration file (.cfg) to get the '
+                                 'dumper conditions', default=dump_cfg_path)
 
-    parser = CfgParser(args.config, logger)
+    args = arg_parser.parse_args()  # Guardar los parámetros creados
+
+    parser = CfgParser(logger)
+
     # Cargar variables de conexión del archivo .cfg obtenido a través de args
+    parser.load_cfg(args.conn)
     parser.parse_pgconn()
     # Cargar variables generales del archivo .cfg obtenido a través de args
+    parser.load_cfg(args.dump)
     parser.parse_dump()
 
     # Asegurar la existencia de un directorio donde almacenar las copias de
