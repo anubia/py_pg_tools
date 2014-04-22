@@ -12,26 +12,50 @@ from dateutil.tz import tzlocal
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
 
-def get_date(fmt='%Y%m%d_%H%M%S_%Z'):
-    '''
-Objetivo:
-    - obtener la fecha actual de la zona en un formato determinado.
-Devolución:
-    - la fecha actual en el formato establecido.
-'''
-    # Obtener fecha y hora actuales de la zona
-    init_time = datetime.datetime.now(tzlocal())
-    init_ts = init_time.strftime(fmt)  # Cambiar el formato de la fecha
-    return init_ts  # Devolver la fecha actual en el formato deseado
+class DateTools:
 
+    def __init__(self):
+        pass
 
-def get_year(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
+    @staticmethod
+    def get_date(fmt='%Y%m%d_%H%M%S_%Z'):
+        '''
+    Objetivo:
+        - obtener la fecha actual de la zona en un formato determinado.
+    Devolución:
+        - la fecha actual en el formato establecido.
     '''
-Objetivo:
-    - obtener el año actual de una fecha dada en formato string.
-Devolución:
-    - el año actual.
-'''
-    init_ts = time.strptime(date_str, fmt)  # Convertir string a objeto date
-    year = init_ts.tm_year  # Obtener el año
-    return year  # Devolver el año
+        # Obtener fecha y hora actuales de la zona
+        init_time = datetime.datetime.now(tzlocal())
+        init_ts = init_time.strftime(fmt)  # Cambiar el formato de la fecha
+        return init_ts  # Devolver la fecha actual en el formato deseado
+
+    @staticmethod
+    def get_year(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
+        '''
+    Objetivo:
+        - obtener el año de una fecha dada en formato string.
+    Devolución:
+        - el año de la fecha dada en formato string.
+    '''
+        # Convertir string a objeto date
+        init_ts = time.strptime(date_str, fmt)
+        yy = init_ts.tm_year  # Obtener el año
+        # Añadir ceros a la derecha a los años de menos de cuatro dígitos
+        year = str(yy).rjust(4, '0')
+        return year  # Devolver el año
+
+    @staticmethod
+    def get_month(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
+        '''
+    Objetivo:
+        - obtener el mes de una fecha dada en formato string.
+    Devolución:
+        - el mes de la fecha dada en formato string.
+    '''
+        # Convertir string a objeto date
+        init_ts = time.strptime(date_str, fmt)
+        mm = init_ts.tm_mon  # Obtener el mes
+        # Añadir un cero a la derecha a los meses de un dígito
+        month = str(mm).rjust(2, '0')
+        return month  # Devolver el mes

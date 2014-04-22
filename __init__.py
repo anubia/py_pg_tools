@@ -4,7 +4,7 @@
 
 __all__ = ['dump', 'dumpall', 'vacuum', 'clean', 'logger', 'config',
            'db_selector', 'pg_connection', 'pg_queries', 'dir_tools',
-           'date_tools']
+           'date_tools', 'mail']
 
 from . import dump
 from . import dumpall
@@ -17,3 +17,4 @@ from . import pg_connection
 from . import pg_queries
 from . import dir_tools
 from . import date_tools
+from . import mail

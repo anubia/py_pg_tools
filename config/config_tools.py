@@ -4,9 +4,7 @@
 
 # ************************* CARGA DE LIBRERÍAS *************************
 
-# Importar la función logger_fatal de la librería personalizada logger.logger
-# (para utilizar un logger que proporcione información al usuario)
-from logger.logger import logger_fatal, logger_colored
+from logger.logger import Logger
 # Importar la librería configparser (para obtener datos de un archivo .cfg)
 import configparser
 import re  # Importar la librería re (para trabajar con expresiones regulares)
@@ -14,532 +12,538 @@ import re  # Importar la librería re (para trabajar con expresiones regulares)
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
 
-def check_regex(logger, regex):
+class Checker:
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def __warn(param, logger=None):
+        if not logger:
+            logger = Logger()
+        message = 'El parámetro "{}" no es válido: revise el archivo de ' \
+                  'configuración del programa.'.format(param)
+        logger.set_view('warning', message, 'yellow', effect='bold')
+
+    @staticmethod
+    def check_regex(regex, logger=None):
+        '''
+    Objetivo:
+        - comprobar que una expresión regular sea correcta.
+    Parámetros:
+        - regex: la expresión regular a analizar.
+    Devolución:
+        - el resultado de la comprobación.
     '''
-Objetivo:
-    - comprobar que una expresión regular sea correcta.
-Parámetros:
-    - regex: la expresión regular a analizar.
-Devolución:
-    - el resultado de la comprobación.
-'''
-    valid = True  # Inicializar regex como correcta
-    try:  # Probar si hay excepciones en...
-        re.compile(regex)  # Compilar regex
-    except re.error as e:  # Si salta la excepción re.error...
-        logger.debug('Error en la función "check_regex": {}.'.format(str(e)))
-        valid = False  # Marcar regex como incorrecta
-    return valid  # Devolver resultado de la comprobación
+        if not logger:
+            logger = Logger()
+        valid = True  # Inicializar regex como correcta
+        try:  # Probar si hay excepciones en...
+            re.compile(regex)  # Compilar regex
+        except re.error as e:  # Si salta la excepción re.error...
+            logger.debug('Error en la función "check_regex": {}.'.format(
+                str(e)))
+            valid = False  # Marcar regex como incorrecta
+        return valid  # Devolver resultado de la comprobación
 
-
-def cast_bool(boolean):
+    @staticmethod
+    def check_cfg_vars(in_regex='', ex_regex='', in_forbidden=False,
+                       in_priority=False, ex_templates=True, vacuum=True,
+                       server_alias=None, bkp_path=None, obs_days=365,
+                       min_bkps=1, pg_warnings=True, logger=None):
+        '''
+    Objetivo:
+        - comprobar la validez de las expresiones regulares y las banderas del
+        archivo de configuración.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - in_regex: la expresión regular de inclusión a comprobar.
+        - ex_regex: la expresión regular de exclusión a comprobar.
+        - in_forbidden: bandera de inclusión de bases de datos sin permisos de
+        conexión a comprobar.
+        - ex_templates: bandera de exclusión de plantillas a comprobar.
+        - vacuum: bandera de realización de vacuum previo a dump a comprobar.
     '''
-Objetivo:
-    - convierte una cadena en un booleano, si la cadena es correcta.
-Parámetros:
-    - boolean: la cadena que se convierte a booleano.
-Devolución:
-    - una variable de tipo booleano, "None" si la cadena era incorrecta.
-'''
-    if boolean.lower() == 'true':  # Si en el .cfg se escribió True bien...
-        return True
-    elif boolean.lower() == 'false':  # Si en el .cfg se escribió False bien...
-        return False
-    else:  # Si la cadena no se puede convertir a booleano...
-        return None
+        if not logger:
+            logger = Logger()
+        try:  # Comprobar si algunos parámetros del .cfg son correctos
+            # Si no es una regex...
+            if not Checker.check_regex(in_regex, logger):
+                Checker.__warn('in_regex', logger)
+                raise Exception()
+            # Si no es una regex...
+            if not Checker.check_regex(ex_regex, logger):
+                Checker.__warn('ex_regex', logger)
+                raise Exception()
+            if in_forbidden is None:  # Si no se pudo convertir...
+                Checker.__warn('in_forbidden', logger)
+                raise Exception()
+            if in_priority is None:  # Si no se pudo convertir...
+                Checker.__warn('in_priority', logger)
+                raise Exception()
+            if ex_templates is None:  # Si no se pudo convertir...
+                Checker.__warn('ex_templates', logger)
+                raise Exception()
+            if vacuum is None:  # Si no se pudo convertir...
+                Checker.__warn('vacuum', logger)
+                raise Exception()
+            if server_alias == '':
+                Checker.__warn('server_alias', logger)
+                raise Exception()
+            if bkp_path == '':
+                Checker.__warn('bkp_path', logger)
+                raise Exception()
+            if obs_days < 0:
+                Checker.__warn('obs_days', logger)
+                raise Exception()
+            if min_bkps < 0:
+                Checker.__warn('min_bkps', logger)
+                raise Exception()
+            if pg_warnings is None:  # Si no se pudo convertir...
+                Checker.__warn('pg_warnings', logger)
+                raise Exception()
+        # Si el programa falla al analizar las variables del .cfg...
+        except Exception as e:
+            logger.debug('Error en la función "check_cfg_vars": {}.'.format(
+                str(e)))
+            logger.stop_exe('El archivo de configuración tiene parámetros con '
+                            'valores incorrectos.')
 
-
-def str_to_list(string):
+    @staticmethod
+    def check_compress_type(c_type, logger=None):
+        '''
+    Objetivo:
+        - comprobar la validez de los tipos de extensión para comprimir
+        archivos.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - c_type: el tipo de extensión a analizar.
     '''
-Objetivo:
-    - convierte una cadena en una lista de elementos, que vendrán delimitados
-    por comas. Se emplea para cargar las variables del archivo de configuración
-    que deben ser tratadas como listas.
-Parámetros:
-    - string: la cadena que se quiere convertir en una lista.
-Devolución:
-    - la lista resultante de dividir la cadena por sus comas.
-'''
-    # Partir la cadena por sus comas y generar una lista con los fragmentos
-    str_list = string.split(',')
-    for i in range(len(str_list)):  # Recorrer cada elemento de la lista
-        # Eliminar caracteres de espaciado a cada elemento de la lista
-        str_list[i] = str_list[i].strip()
-    return str_list  # Devolver una lista de elementos sin espaciados
+        if not logger:
+            logger = Logger()
+        # Listar las extensiones admitidas
+        c_ext = ['.dump', '.gz', '.bz2', '.zip']
+        # Comprobar si las extensiones para comprimir las copias son válidas
+        if c_type not in c_ext:
+            Checker.__warn('bkp_type', logger)
+            logger.debug('Error en la función "check_compress_type".')
+            logger.stop_exe('El archivo de configuración tiene parámetros con '
+                            'valores incorrectos.')
 
-
-def warn(logger, param):
-    message = 'El parámetro "{}" no es válido: revise el archivo de ' \
-              'configuración del programa.'.format(param)
-    logger_colored(logger, 'warning', message, 'yellow', effect='bold')
-
-
-def check_cfg_vars(logger, in_regex='', ex_regex='', in_forbidden=False,
-                   in_priority=False, ex_templates=True, vacuum=True,
-                   server_alias=None, bkp_path=None, obs_days=365, min_bkps=1):
+    @staticmethod
+    def check_dir(path, logger=None):
+        '''
+    Objetivo:
+        - comprobar que exista un directorio llamado 'pg_bkp' en el directorio
+        donde se encuentra este script, de no ser así, se crea.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - path: la ruta que debe existir o generarse.
+    Devolución:
+        - la ruta absoluta del directorio donde se almacenarán las copias de
+        seguridad de PostgreSQL.
     '''
-Objetivo:
-    - comprobar la validez de las expresiones regulares y las banderas del
-    archivo de configuración.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - in_regex: la expresión regular de inclusión a comprobar.
-    - ex_regex: la expresión regular de exclusión a comprobar.
-    - in_forbidden: bandera de inclusión de bases de datos sin permisos de
-    conexión a comprobar.
-    - ex_templates: bandera de exclusión de plantillas a comprobar.
-    - vacuum: bandera de realización de vacuum previo a dump a comprobar.
-'''
-    try:  # Comprobar si algunos parámetros del .cfg son correctos
-        if not check_regex(logger, in_regex):  # Si no es una regex...
-            warn(logger, 'in_regex')
-            raise Exception()
-        if not check_regex(logger, ex_regex):  # Si no es una regex...
-            warn(logger, 'ex_regex')
-            raise Exception()
-        if in_forbidden is None:  # Si no se pudo convertir...
-            warn(logger, 'in_forbidden')
-            raise Exception()
-        if in_priority is None:  # Si no se pudo convertir...
-            warn(logger, 'in_priority')
-            raise Exception()
-        if ex_templates is None:  # Si no se pudo convertir...
-            warn(logger, 'ex_templates')
-            raise Exception()
-        if vacuum is None:  # Si no se pudo convertir...
-            warn(logger, 'vacuum')
-            raise Exception()
-        if server_alias is '':
-            warn(logger, 'server_alias')
-            raise Exception()
-        if bkp_path is '':
-            warn(logger, 'bkp_path')
-            raise Exception()
-        if obs_days < 0:
-            warn(logger, 'obs_days')
-            raise Exception()
-        if min_bkps < 0:
-            warn(logger, 'min_bkps')
-            raise Exception()
-    # Si el programa falla al analizar las variables del .cfg...
-    except Exception as e:
-        logger.debug('Error en la función "check_cfg_vars": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
+        if not logger:
+            logger = Logger()
+        if path and path[-1:] != '/':
+            Checker.__warn(logger, 'bkp_path')
+            logger.debug('Error en la función "check_dir".')
+            logger.stop_exe('El archivo de configuración tiene parámetros con '
+                            'valores incorrectos.')
 
 
-def check_compress_type(logger, c_type):
+class Casting:
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def str_to_bool(boolean):
+        '''
+    Objetivo:
+        - convierte una cadena en un booleano, si la cadena es correcta.
+    Parámetros:
+        - boolean: la cadena que se convierte a booleano.
+    Devolución:
+        - una variable de tipo booleano, "None" si la cadena era incorrecta.
     '''
-Objetivo:
-    - comprobar la validez de los tipos de extensión para comprimir archivos.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - c_type: el tipo de extensión a analizar.
-'''
-    # Listar las extensiones admitidas
-    c_ext = ['.dump', '.gz', '.bz2', '.zip']
-    # Comprobar si las extensiones para comprimir las copias son válidas
-    if c_type not in c_ext:
-        warn(logger, 'bkp_type')
-        logger.debug('Error en la función "check_compress_type".')
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
+        # Si en el .cfg se escribió True bien...
+        if boolean.lower() == 'true':
+            return True
+        # Si en el .cfg se escribió False bien...
+        elif boolean.lower() == 'false':
+            return False
+        else:  # Si la cadena no se puede convertir a booleano...
+            return None
 
-
-def check_dir(logger, path):
+    @staticmethod
+    def str_to_list(string):
+        '''
+    Objetivo:
+        - convierte una cadena en una lista de elementos, que vendrán
+        delimitados por comas. Se emplea para cargar las variables del archivo
+        de configuración que deben ser tratadas como listas.
+    Parámetros:
+        - string: la cadena que se quiere convertir en una lista.
+    Devolución:
+        - la lista resultante de dividir la cadena por sus comas.
     '''
-Objetivo:
-    - comprobar que exista un directorio llamado 'pg_bkp' en el directorio
-    donde se encuentra este script, de no ser así, se crea.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - path: la ruta que debe existir o generarse.
-Devolución:
-    - la ruta absoluta del directorio donde se almacenarán las copias de
-    seguridad de PostgreSQL.
-'''
-    if path and path[-1:] != '/':
-        warn(logger, 'bkp_path')
-        logger.debug('Error en la función "check_dir".')
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
+        # Partir la cadena por sus comas y generar una lista con los fragmentos
+        str_list = string.split(',')
+        for i in range(len(str_list)):  # Recorrer cada elemento de la lista
+            # Eliminar caracteres de espaciado a cada elemento de la lista
+            str_list[i] = str_list[i].strip()
+        return str_list  # Devolver una lista de elementos sin espaciados
 
 
-def parse_dump(logger, cfg):
+class CfgParser:
+
+    logger = None
+    cfg = None
+    conn_vars = {}
+    bkp_vars = {}
+
+    def __init__(self, cfg_file, logger=None):
+        '''
+    Objetivo:
+        - cargar el archivo de configuración con todas sus variables.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+        - action: una acción que indicará las variables a cargar, ya que éstas
+        son diferentes a la hora de conectarse a PostgreSQL, hacer dump,
+        dumpall, vacuum, clean o cleanall.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
     '''
-Objetivo:
-    - obtener las variables del archivo de configuración y comprobar que son
-    válidas.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Comprobar si el programa falla al cargar las variables del .cfg
-        bkp_vars = {  # Pasar los valores del archivo .cfg a un diccionario
-            'server': cfg.get('postgres', 'server').strip(),  # Servidor
-            # Usuario de PostgreSQL
-            'user': cfg.get('postgres', 'username').strip(),
-            # Contraseña del usuario de PostgreSQL
-            'pwd': cfg.get('postgres', 'password').strip(),
-            'port': int(cfg.get('postgres', 'port')),  # Puerto
-            'bkp_path': cfg.get('dump', 'bkp_path').strip(),
-            'server_alias': cfg.get('dump', 'server_alias').strip(),
-            # Nombres de las bases de datos de PostgreSQL de las que sí se
-            # desea hacer una copia de seguridad
-            'in_dbs': str_to_list(cfg.get('dump', 'in_dbs')),
-            # Nombres de las bases de datos de PostgreSQL de las que no se
-            # desea hacer una copia de seguridad
-            'in_regex': cfg.get('dump', 'in_regex').strip(),
-            # Expresión regular que indica de qué bases de datos de PostgreSQL
-            # no se desea hacer una copia de seguridad
-            'in_forbidden': cfg.get('dump', 'in_forbidden').strip(),
-            # Bandera que indica si las condiciones de inclusión de bases de
-            # datos predominan sobre las de exclusión a la hora de hacer copias
-            'in_priority': cfg.get('dump', 'in_priority').strip(),
-            # En caso de que el usuario de PostgreSQL (user) elegido sea
-            # administrador de éste, indica si se desea sólo copiar las BDs de
-            # las cuales es propietario un usuario concreto (db_owner)
-            'db_owner': cfg.get('dump', 'db_owner').strip(),
-            # Bandera que indica si se deben incluir en la copia las plantillas
-            # de PostgreSQL
-            'ex_dbs': str_to_list(cfg.get('dump', 'ex_dbs')),
-            # Expresión regular que indica de qué bases de datos de PostgreSQL
-            # se desea hacer una copia de seguridad
-            'ex_regex': cfg.get('dump', 'ex_regex').strip(),
-            # Bandera que indica si se deben incluir en la copia aquellas
-            # bases de datos de PostgreSQL que no permiten conexiones
-            'ex_templates': cfg.get('dump', 'ex_templates').strip(),
-            # Tipo de compresión a realizar a la copia de seguridad de la BD
-            'bkp_type': cfg.get('dump', 'bkp_type').strip(),
-            # Prefijo a incluir en el nombre del archivo de la copia de la BD
-            'prefix': cfg.get('dump', 'prefix').strip(),
-            # Bandera que indica si se desea hacer un vacuum antes de la copia
-            'vacuum': cfg.get('dump', 'vacuum').strip(),
-        }
-        # Convertir a bool las banderas del archivo de configuración
-        bkp_vars['in_forbidden'] = cast_bool(bkp_vars['in_forbidden'])
-        bkp_vars['in_priority'] = cast_bool(bkp_vars['in_priority'])
-        bkp_vars['ex_templates'] = cast_bool(bkp_vars['ex_templates'])
-        bkp_vars['vacuum'] = cast_bool(bkp_vars['vacuum'])
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = Logger()
 
-        # Comprobar la validez del directorio de destino de las copias
-        check_dir(logger, bkp_vars['bkp_path'])
-        # Comprobar la validez de las expresiones regulares y las banderas
-        check_cfg_vars(logger, bkp_vars['in_regex'], bkp_vars['ex_regex'],
-                       bkp_vars['in_forbidden'], bkp_vars['in_priority'],
-                       bkp_vars['ex_templates'], bkp_vars['vacuum'],
-                       bkp_vars['server_alias'])
-        # Comprobar la validez del tipo de compresión de las copias
-        check_compress_type(logger, bkp_vars['bkp_type'])
-        # Si el programa falla al cargar las variables del .cfg...
-    except Exception as e:
-        logger.debug('Error en la función "parse_dump": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
-    return bkp_vars
+        try:  # Probar si hay excepciones en...
+            self.cfg = configparser.ConfigParser()  # Crear un Parser
+            self.cfg.read(cfg_file)  # Parsear el archivo .cfg
+        except Exception as e:  # Si salta una excepción...
+            self.logger.debug('Error en la función "load_cfg": {}.'.format(
+                str(e)))
+            self.logger.stop_exe('La ruta del archivo de configuración es '
+                                 'incorrecta.')
 
+    def parse_pgconn(self):
 
-def parse_dumpall(logger, cfg):
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.conn_vars = {
+                # Servidor
+                'server': self.cfg.get('postgres', 'server').strip(),
+                # Usuario de PostgreSQL
+                'user': self.cfg.get('postgres', 'username').strip(),
+                # Contraseña del usuario de PostgreSQL
+                'pwd': self.cfg.get('postgres', 'password').strip(),
+                'port': int(self.cfg.get('postgres', 'port')),  # Puerto
+            }
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_pg": {}.'.format(
+                str(e)))
+            self.logger.stop_exe('El archivo de configuración tiene '
+                                 'parámetros con valores incorrectos en la '
+                                 'sección [postgres].')
+
+    def parse_dump(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
     '''
-Objetivo:
-    - obtener las variables del archivo de configuración y comprobar que son
-    válidas.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Comprobar si el programa falla al cargar las variables del .cfg
-        bkp_vars = {  # Pasar los valores del archivo .cfg a un diccionario
-            'server': cfg.get('postgres', 'server').strip(),  # Servidor
-            # Usuario de PostgreSQL
-            'user': cfg.get('postgres', 'username').strip(),
-            # Contraseña del usuario de PostgreSQL
-            'pwd': cfg.get('postgres', 'password').strip(),
-            'port': int(cfg.get('postgres', 'port')),  # Puerto
-            'bkp_path': cfg.get('dumpall', 'bkp_path').strip(),
-            'server_alias': cfg.get('dumpall', 'server_alias').strip(),
-            'bkp_type': cfg.get('dumpall', 'bkp_type').strip(),
-            # Prefijo a incluir en el nombre del archivo de la copia de la BD
-            'prefix': cfg.get('dumpall', 'prefix').strip(),
-            # Bandera que indica si se desea hacer un vacuum antes de la copia
-            'vacuum': cfg.get('dumpall', 'vacuum').strip(),
-        }
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.bkp_vars = {
+                'bkp_path': self.cfg.get('dir', 'bkp_path').strip(),
+                'server_alias': self.cfg.get('dir', 'server_alias').strip(),
+                # Tipo de compresión a realizar a la copia de seguridad de la
+                # BD
+                'bkp_type': self.cfg.get('file', 'bkp_type').strip(),
+                # Prefijo a incluir en el nombre del archivo de la copia de la
+                # BD
+                'prefix': self.cfg.get('file', 'prefix').strip(),
+                # Nombres de las bases de datos de PostgreSQL de las que sí se
+                # desea hacer una copia de seguridad
+                'in_dbs': Casting.str_to_list(
+                    self.cfg.get('includes', 'in_dbs')),
+                # Nombres de las bases de datos de PostgreSQL de las que no se
+                # desea hacer una copia de seguridad
+                'in_regex': self.cfg.get('includes', 'in_regex').strip(),
+                # Expresión regular que indica de qué bases de datos de
+                # PostgreSQL no se desea hacer una copia de seguridad
+                'in_forbidden': self.cfg.get(
+                    'includes', 'in_forbidden').strip(),
+                # Bandera que indica si las condiciones de inclusión de bases
+                # de datos predominan sobre las de exclusión a la hora de hacer
+                # copias
+                'in_priority': self.cfg.get('includes', 'in_priority').strip(),
+                # Bandera que indica si se deben incluir en la copia las
+                # plantillas de PostgreSQL
+                'ex_dbs': Casting.str_to_list(
+                    self.cfg.get('excludes', 'ex_dbs')),
+                # Expresión regular que indica de qué bases de datos de
+                # PostgreSQL se desea hacer una copia de seguridad
+                'ex_regex': self.cfg.get('excludes', 'ex_regex').strip(),
+                # Bandera que indica si se deben incluir en la copia aquellas
+                # bases de datos de PostgreSQL que no permiten conexiones
+                'ex_templates': self.cfg.get(
+                    'excludes', 'ex_templates').strip(),
+                # Bandera que indica si se desea hacer un vacuum antes de la
+                # copia
+                'vacuum': self.cfg.get('other', 'vacuum').strip(),
+                # En caso de que el usuario de PostgreSQL (user) elegido sea
+                # administrador de éste, indica si se desea sólo copiar las BDs
+                # de las cuales es propietario un usuario concreto (db_owner)
+                'db_owner': self.cfg.get('other', 'db_owner').strip(),
+            }
+            # Convertir a bool las banderas del archivo de configuración
+            self.bkp_vars['in_forbidden'] = Casting.str_to_bool(
+                self.bkp_vars['in_forbidden'])
+            self.bkp_vars['in_priority'] = Casting.str_to_bool(
+                self.bkp_vars['in_priority'])
+            self.bkp_vars['ex_templates'] = Casting.str_to_bool(
+                self.bkp_vars['ex_templates'])
+            self.bkp_vars['vacuum'] = Casting.str_to_bool(
+                self.bkp_vars['vacuum'])
 
-        # Comprobar la validez del directorio de destino de las copias
-        check_dir(logger, bkp_vars['bkp_path'])
-        # Comprobar la validez del tipo de compresión de las copias
-        check_compress_type(logger, bkp_vars['bkp_type'])
-        # Comprobar las banderas
-        check_cfg_vars(logger, vacuum=bkp_vars['vacuum'],
-                       server_alias=bkp_vars['server_alias'])
-        # Si el programa falla al cargar las variables del .cfg...
-    except Exception as e:
-        logger.debug('Error en la función "parse_dumpall": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
-    return bkp_vars
+            # Comprobar la validez del directorio de destino de las copias
+            Checker.check_dir(self.bkp_vars['bkp_path'], self.logger)
+            # Comprobar la validez de las expresiones regulares y las banderas
+            Checker.check_cfg_vars(self.bkp_vars['in_regex'],
+                                   self.bkp_vars['ex_regex'],
+                                   self.bkp_vars['in_forbidden'],
+                                   self.bkp_vars['in_priority'],
+                                   self.bkp_vars['ex_templates'],
+                                   self.bkp_vars['vacuum'],
+                                   self.bkp_vars['server_alias'],
+                                   logger=self.logger)
+            # Comprobar la validez del tipo de compresión de las copias
+            Checker.check_compress_type(self.bkp_vars['bkp_type'], self.logger)
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_dump": {}.'.format(
+                str(e)))
+            self.logger.stop_exe('El archivo de configuración tiene '
+                                 'parámetros con valores incorrectos.')
 
-
-def parse_vacuum(logger, cfg):
+    def parse_dumpall(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
     '''
-Objetivo:
-    - obtener las variables del archivo de configuración y comprobar que son
-    válidas.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Comprobar si el programa falla al cargar las variables del .cfg
-        bkp_vars = {  # Pasar los valores del archivo .cfg a un diccionario
-            'server': cfg.get('postgres', 'server').strip(),  # Servidor
-            # Usuario de PostgreSQL
-            'user': cfg.get('postgres', 'username').strip(),
-            # Contraseña del usuario de PostgreSQL
-            'pwd': cfg.get('postgres', 'password').strip(),
-            'port': int(cfg.get('postgres', 'port')),  # Puerto
-            'in_dbs': str_to_list(cfg.get('vacuum', 'in_dbs')),
-            # Nombres de las bases de datos de PostgreSQL de las que no se
-            # desea hacer una copia de seguridad
-            'in_regex': cfg.get('vacuum', 'in_regex').strip(),
-            # Expresión regular que indica de qué bases de datos de PostgreSQL
-            # no se desea hacer una copia de seguridad
-            'in_forbidden': cfg.get('vacuum', 'in_forbidden').strip(),
-            # Bandera que indica si las condiciones de inclusión de bases de
-            # datos predominan sobre las de exclusión a la hora de hacer copias
-            'in_priority': cfg.get('vacuum', 'in_priority').strip(),
-            # En caso de que el usuario de PostgreSQL (user) elegido sea
-            # administrador de éste, indica si se desea sólo copiar las BDs de
-            # las cuales es propietario un usuario concreto (db_owner)
-            'db_owner': cfg.get('vacuum', 'db_owner').strip(),
-            # Bandera que indica si se deben incluir en la copia las plantillas
-            # de PostgreSQL
-            'ex_dbs': str_to_list(cfg.get('vacuum', 'ex_dbs')),
-            # Expresión regular que indica de qué bases de datos de PostgreSQL
-            # se desea hacer una copia de seguridad
-            'ex_regex': cfg.get('vacuum', 'ex_regex').strip(),
-            # Bandera que indica si se deben incluir en la copia aquellas
-            # bases de datos de PostgreSQL que no permiten conexiones
-            'ex_templates': cfg.get('vacuum', 'ex_templates').strip(),
-        }
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.bkp_vars = {
+                'bkp_path': self.cfg.get('dir', 'bkp_path').strip(),
+                'server_alias': self.cfg.get('dir', 'server_alias').strip(),
+                'bkp_type': self.cfg.get('file', 'bkp_type').strip(),
+                # Prefijo a incluir en el nombre del archivo de la copia de la
+                # BD
+                'prefix': self.cfg.get('file', 'prefix').strip(),
+                # Bandera que indica si se desea hacer un vacuum antes de la
+                # copia
+                'vacuum': self.cfg.get('other', 'vacuum').strip(),
+            }
 
-        # Comprobar la validez de las expresiones regulares y las banderas
-        check_cfg_vars(logger, bkp_vars['in_regex'], bkp_vars['ex_regex'],
-                       bkp_vars['in_forbidden'], bkp_vars['in_priority'],
-                       bkp_vars['ex_templates'])
-        # Si el programa falla al cargar las variables del .cfg...
-    except Exception as e:
-        logger.debug('Error en la función "parse_vacuum": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
-    return bkp_vars
+            # Comprobar la validez del directorio de destino de las copias
+            Checker.check_dir(self.bkp_vars['bkp_path'], self.logger)
+            # Comprobar la validez del tipo de compresión de las copias
+            Checker.check_compress_type(self.bkp_vars['bkp_type'], self.logger)
+            # Comprobar las banderas
+            Checker.check_cfg_vars(vacuum=self.bkp_vars['vacuum'],
+                                   server_alias=self.bkp_vars['server_alias'],
+                                   logger=self.logger)
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_dumpall": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe('El archivo de configuración tiene '
+                                 'parámetros con valores incorrectos.')
 
-
-def parse_cleaner(logger, cfg):
+    def parse_vacuum(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
     '''
-Objetivo:
-    - obtener las variables del archivo de configuración y comprobar que son
-    válidas.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Comprobar si el programa falla al cargar las variables del .cfg
-        bkp_vars = {  # Pasar los valores del archivo .cfg a un diccionario
-            'server': cfg.get('postgres', 'server').strip(),  # Servidor
-            # Usuario de PostgreSQL
-            'user': cfg.get('postgres', 'username').strip(),
-            # Contraseña del usuario de PostgreSQL
-            'pwd': cfg.get('postgres', 'password').strip(),
-            'port': int(cfg.get('postgres', 'port')),  # Puerto
-            'bkp_path': cfg.get('cleaner', 'bkp_path').strip(),
-            'in_dbs': str_to_list(cfg.get('cleaner', 'in_dbs')),
-            # Nombres de las bases de datos de PostgreSQL de las que no se
-            # desea hacer una copia de seguridad
-            'in_regex': cfg.get('cleaner', 'in_regex').strip(),
-            # Bandera que indica si las condiciones de inclusión de bases de
-            # datos predominan sobre las de exclusión a la hora de hacer copias
-            'in_priority': cfg.get('cleaner', 'in_priority').strip(),
-            # Expresión regular que indica de qué bases de datos de PostgreSQL
-            # no se desea hacer una copia de seguridad
-            'ex_dbs': str_to_list(cfg.get('cleaner', 'ex_dbs')),
-            # Expresión regular que indica de qué bases de datos de PostgreSQL
-            # se desea hacer una copia de seguridad
-            'ex_regex': cfg.get('cleaner', 'ex_regex').strip(),
-            # Prefijo a incluir en el nombre del archivo de la copia de la BD
-            'prefix': cfg.get('cleaner', 'prefix').strip(),
-            'obs_days': int(cfg.get('cleaner', 'obs_days').strip()),
-            'min_bkps': int(cfg.get('cleaner', 'min_bkps').strip()),
-            'max_tsize': int(cfg.get('cleaner', 'max_tsize').strip()),
-        }
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.bkp_vars = {
+                'in_dbs': Casting.str_to_list(
+                    self.cfg.get('includes', 'in_dbs')),
+                # Nombres de las bases de datos de PostgreSQL de las que no se
+                # desea hacer una copia de seguridad
+                'in_regex': self.cfg.get('includes', 'in_regex').strip(),
+                # Expresión regular que indica de qué bases de datos de
+                # PostgreSQL no se desea hacer una copia de seguridad
+                'in_forbidden': self.cfg.get(
+                    'includes', 'in_forbidden').strip(),
+                # Bandera que indica si las condiciones de inclusión de bases
+                # de datos predominan sobre las de exclusión a la hora de hacer
+                # copias
+                'in_priority': self.cfg.get('includes', 'in_priority').strip(),
+                # Bandera que indica si se deben incluir en la copia las
+                # plantillas de PostgreSQL
+                'ex_dbs': Casting.str_to_list(
+                    self.cfg.get('excludes', 'ex_dbs')),
+                # Expresión regular que indica de qué bases de datos de
+                # PostgreSQL se desea hacer una copia de seguridad
+                'ex_regex': self.cfg.get('excludes', 'ex_regex').strip(),
+                # Bandera que indica si se deben incluir en la copia aquellas
+                # bases de datos de PostgreSQL que no permiten conexiones
+                'ex_templates': self.cfg.get(
+                    'excludes', 'ex_templates').strip(),
+                # En caso de que el usuario de PostgreSQL (user) elegido sea
+                # administrador de éste, indica si se desea sólo copiar las BDs
+                # de las cuales es propietario un usuario concreto (db_owner)
+                'db_owner': self.cfg.get('other', 'db_owner').strip(),
+            }
 
-        # Comprobar la validez de las expresiones regulares y las banderas
-        check_cfg_vars(logger, bkp_vars['in_regex'], bkp_vars['ex_regex'],
-                       in_priority=bkp_vars['in_priority'],
-                       bkp_path=bkp_vars['bkp_path'],
-                       obs_days=bkp_vars['obs_days'],
-                       min_bkps=bkp_vars['min_bkps'])
-        # Si el programa falla al cargar las variables del .cfg...
-    except Exception as e:
-        logger.debug('Error en la función "parse_cleaner": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
-    return bkp_vars
+            # Comprobar la validez de las expresiones regulares y las banderas
+            Checker.check_cfg_vars(self.bkp_vars['in_regex'],
+                                   self.bkp_vars['ex_regex'],
+                                   self.bkp_vars['in_forbidden'],
+                                   self.bkp_vars['in_priority'],
+                                   self.bkp_vars['ex_templates'],
+                                   logger=self.logger)
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_vacuum": {}.'.format(
+                str(e)))
+            self.logger.stop_exe('El archivo de configuración tiene '
+                                 'parámetros con valores incorrectos.')
 
-
-def parse_cleanerall(logger, cfg):
+    def parse_clean(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
     '''
-Objetivo:
-    - obtener las variables del archivo de configuración y comprobar que son
-    válidas.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Comprobar si el programa falla al cargar las variables del .cfg
-        bkp_vars = {  # Pasar los valores del archivo .cfg a un diccionario
-            'server': cfg.get('postgres', 'server').strip(),  # Servidor
-            # Usuario de PostgreSQL
-            'user': cfg.get('postgres', 'username').strip(),
-            # Contraseña del usuario de PostgreSQL
-            'pwd': cfg.get('postgres', 'password').strip(),
-            'port': int(cfg.get('postgres', 'port')),  # Puerto
-            'bkp_path': cfg.get('cleanerall', 'bkp_path').strip(),
-            # Prefijo a incluir en el nombre del archivo de la copia de la BD
-            'prefix': cfg.get('cleanerall', 'prefix').strip(),
-            'obs_days': int(cfg.get('cleanerall', 'obs_days').strip()),
-            'min_bkps': int(cfg.get('cleanerall', 'min_bkps').strip()),
-            'max_tsize': int(cfg.get('cleanerall', 'max_tsize').strip()),
-        }
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.bkp_vars = {
+                'bkp_path': self.cfg.get('dir', 'bkp_path').strip(),
+                # Prefijo a incluir en el nombre del archivo de la copia de la
+                # BD
+                'prefix': self.cfg.get('file', 'prefix').strip(),
+                'in_dbs': Casting.str_to_list(
+                    self.cfg.get('includes', 'in_dbs')),
+                # Nombres de las bases de datos de PostgreSQL de las que no se
+                # desea hacer una copia de seguridad
+                'in_regex': self.cfg.get('includes', 'in_regex').strip(),
+                # Bandera que indica si las condiciones de inclusión de bases
+                # de datos predominan sobre las de exclusión a la hora de hacer
+                # copias
+                'in_priority': self.cfg.get('includes', 'in_priority').strip(),
+                # Expresión regular que indica de qué bases de datos de
+                # PostgreSQL no se desea hacer una copia de seguridad
+                'ex_dbs': Casting.str_to_list(
+                    self.cfg.get('excludes', 'ex_dbs')),
+                # Expresión regular que indica de qué bases de datos de
+                # PostgreSQL se desea hacer una copia de seguridad
+                'ex_regex': self.cfg.get('excludes', 'ex_regex').strip(),
+                'min_bkps': int(
+                    self.cfg.get('conditions', 'min_bkps').strip()),
+                'obs_days': int(
+                    self.cfg.get('conditions', 'obs_days').strip()),
+                'max_tsize': int(
+                    self.cfg.get('conditions', 'max_tsize').strip()),
+                # Bandera que indica si se desea hacer un vacuum antes de la
+                # copia
+                'pg_warnings': self.cfg.get('other', 'pg_warnings').strip(),
+            }
 
-        # Comprobar la validez de las expresiones regulares y las banderas
-        check_cfg_vars(logger, bkp_path=bkp_vars['bkp_path'],
-                       obs_days=bkp_vars['obs_days'],
-                       min_bkps=bkp_vars['min_bkps'])
-        # Si el programa falla al cargar las variables del .cfg...
-    except Exception as e:
-        logger.debug('Error en la función "parse_cleaner": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'El archivo de configuración tiene parámetros '
-                             'con valores incorrectos.')
-    return bkp_vars
+            # Comprobar la validez de las expresiones regulares y las banderas
+            Checker.check_cfg_vars(self.bkp_vars['in_regex'],
+                                   self.bkp_vars['ex_regex'],
+                                   in_priority=self.bkp_vars['in_priority'],
+                                   bkp_path=self.bkp_vars['bkp_path'],
+                                   obs_days=self.bkp_vars['obs_days'],
+                                   min_bkps=self.bkp_vars['min_bkps'],
+                                   pg_warnings=self.bkp_vars['pg_warnings'],
+                                   logger=self.logger)
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_cleaner": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe('El archivo de configuración tiene '
+                                 'parámetros con valores incorrectos.')
 
-
-def load_dump(logger, cfg_file):
+    def parse_cleanall(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
     '''
-Objetivo:
-    - cargar el archivo de configuración con todas sus variables.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Probar si hay excepciones en...
-        cfg = configparser.ConfigParser()  # Crear un Parser
-        cfg.read(cfg_file)  # Parsear el archivo .cfg
-    except Exception as e:  # Si salta una excepción...
-        logger.debug('Error en la función "load_dump": {}.'.format(str(e)))
-        logger_fatal(logger, 'La ruta del archivo de configuración es '
-                             'incorrecta.')
-    bkp_vars = parse_dump(logger, cfg)  # Obtener variables del .cfg
-    return bkp_vars  # Devolver el diccionario con el resultado de la operación
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.bkp_vars = {
+                'bkp_path': self.cfg.get('dir', 'bkp_path').strip(),
+                # Prefijo a incluir en el nombre del archivo de la copia de la
+                # BD
+                'prefix': self.cfg.get('file', 'prefix').strip(),
+                'min_bkps': int(
+                    self.cfg.get('conditions', 'min_bkps').strip()),
+                'obs_days': int(
+                    self.cfg.get('conditions', 'obs_days').strip()),
+                'max_tsize': int(
+                    self.cfg.get('conditions', 'max_tsize').strip()),
+            }
 
-
-def load_dumpall(logger, cfg_file):
-    '''
-Objetivo:
-    - cargar el archivo de configuración con todas sus variables.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Probar si hay excepciones en...
-        cfg = configparser.ConfigParser()  # Crear un Parser
-        cfg.read(cfg_file)  # Parsear el archivo .cfg
-    except Exception as e:  # Si salta una excepción...
-        logger.debug('Error en la función "load_dumpall": {}.'.format(str(e)))
-        logger_fatal(logger, 'La ruta del archivo de configuración es '
-                             'incorrecta.')
-    bkp_vars = parse_dumpall(logger, cfg)  # Obtener variables del .cfg
-    return bkp_vars  # Devolver el diccionario con el resultado de la operación
-
-
-def load_vacuum(logger, cfg_file):
-    '''
-Objetivo:
-    - cargar el archivo de configuración con todas sus variables.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Probar si hay excepciones en...
-        cfg = configparser.ConfigParser()  # Crear un Parser
-        cfg.read(cfg_file)  # Parsear el archivo .cfg
-    except Exception as e:  # Si salta una excepción...
-        logger.debug('Error en la función "load_vacuum": {}.'.format(str(e)))
-        logger_fatal(logger, 'La ruta del archivo de configuración es '
-                             'incorrecta.')
-    bkp_vars = parse_vacuum(logger, cfg)  # Obtener variables del .cfg
-    return bkp_vars  # Devolver el diccionario con el resultado de la operación
-
-
-def load_cleaner(logger, cfg_file):
-    '''
-Objetivo:
-    - cargar el archivo de configuración con todas sus variables.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Probar si hay excepciones en...
-        cfg = configparser.ConfigParser()  # Crear un Parser
-        cfg.read(cfg_file)  # Parsear el archivo .cfg
-    except Exception as e:  # Si salta una excepción...
-        logger.debug('Error en la función "load_cleaner": {}.'.format(str(e)))
-        logger_fatal(logger, 'La ruta del archivo de configuración es '
-                             'incorrecta.')
-    bkp_vars = parse_cleaner(logger, cfg)  # Obtener variables del .cfg
-    return bkp_vars  # Devolver el diccionario con el resultado de la operación
-
-
-def load_cleanerall(logger, cfg_file):
-    '''
-Objetivo:
-    - cargar el archivo de configuración con todas sus variables.
-Parámetros:
-    - logger: el logger que se empleará para mostrar y registrar el mensaje.
-    - cfg_file: la ruta con el archivo de configuración a cargar.
-Devolución:
-    - un diccionario con las variables cargadas del archivo de configuración.
-'''
-    try:  # Probar si hay excepciones en...
-        cfg = configparser.ConfigParser()  # Crear un Parser
-        cfg.read(cfg_file)  # Parsear el archivo .cfg
-    except Exception as e:  # Si salta una excepción...
-        logger.debug('Error en la función "load_cleanerall": {}.'.format(
-            str(e)))
-        logger_fatal(logger, 'La ruta del archivo de configuración es '
-                             'incorrecta.')
-    bkp_vars = parse_cleanerall(logger, cfg)  # Obtener variables del .cfg
-    return bkp_vars  # Devolver el diccionario con el resultado de la operación
+            # Comprobar la validez de las expresiones regulares y las banderas
+            Checker.check_cfg_vars(bkp_path=self.bkp_vars['bkp_path'],
+                                   obs_days=self.bkp_vars['obs_days'],
+                                   min_bkps=self.bkp_vars['min_bkps'],
+                                   logger=self.logger)
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_cleaner": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe('El archivo de configuración tiene '
+                                 'parámetros con valores incorrectos.')
