@@ -155,6 +155,15 @@ class Checker:
             logger.stop_exe('El archivo de configuración tiene parámetros con '
                             'valores incorrectos.')
 
+    @staticmethod
+    def check_log_level(log_level, logger):
+        log_levels = ['', 'debug', 'info', 'warning', 'error', 'critical']
+        if log_level not in log_levels:
+            Checker.__warn(logger, 'log_level')
+            logger.debug('Error en la función "check_log_level".')
+            logger.stop_exe('El archivo de configuración tiene parámetros con '
+                            'valores incorrectos.')
+
 
 class Casting:
 
@@ -207,6 +216,7 @@ class CfgParser:
     conn_vars = {}
     bkp_vars = {}
     kill_vars = {}
+    log_vars = {}
 
     def __init__(self, logger=None):
         if logger:
@@ -586,6 +596,33 @@ class CfgParser:
             # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
             self.logger.debug('Error en la función "parse_kill": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe('El archivo de configuración con las '
+                                 'condiciones de desconexiones de PostgreSQL '
+                                 'tiene parámetros con valores incorrectos.')
+
+    def parse_logger(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
+    '''
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.log_vars = {
+                'log_dir': self.cfg.get('settings', 'log_dir').strip(),
+                'level': self.cfg.get('settings', 'level').strip(),
+                'mute': Casting.str_to_bool(
+                    self.cfg.get('settings', 'mute').strip()),
+            }
+            # Comprobar la validez de las expresiones regulares y las banderas
+            Checker.check_log_dir(self.log_vars['log_dir'], self.logger)
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_logger": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe('El archivo de configuración con las '
                                  'condiciones de desconexiones de PostgreSQL '

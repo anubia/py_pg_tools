@@ -16,6 +16,7 @@ import os.path
 from date_tools.date_tools import DateTools  # Librería personalizada
 # Importar la función get_date de la librería date (para obtener la fecha
 # de la zona en el formato deseado)
+from messenger.messenger import Default
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -33,8 +34,11 @@ class CustomRotatingFileHandler(logging.handlers.RotatingFileHandler):
 class Logger:
 
     logger = None
+    log_dir = None
+    level = None
+    mute = False
 
-    def __init__(self):
+    def __init__(self, log_dir=None, level=None, mute=False):
         '''
     Objetivo:
         - generar un logger con handlers para consola (en nivel INFO) y para
@@ -43,22 +47,36 @@ class Logger:
     Devolución:
         - el logger que se usará para mostrar mensajes.
     '''
+        if log_dir:
+            self.log_dir = log_dir
+        else:
+            # Obtener directorio de esta librería
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            # Obtener directorio padre de esta librería
+            script_pardir = os.path.abspath(os.path.join(script_dir,
+                                                         os.pardir))
+            self.log_dir = os.path.join(script_pardir, 'log/')
+
+        if level in Default.LOG_LEVELS:
+            self.level = level
+        else:
+            self.level = Default.LOG_LEVEL
+
+        if mute is not None:
+            self.mute = mute
+        else:
+            self.mute = Default.MUTE
+
         # Obtener fecha y hora actuales de la zona
         init_ts = DateTools.get_date()
         # Obtener nombre de este archivo
         script_filename = os.path.basename(sys.argv[0])
         # Obtener nombre de este script
         script_name = os.path.splitext(script_filename)[0]
-        # Obtener directorio de esta librería
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        # Obtener directorio padre de esta librería
-        script_pardir = os.path.abspath(os.path.join(script_dir, os.pardir))
         # Establecer formato para el nombre de los archivos "logs"
         log_name = script_name + '_' + init_ts + '.log'
-        # Establecer directorio para los archivos "logs"
-        log_dir = os.path.join(script_pardir, 'log/')
         # Establecer ruta completa de los archivos "logs"
-        log_file = os.path.join(log_dir, log_name)
+        log_file = os.path.join(self.log_dir, log_name)
         # Crear logger con el mismo nombre de este script
         self.logger = logging.getLogger(script_name)
         # Establecer DEBUG como nivel máximo para el logger
@@ -68,23 +86,36 @@ class Logger:
         # Poner el nivel del handler de consola a sólo "INFO" (no ver "DEBUG")
         ch.setLevel(logging.INFO)
         # Si en el directorio actual no existe un directario llamado "log"...
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)  # Crear directorio "log"
-        # Establecer tamaño que tendrán los archivos "log"
-        max_bytes = 4 * 1024 * 1024  # 4MiB
-        # Crear un handler para un archivo
-        fh = CustomRotatingFileHandler(log_file, 'a', max_bytes, 10)
-        # Poner el nivel del handler de archivo a "DEBUG" (ver todos los
-        # mensajes)
-        fh.setLevel(logging.DEBUG)
-        # Establecer un formato para los mensajes del logger
         formatter = logging.Formatter('%(asctime)s - %(levelname)-4s - '
                                       '%(message)s',
                                       datefmt='%Y.%m.%d_%H:%M:%S_%Z')
+        if self.mute is False:
+            if not os.path.exists(self.log_dir):
+                os.makedirs(self.log_dir)  # Crear directorio "log"
+            # Establecer tamaño que tendrán los archivos "log"
+            max_bytes = 4 * 1024 * 1024  # 4MiB
+            # Crear un handler para un archivo
+            fh = CustomRotatingFileHandler(log_file, 'a', max_bytes, 10)
+            # Poner el nivel del handler de archivo a "DEBUG" (ver todos los
+            # mensajes)
+            if self.level == 'debug':
+                fh.setLevel(logging.DEBUG)
+            if self.level == 'info':
+                fh.setLevel(logging.INFO)
+            if self.level == 'warning':
+                fh.setLevel(logging.WARNING)
+            if self.level == 'error':
+                fh.setLevel(logging.ERROR)
+            if self.level == 'critical':
+                fh.setLevel(logging.CRITICAL)
+            # Establecer un formato para los mensajes del logger
+            fh.setFormatter(formatter)  # Añadir formato al handler del archivo
+
         ch.setFormatter(formatter)  # Añadir formato al handler de la consola
-        fh.setFormatter(formatter)  # Añadir formato al handler del archivo
         self.logger.addHandler(ch)  # Añadir handler de la consola al logger
-        self.logger.addHandler(fh)  # Añadir handler del archivo al logger
+
+        if self.mute is False:
+            self.logger.addHandler(fh)  # Añadir handler del archivo al logger
 
     def debug(self, message):
         self.logger.debug(message)

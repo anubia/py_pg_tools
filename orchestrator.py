@@ -307,7 +307,7 @@ class Orchestrator:
             pg_dbs = []
             # Para cada registro de la consulta...
             for record in connecter.cursor:
-                pg_dbs.append(record[0])
+                pg_dbs.append(record['datname'])
 
             bkped_dbs = Dir.get_dbs_bkped(bkps_list)
 
@@ -368,11 +368,20 @@ class Orchestrator:
         # Cerrar comunicación con la base de datos
         connecter.pg_disconnect()
 
+    def setup_informer(self):
+
+        connecter = self.get_connecter()
+        
+
     def detect_module(self):
 
         # ****************************** BACKER *******************************
         if self.action == 'B':
             self.setup_backer()
+
+        # ***************************** INFORMER ******************************
+        elif self.action == 'i':
+            self.setup_informer()
 
         # **************************** TERMINATOR *****************************
         elif self.action == 't':

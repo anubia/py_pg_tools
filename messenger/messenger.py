@@ -118,5 +118,9 @@ class Default:
     VACUUM = True
     DB_OWNER = ''
 
+    LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
+    LOG_LEVEL = 'debug'
+    MUTE = False
+
     def __init__(self):
         pass

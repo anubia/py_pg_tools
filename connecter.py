@@ -10,6 +10,7 @@
 from logger.logger import Logger
 # Importar la librería psycopg2 (para realizar consultas a PostgreSQL)
 import psycopg2
+import psycopg2.extras
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -55,7 +56,8 @@ class Connecter:
             self.conn = psycopg2.connect(host=self.server,
                                          database='template1', user=self.user,
                                          password=self.pwd, port=self.port)
-            self.cursor = self.conn.cursor()
+            self.cursor = self.conn.cursor(
+                cursor_factory=psycopg2.extras.DictCursor)
         except Exception as e:  # Si salta una excepción...
             self.logger.debug('Error en la función "pg_connect": {}.'.format(
                 str(e)))
@@ -108,7 +110,7 @@ class Connecter:
         )
         self.cursor.execute(query_is_superuser)
         row = self.cursor.fetchone()
-        return(row[0])
+        return(row['usesuper'])  # return(row[0])
 
     def get_cursor_dbs(self, ex_templates=True, db_owner=''):
         '''
@@ -128,24 +130,24 @@ class Connecter:
     '''
         query_get_dbs = (
             'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) '
+            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
             'FROM pg_catalog.pg_database d;'
         )
         query_get_ex_template_dbs = (
             'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) '
+            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
             'FROM pg_catalog.pg_database d '
             'WHERE not datistemplate;'
         )
         query_get_owner_dbs = (
             'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) '
+            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
             'FROM pg_catalog.pg_database d '
             'WHERE pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
         )
         query_get_ex_template_owner_dbs = (
             'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) '
+            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
             'FROM pg_catalog.pg_database d '
             'WHERE not datistemplate '
             'AND pg_catalog.pg_get_userbyid(d.datdba) = (%s);'

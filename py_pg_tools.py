@@ -85,6 +85,30 @@ if __name__ == "__main__":
                            help='indicates the password of the PostgreSQL '
                            'account you are going to use')
 
+    # ******************************** LOGGER *********************************
+
+    logger = sub_parsers.add_parser('L', help='LOGGER: specifies the '
+                                    'propierties of the info messages and the '
+                                    'log file ones')
+
+    logger.add_argument('-Lc', '--config-logger',
+                        help='load a configuration file (.cfg) to get the '
+                             'logger parameters')
+
+    logger.add_argument('-Lf', '--logger-logfile',
+                        help='indicates the path of the file in which the '
+                        'logger is going to store the log info')
+
+    logger.add_argument('-Ll', '--logger-level',
+                        help='indicates the logger\'s verbosity level (debug, '
+                        'info, warning, error, critical)',
+                        choices=['debug', 'info', 'warning', 'error',
+                                 'critical'])
+
+    logger.add_argument('-Lm', '--logger-mute',
+                        help='indicates not to store anything',
+                        action='store_true')
+
     # ****************************** TERMINATOR *******************************
 
     terminator = sub_parsers.add_parser('t', help='TERMINATOR: terminates '
@@ -170,6 +194,15 @@ if __name__ == "__main__":
     elif action == 't':
         if not (args.config or args.all or args.db_name or args.user):
             terminator.error('insufficient parameters to work')
+
+    # ************************** TRIMMER REQUIREMENTS *************************
+
+    elif action == 'T':
+        if not (args.config or args.db_name or args.cluster):
+            trimmer.error('insufficient parameters to work')
+
+    else:
+        pass
 
     logger = Logger()
 

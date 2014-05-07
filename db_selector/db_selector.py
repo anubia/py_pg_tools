@@ -301,9 +301,10 @@ class DbSelector:
         dbs_all = []  # Inicializar lista de nombres de las bases de datos
         for record in cursor:  # Para cada registro de la consulta...
             dictionary = {  # Crear diccionario con...
-                'name': record[0],  # Nombre de la base de datos
-                'allow_connection': record[1],  # Permiso de conexión
-                'owner': record[2],  # Propietario de la base de datos
+                'name': record['datname'],  # Nombre de la base de datos
+                # Permiso de conexión
+                'allow_connection': record['datallowconn'],
+                'owner': record['owner'],  # Propietario de la base de datos
             }
             dbs_all.append(dictionary)  # Añadir diccionario a la lista de BDs
         return dbs_all
@@ -312,5 +313,5 @@ class DbSelector:
     def list_pg_dbnames(cursor):
         dbs_all = []  # Inicializar lista de nombres de las bases de datos
         for record in cursor:  # Para cada registro de la consulta...
-            dbs_all.append(record[0])  # Añadir diccionario a la lista de BDs
+            dbs_all.append(record['datname'])
         return dbs_all
