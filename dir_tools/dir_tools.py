@@ -19,7 +19,7 @@ class Dir:
         pass
 
     @staticmethod
-    def is_root(logger=None):
+    def forbid_root(logger=None):
         '''
     Objetivo:
         - comprobar que no se ejecute el programa como usuario "root".
@@ -31,7 +31,8 @@ class Dir:
             if getuser() == 'root':
                 raise Exception()  # Lanzar una excepción
         except Exception as e:  # Si salta una excepción...
-            logger.debug('Error en la función "is_root": {}.'.format(str(e)))
+            logger.debug('Error en la función "forbid_root": {}.'.format(
+                str(e)))
             logger.stop_exe('Por seguridad, no se permite la ejecución del '
                             'programa como usuario "root".')
 
@@ -114,8 +115,15 @@ class Dir:
     Devolución:
         - una lista con los archivos ordenados.
     '''
-        mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
-        return list(sorted(os.listdir(path), key=mtime))
+        #mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+        #return list(sorted(os.listdir(path), key=mtime))
+        files_list = []
+        for dirname, dirnames, filenames in os.walk(path):
+            for file in filenames:
+                filepath = os.path.realpath(os.path.join(dirname, file))
+                files_list.append(filepath)
+        sorted_list = sorted(files_list, key=lambda f: os.stat(f).st_mtime)
+        return sorted_list
 
     @staticmethod
     def get_dbs_bkped(bkps_list=[]):
@@ -138,9 +146,10 @@ class Dir:
         regex = re.compile(regex)  # Validar la expresión regular
         for f in bkps_list:  # Para cada archivo de la lista...
             # Si su nombre sigue el patrón de dump.py...
-            if re.match(regex, f):
+            filename = os.path.basename(f)
+            if re.match(regex, filename):
                 # Extraer las partes del nombre ([prefix], dbname, date)
-                parts = regex.search(f).groups()
+                parts = regex.search(filename).groups()
                 # Si el nombre de la BD no está en la lista de BDs con backup,
                 # se añade (si está, no se añade, para evitar nombres
                 # repetidos)
@@ -179,7 +188,7 @@ class Dir:
                     break
                 message += '"{}", '.format(dbname)
         if show_msg:
-            logger.set_view('warning', message, 'purple', effect='bold')
+            logger.highlight('warning', message, 'purple', effect='bold')
 
         show_msg = False
         message = 'Las siguientes bases de datos tienen copias de seguridad ' \
@@ -193,10 +202,10 @@ class Dir:
                     break
                 message += '"{}", '.format(dbname)
         if show_msg:
-            logger.set_view('warning', message, 'purple', effect='bold')
+            logger.highlight('warning', message, 'purple', effect='bold')
 
     @staticmethod
-    def get_files_tsize(path, files_list=[]):
+    def get_files_tsize(files_list=[]):
         '''
     Objetivo:
         - devuelve el tamaño total en disco del conjunto de archivos que
@@ -209,7 +218,21 @@ class Dir:
     '''
         tsize = 0  # Inicializar tamaño a 0 bytes
         for f in files_list:  # Para cada archivo de la lista...
-            file_info = os.stat(path + f)  # Almacenar información del archivo
+            file_info = os.stat(f)  # Almacenar información del archivo
             # Añadir el tamaño del archivo al tamaño total
             tsize += file_info.st_size
         return tsize  # Devolver tamaño total de la lista de archivos
+
+    @staticmethod
+    def remove_empty_dir(path):
+        try:
+            os.rmdir(path)
+        except OSError:
+            pass
+
+    @staticmethod
+    def remove_empty_dirs(path):
+        for root, dirnames, filenames in os.walk(path, topdown=False):
+            for dirname in dirnames:
+                Dir.remove_empty_dir(os.path.realpath(os.path.join(root,
+                                                                   dirname)))

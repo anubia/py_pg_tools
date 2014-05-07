@@ -4,6 +4,7 @@
 
 # ************************* CARGA DE LIBRERÍAS *************************
 
+from messenger.messenger import Messenger
 from logger.logger import Logger
 import re  # Importar la librería re (para trabajar con expresiones regulares)
 
@@ -147,19 +148,15 @@ class DbSelector:
                                                     logger)
             bkp_list = DbSelector.db_filter_exclude(bkp_list, ex_dbs, ex_regex,
                                                     logger)
+
+        logger.highlight('info', Messenger.SEARCHING_SELECTED_DBS, 'white')
+
         if bkp_list == []:
-            logger.warning('Ninguna base de datos cumple los parámetros '
-                           'especificados en el archivo de configuración: no '
-                           'se realizará ninguna copia de seguridad.')
+            logger.highlight('warning', Messenger.EMPTY_DB_LIST, 'yellow',
+                             effect='bold')
         else:
-            message = 'Se realizará la acción sobre las siguientes bases de ' \
-                      'datos: '
             for db in bkp_list:
-                if db is bkp_list[-1]:
-                    message += '"{}".'.format(db['name'])
-                    break
-                message += '"{}", '.format(db['name'])
-            logger.set_view('info', message, 'white')
+                logger.info(Messenger.SELECTED_DB.format(dbname=db['name']))
         return bkp_list
 
     @staticmethod
@@ -288,18 +285,32 @@ class DbSelector:
                                                         in_regex, logger)
             bkp_list = DbSelector.dbname_filter_exclude(bkp_list, ex_dbs,
                                                         ex_regex, logger)
+
+        logger.highlight('info', Messenger.SEARCHING_SELECTED_DBS, 'white')
+
         if bkp_list == []:
-            logger.warning('Ninguna base de datos cumple los parámetros '
-                           'especificados en el archivo de configuración: no '
-                           'se realizará ninguna limpieza de copias de '
-                           'seguridad.')
+            logger.highlight('warning', Messenger.EMPTY_DBNAME_LIST, 'yellow',
+                             effect='bold')
         else:
-            message = 'Se realizará una limpieza de las siguientes bases de ' \
-                      'datos: '
             for dbname in bkp_list:
-                if dbname is bkp_list[-1]:
-                    message += '"{}".'.format(dbname)
-                    break
-                message += '"{}", '.format(dbname)
-            logger.set_view('info', message, 'white')
+                logger.info(Messenger.SELECTED_DB.format(dbname=dbname))
         return bkp_list
+
+    @staticmethod
+    def list_pg_dbs(cursor):
+        dbs_all = []  # Inicializar lista de nombres de las bases de datos
+        for record in cursor:  # Para cada registro de la consulta...
+            dictionary = {  # Crear diccionario con...
+                'name': record[0],  # Nombre de la base de datos
+                'allow_connection': record[1],  # Permiso de conexión
+                'owner': record[2],  # Propietario de la base de datos
+            }
+            dbs_all.append(dictionary)  # Añadir diccionario a la lista de BDs
+        return dbs_all
+
+    @staticmethod
+    def list_pg_dbnames(cursor):
+        dbs_all = []  # Inicializar lista de nombres de las bases de datos
+        for record in cursor:  # Para cada registro de la consulta...
+            dbs_all.append(record[0])  # Añadir diccionario a la lista de BDs
+        return dbs_all

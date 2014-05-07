@@ -14,7 +14,7 @@ import psycopg2
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
 
-class Connection:
+class Connecter:
 
     conn = None
     cursor = None
@@ -23,6 +23,10 @@ class Connection:
     pwd = None
     port = None
     logger = None
+
+    PG_PID_VERSION_THRESHOLD = 90200
+    pg_pid_91 = 'procpid'  # Name for PostgreSQL PID variable till version 9.1
+    pg_pid_92 = 'pid'  # Name for PostgreSQL PID variable since version 9.2
 
     def __init__(self, server, user, pwd, port, logger=None):
         '''
@@ -57,7 +61,20 @@ class Connection:
                 str(e)))
             self.logger.stop_exe('Error de conexión a PostgreSQL.')
 
-    def __get_pid_str(self):
+    def pg_disconnect(self):
+        '''
+    Objetivo:
+        - desconectarse de PostgreSQL.
+    '''
+        try:  # Probar si hay excepciones en...
+            self.cursor.close()  # Cerrar cursor de la conexión
+            self.conn.close()  # Cerrar comunicación con la base de datos
+        except Exception as e:  # Si salta una excepción...
+            self.logger.debug('Error en la función "pg_disconnect": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe('Error al desconectarse de PostgreSQL.')
+
+    def get_pid_str(self):
         '''
     Objetivo:
         - comprobar la versión de PostgreSQL a la que se realiza la conexión y
@@ -70,42 +87,10 @@ class Connection:
     '''
         pg_version = self.conn.server_version  # Obtener versión de PostgreSQL
         # Asignar nombre del atributo según la versión de PostgreSQL
-        pg_pid = 'procpid' if pg_version < 90200 else 'pid'
-        # Devolver el nombre del atributo que se emplea realmente
-        return pg_pid
-
-    def __kill_connections(self):
-        '''
-    Objetivo:
-        - eliminar todas las conexiones a PostgreSQL del usuario.
-    '''
-        sql = ('SELECT pg_terminate_backend({pg_pid}) '
-               'FROM pg_stat_activity '
-               'WHERE {pg_pid} <> pg_backend_pid();')
-        try:  # Probar si hay excepciones en...
-            # Obtener el nombre de la variable que indica el pg_pid según la
-            # versión de PostgreSQL
-            pg_pid = self.__get_pid_str()
-            sql = sql.format(pg_pid=pg_pid)
-            self.cursor.execute(sql)  # Ejecutar consulta
-        except Exception as e:  # Si salta una excepción...
-            self.logger.debug('Error en la función "kill_connections": '
-                              '{}.'.format(str(e)))
-            self.logger.stop_exe('Error al eliminar conexiones a PostgreSQL.')
-
-    def pg_disconnect(self):
-        '''
-    Objetivo:
-        - desconectarse de PostgreSQL.
-    '''
-        try:  # Probar si hay excepciones en...
-            #self.__kill_connections()  # Eliminar todas las conexiones
-            self.cursor.close()  # Cerrar cursor de la conexión
-            self.conn.close()  # Cerrar comunicación con la base de datos
-        except Exception as e:  # Si salta una excepción...
-            self.logger.debug('Error en la función "pg_disconnect": '
-                              '{}.'.format(str(e)))
-            self.logger.stop_exe('Error al desconectarse de PostgreSQL.')
+        if pg_version < self.PG_PID_VERSION_THRESHOLD:
+            return self.pg_pid_91
+        else:
+            return self.pg_pid_92
 
     def is_pg_superuser(self):
         '''

@@ -20,6 +20,16 @@ from date_tools.date_tools import DateTools  # Librería personalizada
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
 
+class CustomRotatingFileHandler(logging.handlers.RotatingFileHandler):
+
+    import re
+    ansi_escape = re.compile(r'\x1b[^m]*m')
+
+    def emit(self, record):
+        record.msg = self.ansi_escape.sub('', record.msg)
+        logging.handlers.RotatingFileHandler.emit(self, record)
+
+
 class Logger:
 
     logger = None
@@ -63,7 +73,7 @@ class Logger:
         # Establecer tamaño que tendrán los archivos "log"
         max_bytes = 4 * 1024 * 1024  # 4MiB
         # Crear un handler para un archivo
-        fh = logging.handlers.RotatingFileHandler(log_file, 'a', max_bytes, 10)
+        fh = CustomRotatingFileHandler(log_file, 'a', max_bytes, 10)
         # Poner el nivel del handler de archivo a "DEBUG" (ver todos los
         # mensajes)
         fh.setLevel(logging.DEBUG)
@@ -91,72 +101,28 @@ class Logger:
     def critical(self, message):
         self.logger.critical(message)
 
-    def __highlight_msg(self, color, bgcolor='black', effect='default'):
-        '''
-    Objetivo:
-        - resaltar un mensaje por consola modificando su color de fondo, texto
-        y efectos visuales.
-    Parámetros:
-        - color: el color del texto del mensaje.
-        - bgcolor: el color de fondo del mensaje.
-        - effect: el efecto visual del mensaje
-    '''
-        # Declarar un diccionario con los códigos ANSI de colores en consola
-        cl_code = {
-            'black': {'color': 90, 'bg': 40, },
-            'red': {'color': 91, 'bg': 41, },
-            'green': {'color': 92, 'bg': 42, },
-            'yellow': {'color': 93, 'bg': 43, },
-            'blue': {'color': 94, 'bg': 44, },
-            'purple': {'color': 95, 'bg': 45, },
-            'cyan': {'color': 96, 'bg': 46, },
-            'white': {'color': 97, 'bg': 47, },
-        }
-        # Declarar un diccionario con los códigos ANSI de efectos en consola
-        eff_code = {
-            'default': 0,
-            'bold': 1,
-            'underline': 4,
-            'blink': 5,
-            'inverse': 7,
-            'hidden': 8,
-        }
-        # Aplicar cambios a los próximos mensajes en consola
-        print('\033[{};{};{}m'.format(eff_code[effect], cl_code[bgcolor]['bg'],
-                                      cl_code[color]['color']))
+    def highlight(self, level, message, txtcolor='default', bgcolor='black',
+                  effect='default'):
 
-    def __reset_msg_colors(self):
-        '''
-    Objetivo:
-        - reestablecer los colores y efectos de mensajes en consola a su estado
-        por defecto.
-    '''
-        # Aplicar cambios a los próximos mensajes en consola
-        print('\033[0m')
+        eff = Logger.__get_effect_code(effect)
+        bg = Logger.__get_bgcolor_code(bgcolor)
+        txt = Logger.__get_txtcolor_code(txtcolor)
 
-    def set_view(self, level, message, color, bgcolor='black',
-                 effect='default'):
-        '''
-    Objetivo:
-        - resaltar un mensaje de logger por consola modificando su color de
-        fondo, texto y efectos visuales.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - level: el nivel de información del mensaje de logger.
-        - message: el mensaje a mostrar al usuario y registrar en log.
-        - color: el color del texto del mensaje.
-        - bgcolor: el color de fondo del mensaje.
-        - effect: el efecto visual del mensaje
-    '''
-        self.__highlight_msg(color, bgcolor, effect)
         if level == 'info':
-            self.logger.info(message)
+            self.info('\033[{};{};{}m'.format(eff, bg, txt) + message +
+                      '\033[0m')
         elif level == 'warning':
-            self.logger.warning(message)
+            self.warning('\033[{};{};{}m'.format(eff, bg, txt) + message +
+                         '\033[0m')
+        elif level == 'error':
+            self.error('\033[{};{};{}m'.format(eff, bg, txt) + message +
+                       '\033[0m')
+        elif level == 'critical':
+            self.critical('\033[{};{};{}m'.format(eff, bg, txt) + message +
+                          '\033[0m')
         else:
-            self.logger.error(message)
-        self.__reset_msg_colors()
+            self.debug('\033[{};{};{}m'.format(eff, bg, txt) + message +
+                       '\033[0m')
 
     def stop_exe(self, message):
         '''
@@ -168,7 +134,57 @@ class Logger:
         mensaje.
         - message: el mensaje a mostrar al usuario y registrar en log.
     '''
-        self.__highlight_msg('white', 'red', 'bold')
-        self.logger.error(message)  # Mostrar y registrar el error
-        self.__reset_msg_colors()
+        self.highlight('error', message, 'white', 'red', 'bold')
         sys.exit(1)  # Interrumpir la ejecución del programa
+
+    @staticmethod
+    def __get_txtcolor_code(txtcolor):
+        # Declarar un diccionario con los códigos ANSI de colores de texto
+        # en consola
+        txtcolors = {
+            'black': 90,
+            'darkred': 31,
+            'red': 91,
+            'darkgreen': 32,
+            'green': 92,
+            'orange': 33,
+            'yellow': 93,
+            'darkblue': 34,
+            'blue': 94,
+            'darkpurple': 35,
+            'purple': 95,
+            'darkcyan': 36,
+            'cyan': 96,
+            'white': 97,
+            'default': 37,
+        }
+        return txtcolors[txtcolor]
+
+    @staticmethod
+    def __get_bgcolor_code(bgcolor):
+        # Declarar un diccionario con los códigos ANSI de colores de fondo en
+        # consola
+        bgcolors = {
+            'black': 40,
+            'red': 41,
+            'green': 42,
+            'orange': 43,
+            'blue': 44,
+            'purple': 45,
+            'cyan': 46,
+            'white': 47,
+        }
+        return bgcolors[bgcolor]
+
+    @staticmethod
+    def __get_effect_code(effect):
+        # Declarar un diccionario con los códigos ANSI de efectos en consola
+        effects = {
+            'default': 0,
+            'bold': 1,
+            'underline': 4,
+            'blink': 5,
+            'inverse': 7,
+            'hidden': 8,
+        }
+        return effects[effect]

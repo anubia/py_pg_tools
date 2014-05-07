@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+
+
+from config.config_tools import CfgParser
+from logger.logger import Logger
+
+
+class Configurator:
+
+    cfg_type = None
+    path = None
+    parser = None
+    logger = None
+
+    def __init__(self, logger=None):
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = Logger()
+
+    def load_cfg(self, cfg_type, path):
+
+        self.cfg_type = cfg_type
+        self.path = path
+        self.parser = CfgParser(self.logger)
+
+        if self.cfg_type == 'connect':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_pgconn()
+
+        elif self.cfg_type == 'backup':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_dump()
+
+        elif self.cfg_type == 'backup_all':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_dumpall()
+
+        elif self.cfg_type == 'vacuum':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_vacuum()
+
+        elif self.cfg_type == 'trim':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_clean()
+
+        elif self.cfg_type == 'trim_all':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_cleanall()
+
+        elif self.cfg_type == 'terminate':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_kill()
+        else:
+            pass

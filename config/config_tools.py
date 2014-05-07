@@ -24,7 +24,7 @@ class Checker:
             logger = Logger()
         message = 'El parámetro "{}" no es válido: revise el archivo de ' \
                   'configuración del programa.'.format(param)
-        logger.set_view('warning', message, 'yellow', effect='bold')
+        logger.highlight('warning', message, 'yellow', effect='bold')
 
     @staticmethod
     def check_regex(regex, logger=None):
