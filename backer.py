@@ -35,7 +35,7 @@ class Backer:
     logger = None
 
     def __init__(self, connecter=None, bkp_path='', server_alias='',
-                 bkp_type='.dump', prefix='', in_dbs=[], in_regex='',
+                 bkp_type='dump', prefix='', in_dbs=[], in_regex='',
                  in_forbidden=False, in_priority=False, ex_dbs=['postgres'],
                  ex_regex='', ex_templates=True, vacuum=True, db_owner='',
                  logger=None):
@@ -99,23 +99,23 @@ class Backer:
         bkp_dir = bkps_dir + year + '/' + month + '/'
         Dir.create_dir(bkp_dir, self.logger)
         # Establecer nombre del archivo que contiene la copia de seguridad
-        file_name = self.prefix + 'db_' + dbname + '_' + init_ts + \
+        file_name = self.prefix + 'db_' + dbname + '_' + init_ts + '.' + \
             self.bkp_type
         # Almacenar la instrucción a realizar en consola
-        if self.bkp_type == '.gz':  # Comprimir con gzip
-            command = 'pg_dump {} -Fp -U {} -h {} -p {} | gzip > {}'.format(
+        if self.bkp_type == 'gz':  # Comprimir con gzip
+            command = 'pg_dump {} -Fc -U {} -h {} -p {} | gzip > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == '.bz2':  # Comprimir con bzip2
-            command = 'pg_dump {} -Fp -U {} -h {} -p {} | bzip2 > {}'.format(
+        elif self.bkp_type == 'bz2':  # Comprimir con bzip2
+            command = 'pg_dump {} -Fc -U {} -h {} -p {} | bzip2 > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == '.zip':  # Comprimir con zip
-            command = 'pg_dump {} -Fp -U {} -h {} -p {} | zip > {}'.format(
+        elif self.bkp_type == 'zip':  # Comprimir con zip
+            command = 'pg_dump {} -Fc -U {} -h {} -p {} | zip > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
         else:  # No comprimir la copia
-            command = 'pg_dump {} -Fp -U {} -h {} -p {} > {}'.format(
+            command = 'pg_dump {} -Fc -U {} -h {} -p {} > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
         try:  # Probar que la copia se realiza correctamente
@@ -204,7 +204,7 @@ class BackerCluster:
     logger = None
 
     def __init__(self, connecter=None, bkp_path='', server_alias='',
-                 bkp_type='.dump', prefix='', vacuum=True, logger=None):
+                 bkp_type='dump', prefix='', vacuum=True, logger=None):
 
         if logger:
             self.logger = logger
@@ -254,17 +254,18 @@ class BackerCluster:
         Dir.create_dir(bkp_dir, self.logger)
         # Establecer nombre del archivo que contiene la copia de seguridad
         file_name = self.prefix + 'ht_' + self.connecter.server + \
-            str(self.connecter.port) + '_cluster_' + init_ts + self.bkp_type
+            str(self.connecter.port) + '_cluster_' + init_ts + '.' + \
+            self.bkp_type
         # Almacenar la instrucción a realizar en consola
-        if self.bkp_type == '.gz':  # Comprimir con gzip
+        if self.bkp_type == 'gz':  # Comprimir con gzip
             command = 'pg_dumpall -U {} -h {} -p {} | gzip > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == '.bz2':  # Comprimir con bzip2
+        elif self.bkp_type == 'bz2':  # Comprimir con bzip2
             command = 'pg_dumpall -U {} -h {} -p {} | bzip2 > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == '.zip':  # Comprimir con zip
+        elif self.bkp_type == 'zip':  # Comprimir con zip
             command = 'pg_dumpall -U {} -h {} -p {} | zip > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)

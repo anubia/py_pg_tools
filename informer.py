@@ -40,20 +40,40 @@ class Informer:
             'SELECT d.datname, d.datctype, '
             'pg_catalog.pg_get_userbyid(d.datdba) as owner '
             'FROM pg_catalog.pg_database d '
-            'WHERE d.datname = {dbname};'
+            'WHERE d.datname = (%s);'
         )
         try:
-            result = self.connecter.cursor.execute(query_get_db_data)
+            #self.connecter.allow_db_conn(dbname)
+            self.connecter.cursor.execute('commit')
+            result = self.connecter.cursor.execute(
+                query_get_db_data, (dbname, ))
+            print('*' * 80)
+            print(result)
+            print('*' * 80)
+            #self.connecter.disallow_db_conn(dbname)
         except Exception as e:
             self.logger.debug('Error en la función "get_pg_db_data": '
                               '{}.'.format(str(e)))
             result = None
         return result
 
-    def get_pg_dbs_data(self):
+    def show_pg_dbs_data(self):
 
-        dbs_data = {}
+        dbs_data = []
         for dbname in self.dbnames:
             db_data = self.get_pg_db_data(dbname)
-            dbs_data.append(db_data)
-        #TODO Continue this function tomorrow
+            if db_data:
+                dbs_data.append(db_data)
+        message = Messenger.SEARCHING_SELECTED_DBS_DATA
+        self.logger.highlight('info', message, 'white')
+        if dbs_data:
+            for db in dbs_data:
+                message = Messenger.DBNAME + db['datname']
+                self.logger.info(message)
+                message = Messenger.DBENCODING + db['datctype']
+                self.logger.info(message)
+                message = Messenger.DBOWNER + db['owner']
+                self.logger.info(message)
+        else:
+            message = Messenger.NO_DB_DATA_TO_SHOW
+            self.logger.highlight('warning', message, 'yellow', effect='bold')

@@ -46,9 +46,8 @@ if __name__ == "__main__":
                         action='store_true')
 
     backer.add_argument('-f', '--backup-format',
-                        help='select the backup\'s file format (dump, '
-                             'bz2, gzip, zip)',
-                        choices=['dump', 'bz2', 'gzip', 'zip'])
+                        help='select the backup\'s file format (dump, bz2, '
+                        'gz, zip)', choices=['dump', 'bz2', 'gz', 'zip'])
 
     backer.add_argument('-g', '--group',
                         help='select a name to put in the each backup\'s name '
@@ -60,6 +59,9 @@ if __name__ == "__main__":
                              'dumped', action='store_true')
 
     # ******************************* CONNECTER *******************************
+
+    # TODO Trasladar estos argumentos (menos --config-connection, que ya está)
+    # a cada uno de los sub_parsers que necesiten conexión a PostgreSQL
 
     connecter = sub_parsers.add_parser('c', help='CONNECTER: makes a '
                                        'connection to PostgreSQL with the '
@@ -83,9 +85,41 @@ if __name__ == "__main__":
 
     connecter.add_argument('-cP', '--pg-password',
                            help='indicates the password of the PostgreSQL '
-                           'account you are going to use')
+                                'account you are going to use')
+
+    # ******************************** DROPPER ********************************
+
+    dropper = sub_parsers.add_parser('d', help='DROPPER: deletes the '
+                                     'specified PostgreSQL databases')
+
+    dropper.add_argument('-cC', '--config-connection',
+                         help='load a configuration file (.cfg) to get the '
+                         'PostgreSQL connection parameters')
+
+    dropper.add_argument('-d', '--db-name', nargs='+',
+                         help='specify the PostgreSQL databases to be deleted')
+
+    # ******************************** INFORMER *******************************
+
+    informer = sub_parsers.add_parser('i', help='INFORMER: gives some '
+                                      'information about PostgreSQL')
+
+    informer.add_argument('-cC', '--config-connection',
+                          help='load a configuration file (.cfg) to get the '
+                          'PostgreSQL connection parameters')
+
+    groupA = informer.add_mutually_exclusive_group()
+    groupA.add_argument('-d', '--db-name', nargs='+',
+                        help='gives the owner and the codification of the '
+                        'specified databases')
+
+    groupA.add_argument('-u', '--users', nargs='+',
+                        help='gives the role of the specified users')
 
     # ******************************** LOGGER *********************************
+
+    # TODO Trasladar estos argumentos (menos --config-connection, que ya está)
+    # a cada uno de los sub_parsers que usen logger
 
     logger = sub_parsers.add_parser('L', help='LOGGER: specifies the '
                                     'propierties of the info messages and the '
@@ -108,6 +142,41 @@ if __name__ == "__main__":
     logger.add_argument('-Lm', '--logger-mute',
                         help='indicates not to store anything',
                         action='store_true')
+
+    # ****************************** REPLICATOR *******************************
+
+    replicator = sub_parsers.add_parser('r', help='REPLICATOR: clone the '
+                                        'specified PostgreSQL database')
+
+    replicator.add_argument('-cC', '--config-connection',
+                            help='load a configuration file (.cfg) to get the '
+                            'PostgreSQL connection parameters')
+
+    replicator.add_argument('-d', '--db-name', nargs=2,
+                            help='specifies the new name of the database '
+                            'generated and the name of the database which is '
+                            'being cloned, respectively')
+
+    # ******************************* RESTORER ********************************
+
+    restorer = sub_parsers.add_parser('R', help='RESTORER: restores a '
+                                      'database\'s backup file in PostgreSQL')
+
+    restorer.add_argument('-cC', '--config-connection',
+                          help='load a configuration file (.cfg) to get the '
+                          'PostgreSQL connection parameters')
+
+    groupA = restorer.add_mutually_exclusive_group()
+    groupA.add_argument('-d', '--db-backup', nargs=2,
+                        help='specifies the path of the backup\'s file which '
+                        'is going to be loaded and the name of the PostgreSQL '
+                        'database which is going to be generated, '
+                        'respectively')
+
+    groupA.add_argument('-c', '--cluster-backup',
+                        help='specifies the new name of the database '
+                        'generated and the name of the database which is '
+                        'being cloned, respectively')
 
     # ****************************** TERMINATOR *******************************
 
@@ -183,11 +252,38 @@ if __name__ == "__main__":
 
     action = sys.argv[1]
 
+    # TODO Implantar las exigencias en los parámetros del resto de sub_parsers
+    # (si --config-connection o --config son obligatorios por ejemplo)
+
     # ************************** BACKER REQUIREMENTS **************************
 
     if action == 'B':
         if not (args.config or args.db_name or args.cluster):
             backer.error('insufficient parameters to work')
+
+    # ************************** DROPPER REQUIREMENTS *************************
+
+    if action == 'd':
+        if not args.db_name:
+            backer.error('insufficient parameters to work')
+
+    # ************************* INFORMER REQUIREMENTS *************************
+
+    if action == 'i':
+        if not (args.db_name or args.users):
+            informer.error('insufficient parameters to work')
+
+    # ****************************** REPLICATOR *******************************
+
+    if action == 'r':
+        if not (args.db_name):
+            replicator.error('insufficient parameters to work')
+
+    # ******************************* RESTORER ********************************
+
+    if action == 'R':
+        if not (args.db_backup or args.cluster_backup):
+            restorer.error('insufficient parameters to work')
 
     # ************************ TERMINATOR REQUIREMENTS ************************
 

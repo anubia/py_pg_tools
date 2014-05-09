@@ -56,6 +56,11 @@ class Connecter:
             self.conn = psycopg2.connect(host=self.server,
                                          database='template1', user=self.user,
                                          password=self.pwd, port=self.port)
+            # TODO cambiar lo de la contraseña por una bandera
+            # -w, --no-password        never prompt for password
+            # -W, --password           force password prompt (should happen
+            # automatically)
+
             self.cursor = self.conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor)
         except Exception as e:  # Si salta una excepción...

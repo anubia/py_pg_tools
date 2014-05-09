@@ -2,30 +2,25 @@
 # -*- encoding: utf-8 -*-
 
 
-__all__ = ['dump', 'dumpall', 'vacuum', 'clean', 'logger', 'messenger',
-           'config', 'db_selector', 'connecter', 'pg_queries', 'dir_tools',
-           'date_tools', 'mail', 'backer', 'cluster_backer', 'configurator',
-           'orchestrator', 'trimmer', 'cluster_trimmer', 'terminator',
-           'vacuumer']
+__all__ = ['backer', 'config',  'configurator', 'connecter', 'date_tools',
+           'db_selector', 'dir_tools', 'dropper', 'informer', 'logger',
+           'messenger', 'orchestrator', 'replicator', 'restorer', 'terminator',
+           'trimmer', 'vacuumer']
 
-from . import dump
-from . import dumpall
-from . import vacuum
-from . import clean
+from . import backer
+from . import config
+from . import configurator
+from . import connecter
+from . import date_tools
+from . import db_selector
+from . import dir_tools
+from . import dropper
+from . import informer
 from . import logger
 from . import messenger
-from . import config
-from . import db_selector
-from . import connecter
-from . import pg_queries
-from . import dir_tools
-from . import date_tools
-from . import mail
-from . import backer
-from . import cluster_backer
-from . import trimmer
-from . import cluster_trimmer
-from . import configurator
 from . import orchestrator
+from . import replicator
+from . import restorer
 from . import terminator
+from . import trimmer
 from . import vacuumer

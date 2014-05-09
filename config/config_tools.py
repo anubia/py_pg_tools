@@ -125,7 +125,7 @@ class Checker:
         if not logger:
             logger = Logger()
         # Listar las extensiones admitidas
-        c_ext = ['.dump', '.gz', '.bz2', '.zip']
+        c_ext = ['dump', 'gz', 'bz2', 'zip']
         # Comprobar si las extensiones para comprimir las copias son válidas
         if c_type not in c_ext:
             Checker.__warn('bkp_type', logger)

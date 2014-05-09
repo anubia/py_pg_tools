@@ -9,6 +9,11 @@ from trimmer import TrimmerCluster
 from terminator import Terminator
 from connecter import Connecter
 from configurator import Configurator
+from informer import Informer
+from replicator import Replicator
+from dropper import Dropper
+from restorer import Restorer
+from restorer import RestorerCluster
 
 from logger.logger import Logger
 from messenger.messenger import Messenger
@@ -371,7 +376,39 @@ class Orchestrator:
     def setup_informer(self):
 
         connecter = self.get_connecter()
-        
+        informer = Informer(connecter, self.args.db_name, self.args.users,
+                            self.logger)
+        if self.args.db_name:
+            informer.show_pg_dbs_data()
+        else:
+            # TODO Poner aquí lo que ocurre si se manda una lista de usuarios
+            # de PostgreSQL al informer
+            pass
+
+    def setup_replicator(self):
+
+        connecter = self.get_connecter()
+        replicator = Replicator(connecter, self.args.db_name[0],
+                                self.args.db_name[1], self.logger)
+        replicator.replicate_pg_db()
+
+    def setup_dropper(self):
+
+        connecter = self.get_connecter()
+        dropper = Dropper(connecter, self.args.db_name, self.logger)
+        dropper.drop_pg_dbs()
+
+    def setup_restorer(self):
+
+        connecter = self.get_connecter()
+        if self.args.db_backup:
+            restorer = Restorer(connecter, self.args.db_backup[0],
+                                self.args.db_backup[1], self.logger)
+            restorer.restore_db_backup()
+        else:
+            restorer = RestorerCluster(connecter, self.args.cluster_backup,
+                                       self.logger)
+            restorer.restore_cluster_backup()
 
     def detect_module(self):
 
@@ -380,8 +417,20 @@ class Orchestrator:
             self.setup_backer()
 
         # ***************************** INFORMER ******************************
+        elif self.action == 'd':
+            self.setup_dropper()
+
+        # ***************************** INFORMER ******************************
         elif self.action == 'i':
             self.setup_informer()
+
+        # **************************** REPLICATOR *****************************
+        elif self.action == 'r':
+            self.setup_replicator()
+
+        # ***************************** RESTORER ******************************
+        elif self.action == 'R':
+            self.setup_restorer()
 
         # **************************** TERMINATOR *****************************
         elif self.action == 't':

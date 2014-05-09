@@ -97,6 +97,43 @@ class Messenger:
                                    'especificadas...'
     BEGINNING_TERMINATE_ALL_CONN = 'Terminando todas las conexiones a ' \
                                    'PostgreSQL...'
+    SEARCHING_SELECTED_DBS_DATA = 'Analizando información de las bases de ' \
+                                  'datos de PostgreSQL...'
+    NO_DB_DATA_TO_SHOW = 'No hay información disponible para las bases de ' \
+                         'datos especificadas.'
+    DBNAME = 'Nombre: '
+    DBENCODING = 'Codificación: '
+    DBOWNER = 'Propietario: '
+    NO_NEW_DBNAME = 'No se ha especificado un nombre para la nueva base de ' \
+                    'datos.'
+    NO_ORIGINAL_DBNAME = 'No se ha especificado el nombre de la base de ' \
+                         'datos que se desea clonar.'
+    BEGINNING_REPLICATOR = 'Copiando la base de datos "{original_dbname}"...'
+    REPLICATE_DB_DONE = 'Generada con éxito una copia "{new_dbname}" en ' \
+                        'PostgreSQL de la base de datos "{original_dbname}".'
+    REPLICATE_DB_FAIL = 'No fue posible copiar la base de datos ' \
+                        'especificada de PostgreSQL.'
+    NO_DBS_TO_DROP = 'No se ha especificado ninguna base de datos para ' \
+                     'eliminar en PostgreSQL.'
+    BEGINNING_DROPPER = 'Eliminando bases de datos especificadas en ' \
+                        'PostgreSQL...'
+    DROP_DB_DONE = 'Eliminada base de datos "{dbname}".'
+    DROP_DB_FAIL = 'La base de datos "{dbname}" no se pudo eliminar.'
+    DROP_DBS_DONE = 'Bases de datos especificadas eliminadas en PostgreSQL.'
+    NO_BKP_TO_RESTORE = 'No se ha especificado la ruta del archivo que ' \
+                        'contiene la copia a restaurar.'
+    NO_DBNAME_TO_RESTORE = 'No se ha especificado un nombre para la nueva ' \
+                           'base de datos que se generará en PostgreSQL a ' \
+                           'partir de la copia.'
+    BEGINNING_RESTORER = 'Restaurando la copia "{db_backup}" con el nombre ' \
+                         '"{new_dbname}"...'
+    WAIT_PLEASE = 'Esta operación puede llevar unos minutos, espere por ' \
+                  'favor...'
+    RESTORE_DB_DONE = 'Restaurada con éxito la copia "{db_backup}" en ' \
+                      'PostgreSQL con el nombre "{new_dbname}".'
+    RESTORE_DB_FAIL = 'No fue posible restaurar la copia "{db_backup}" ' \
+                      'especificada de PostgreSQL con el nombre ' \
+                      '"{new_dbname}".'
 
     def __init__(self):
         pass
@@ -106,7 +143,7 @@ class Default:
 
     BKP_PATH = '/opt/backups/pg_backups/'
     SERVER_ALIAS = 'my_server'
-    BKP_TYPE = '.dump'
+    BKP_TYPE = 'dump'
     PREFIX = ''
     IN_DBS = []
     IN_REGEX = ''
