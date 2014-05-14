@@ -2,12 +2,14 @@
 # -*- encoding: utf-8 -*-
 
 
-__all__ = ['backer', 'config',  'configurator', 'connecter', 'date_tools',
-           'db_selector', 'dir_tools', 'dropper', 'informer', 'logger',
-           'messenger', 'orchestrator', 'replicator', 'restorer', 'terminator',
-           'trimmer', 'vacuumer']
+__all__ = ['backer', 'casting', 'checker', 'config',  'configurator',
+           'connecter', 'date_tools', 'db_selector', 'dir_tools', 'dropper',
+           'informer', 'logger', 'messenger', 'orchestrator', 'replicator',
+           'restorer', 'terminator', 'trimmer', 'vacuumer']
 
 from . import backer
+from . import casting
+from . import checker
 from . import config
 from . import configurator
 from . import connecter

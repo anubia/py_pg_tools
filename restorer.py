@@ -66,7 +66,7 @@ class Restorer:
         else:
             pass
 
-        message = Messenger.BEGINNING_RESTORER.format(
+        message = Messenger.BEGINNING_DB_RESTORER.format(
             db_backup=self.db_backup, new_dbname=self.new_dbname)
         self.logger.highlight('info', message, 'white')
         self.logger.info(Messenger.WAIT_PLEASE)
@@ -146,26 +146,29 @@ class RestorerCluster:
         else:
             pass
 
-        #message = Messenger.BEGINNING_RESTORER.format(
-            #db_backup=self.db_backup, new_dbname=self.new_dbname)
-        self.logger.highlight('info', 'Restaurando cluster...', 'white')
+        message = Messenger.BEGINNING_CL_RESTORER.format(
+            cluster_backup=self.cluster_backup)
+        self.logger.highlight('info', message, 'white')
         self.logger.info(Messenger.WAIT_PLEASE)
 
         if ext == 'gz':
-            command = 'gunzip -c {} -k | pg_restore -U {} -h {} -p {}'.format(
-                self.cluster_backup, self.connecter.user,
-                self.connecter.server, self.connecter.port)
+            command = 'gunzip -c {} -k | psql -U {} -h {} -p {} ' \
+                      'postgres'.format(
+                          self.cluster_backup, self.connecter.user,
+                          self.connecter.server, self.connecter.port)
         elif ext == 'bz2':
-            command = 'bunzip2 -c {} -k | pg_restore -U {} -h {} -p {}'.format(
-                self.cluster_backup, self.connecter.user,
-                self.connecter.server, self.connecter.port)
+            command = 'bunzip2 -c {} -k | psql -U {} -h {} -p {} ' \
+                      'postgres'.format(
+                          self.cluster_backup, self.connecter.user,
+                          self.connecter.server, self.connecter.port)
         elif ext == 'zip':
-            command = 'gunzip -c {} -k | pg_restore -U {} -h {} -p {}'.format(
+            command = 'unzip -p {} | psql -U {} -h {} -p {} postgres'.format(
                 self.cluster_backup, self.connecter.user,
                 self.connecter.server, self.connecter.port)
         else:
-            # TODO Revisar esto que aún no funciona
-            command = 'psql -U {} -h {} -p {} {} template1'.format(
+            # TODO Hacer que desaparezcan todos los comandos SQL que se ven en
+            # consola, crear automáticamente el clúster antes de restaurarlo
+            command = 'psql -U {} -h {} -p {} -f {} postgres'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, self.cluster_backup)
 
@@ -174,12 +177,12 @@ class RestorerCluster:
             result = subprocess.call(command, shell=True)
             if result != 0:  # Si el comando no de resultados en consola...
                 raise Exception()  # Lanzar excepción
-            #message = Messenger.RESTORE_DB_DONE.format(
-                #db_backup=self.db_backup, new_dbname=self.new_dbname)
-            self.logger.highlight('info', 'HECHO', 'green')
+            message = Messenger.RESTORE_CL_DONE.format(
+                cluster_backup=self.cluster_backup)
+            self.logger.highlight('info', message, 'green')
         except Exception as e:
             self.logger.debug('Error en la función "restore_cluster_backup": '
                               '{}.'.format(str(e)))
-            #message = Messenger.RESTORE_DB_FAIL.format(
-                #db_backup=self.db_backup, new_dbname=self.new_dbname)
-            self.logger.stop_exe('DISASTER')
+            message = Messenger.RESTORE_CL_FAIL.format(
+                cluster_backup=self.cluster_backup)
+            self.logger.stop_exe(message)

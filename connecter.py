@@ -11,6 +11,9 @@ from logger.logger import Logger
 # Importar la librería psycopg2 (para realizar consultas a PostgreSQL)
 import psycopg2
 import psycopg2.extras
+from casting.casting import Casting
+from checker.checker import Checker
+from messenger.messenger import Messenger
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -29,15 +32,13 @@ class Connecter:
     pg_pid_91 = 'procpid'  # Name for PostgreSQL PID variable till version 9.1
     pg_pid_92 = 'pid'  # Name for PostgreSQL PID variable since version 9.2
 
-    def __init__(self, server, user, pwd, port, logger=None):
+    def __init__(self, server, user, port, logger=None):
         '''
     Objetivo:
         - realizar una conexión a PostgreSQL con los parámetros especificados.
     Parámetros:
         - server: servidor donde está alojado PostgreSQL.
         - user: usuario de PostgreSQL con el que se realiza la conexión.
-        - pwd: contraseña del usuario de PostgreSQL con el que se realiza la
-        conexión.
         - port: puerto por el que se realizala conexión a PostgreSQL.
     Devolución:
         - el resultado de la conexión.
@@ -46,21 +47,26 @@ class Connecter:
             self.logger = logger
         else:
             self.logger = Logger()
+
         self.server = server
+
         self.user = user
-        self.pwd = pwd
-        self.port = port
+
+        if isinstance(port, int):
+            self.port = port
+        elif Checker.str_is_int(port):
+            self.port = Casting.str_to_int(port)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_PORT)
 
         try:  # Probar si hay excepciones en...
             # Realizar la conexión a PostgreSQL con parámetros especificados
             self.conn = psycopg2.connect(host=self.server,
                                          database='template1', user=self.user,
-                                         password=self.pwd, port=self.port)
-            # TODO cambiar lo de la contraseña por una bandera
-            # -w, --no-password        never prompt for password
-            # -W, --password           force password prompt (should happen
-            # automatically)
-
+                                         port=self.port)  # password=self.pwd,
+            # TODO: añadir argumento password a psycopg2.connect en caso de que
+            # en futuro se quisiese añadir la opción de introducir contraseña
+            # manualmente en vez de revisar .pgpass
             self.cursor = self.conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor)
         except Exception as e:  # Si salta una excepción...
@@ -119,20 +125,20 @@ class Connecter:
 
     def get_cursor_dbs(self, ex_templates=True, db_owner=''):
         '''
-    Objetivo:
-        - realizar una consulta a PostgreSQL para devolver un cursor que
-        contiene la lista de bases de datos correspondiente a los parámetros
-        del archivo de configuración.
-    Parámetros:
-        - ex_templates: indica si se deben ignorar las bases de datos que sean
-        plantillas en PostgreSQL.
-        - db_owner: indica el propietario que deben tener las bases de datos
-        que se desean obtener. Si el propietario es nulo, se obtienen todas las
-        bases de datos que hay en PostgreSQL.
-    Devolución:
-        - un booleano, True si la conexión establecida es como superusuario,
-        False de lo contrario.
-    '''
+        Objetivo:
+            - realizar una consulta a PostgreSQL para devolver un cursor que
+            contiene la lista de bases de datos correspondiente a los
+            parámetros del archivo de configuración.
+        Parámetros:
+            - ex_templates: indica si se deben ignorar las bases de datos que
+            sean plantillas en PostgreSQL.
+            - db_owner: indica el propietario que deben tener las bases de
+            datos que se desean obtener. Si el propietario es nulo, se obtienen
+            todas las bases de datos que hay en PostgreSQL.
+        Devolución:
+            - un booleano, True si la conexión establecida es como
+            superusuario, False de lo contrario.
+        '''
         query_get_dbs = (
             'SELECT d.datname, d.datallowconn, '
             'pg_catalog.pg_get_userbyid(d.datdba) as owner '

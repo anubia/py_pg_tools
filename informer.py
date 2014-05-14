@@ -17,9 +17,9 @@ class Informer:
     connecter = None
     logger = None
     dbnames = []
-    users = False
+    usernames = []
 
-    def __init__(self, connecter=None, dbnames=[], users=False, logger=None):
+    def __init__(self, connecter=None, dbnames=[], usernames=[], logger=None):
 
         if logger:
             self.logger = logger
@@ -32,7 +32,7 @@ class Informer:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
         self.dbnames = dbnames
-        self.users = users
+        self.usernames = usernames
 
     def get_pg_db_data(self, dbname):
 
@@ -42,38 +42,73 @@ class Informer:
             'FROM pg_catalog.pg_database d '
             'WHERE d.datname = (%s);'
         )
+
         try:
-            #self.connecter.allow_db_conn(dbname)
-            self.connecter.cursor.execute('commit')
-            result = self.connecter.cursor.execute(
-                query_get_db_data, (dbname, ))
-            print('*' * 80)
-            print(result)
-            print('*' * 80)
-            #self.connecter.disallow_db_conn(dbname)
+            self.connecter.cursor.execute(query_get_db_data, (dbname, ))
         except Exception as e:
             self.logger.debug('Error en la función "get_pg_db_data": '
                               '{}.'.format(str(e)))
-            result = None
-        return result
+            self.connecter.cursor = None
 
     def show_pg_dbs_data(self):
 
         dbs_data = []
         for dbname in self.dbnames:
-            db_data = self.get_pg_db_data(dbname)
-            if db_data:
-                dbs_data.append(db_data)
+            self.get_pg_db_data(dbname)
+            result = self.connecter.cursor.fetchone()
+            if result:
+                dbs_data.append(result)
         message = Messenger.SEARCHING_SELECTED_DBS_DATA
         self.logger.highlight('info', message, 'white')
         if dbs_data:
             for db in dbs_data:
                 message = Messenger.DBNAME + db['datname']
-                self.logger.info(message)
+                self.logger.highlight('info', message, 'cyan')
                 message = Messenger.DBENCODING + db['datctype']
                 self.logger.info(message)
                 message = Messenger.DBOWNER + db['owner']
                 self.logger.info(message)
         else:
             message = Messenger.NO_DB_DATA_TO_SHOW
+            self.logger.highlight('warning', message, 'yellow', effect='bold')
+
+    def get_pg_user_data(self, username):
+
+        query_get_user_data = (
+            'SELECT usename, usesysid, usesuper '
+            'FROM pg_user '
+            'WHERE usename = (%s);'
+        )
+
+        try:
+            self.connecter.cursor.execute(query_get_user_data, (username, ))
+        except Exception as e:
+            self.logger.debug('Error en la función "get_pg_user_data": '
+                              '{}.'.format(str(e)))
+            self.connecter.cursor = None
+
+    def show_pg_users_data(self):
+
+        users_data = []
+        for username in self.usernames:
+            self.get_pg_user_data(username)
+            result = self.connecter.cursor.fetchone()
+            if result:
+                users_data.append(result)
+        message = Messenger.SEARCHING_SELECTED_USERS_DATA
+        self.logger.highlight('info', message, 'white')
+        if users_data:
+            for user in users_data:
+                message = Messenger.USERNAME + user['usename']
+                self.logger.highlight('info', message, 'cyan')
+                message = Messenger.USERID + str(user['usesysid'])
+                self.logger.info(message)
+                message = Messenger.SUPERUSER
+                if user['usesuper']:
+                    message += 'Sí'
+                else:
+                    message += 'No'
+                self.logger.info(message)
+        else:
+            message = Messenger.NO_USER_DATA_TO_SHOW
             self.logger.highlight('warning', message, 'yellow', effect='bold')

@@ -17,6 +17,8 @@ from date_tools.date_tools import DateTools  # Librería personalizada
 # Importar la función get_date de la librería date (para obtener la fecha
 # de la zona en el formato deseado)
 from messenger.messenger import Default
+from checker.checker import Checker
+from casting.casting import Casting
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -62,8 +64,10 @@ class Logger:
         else:
             self.level = Default.LOG_LEVEL
 
-        if mute is not None:
+        if isinstance(mute, bool):
             self.mute = mute
+        elif Checker.str_is_bool(mute):
+            self.mute = Casting.str_to_bool(mute)
         else:
             self.mute = Default.MUTE
 

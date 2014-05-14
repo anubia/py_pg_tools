@@ -10,6 +10,8 @@ from db_selector.db_selector import DbSelector
 from dir_tools.dir_tools import Dir
 from messenger.messenger import Messenger
 from messenger.messenger import Default
+from casting.casting import Casting
+from checker.checker import Checker
 from vacuumer import Vacuumer
 import subprocess
 
@@ -19,12 +21,11 @@ import subprocess
 class Backer:
 
     bkp_path = ''
-    server_alias = ''
+    group = ''
     bkp_type = ''
     prefix = ''
     in_dbs = []
     in_regex = ''
-    in_forbidden = False
     in_priority = False
     ex_dbs = []
     ex_regex = ''
@@ -34,11 +35,10 @@ class Backer:
     connecter = None
     logger = None
 
-    def __init__(self, connecter=None, bkp_path='', server_alias='',
+    def __init__(self, connecter=None, bkp_path='', group='',
                  bkp_type='dump', prefix='', in_dbs=[], in_regex='',
-                 in_forbidden=False, in_priority=False, ex_dbs=['postgres'],
-                 ex_regex='', ex_templates=True, vacuum=True, db_owner='',
-                 logger=None):
+                 in_priority=False, ex_dbs=['postgres'], ex_regex='',
+                 ex_templates=True, vacuum=True, db_owner='', logger=None):
 
         if logger:
             self.logger = logger
@@ -55,24 +55,66 @@ class Backer:
         else:
             self.bkp_path = Default.BKP_PATH
             Dir.create_dir(self.bkp_path, self.logger)
-        if server_alias:
-            self.server_alias = server_alias
+
+        if group:
+            self.group = group
         else:
-            self.server_alias = Default.SERVER_ALIAS
-        if bkp_type:
+            self.group = Default.GROUP
+
+        if bkp_type is None:
+            self.bkp_type = Default.BKP_TYPE
+        elif Checker.check_compress_type(bkp_type):
             self.bkp_type = bkp_type
         else:
-            self.bkp_type = Default.BKP_TYPE
+            self.logger.stop_exe(Messenger.INVALID_BKP_TYPE)
+
         self.prefix = prefix
-        self.in_dbs = in_dbs
-        self.in_regex = in_regex
-        self.in_forbidden = in_forbidden
-        self.in_priority = in_priority
-        self.ex_dbs = ex_dbs
-        self.ex_regex = ex_regex
-        self.ex_templates = ex_templates
-        self.vacuum = vacuum
-        self.db_owner = db_owner
+
+        if isinstance(in_dbs, list):
+            self.in_dbs = in_dbs
+        else:
+            self.in_dbs = Casting.str_to_list(in_dbs)
+
+        if Checker.check_regex(in_regex):
+            self.in_regex = in_regex
+        else:
+            self.logger.stop_exe(Messenger.INVALID_IN_REGEX)
+
+        if isinstance(in_priority, bool):
+            self.in_priority = in_priority
+        elif Checker.str_is_bool(in_priority):
+            self.in_priority = Casting.str_to_bool(in_priority)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_IN_PRIORITY)
+
+        if isinstance(ex_dbs, list):
+            self.ex_dbs = ex_dbs
+        else:
+            self.ex_dbs = Casting.str_to_list(ex_dbs)
+
+        if Checker.check_regex(ex_regex):
+            self.ex_regex = ex_regex
+        else:
+            self.logger.stop_exe(Messenger.INVALID_EX_REGEX)
+
+        if isinstance(ex_templates, bool):
+            self.ex_templates = ex_templates
+        elif Checker.str_is_bool(ex_templates):
+            self.ex_templates = Casting.str_to_bool(ex_templates)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_EX_TEMPLATES)
+
+        if isinstance(vacuum, bool):
+            self.vacuum = vacuum
+        elif Checker.str_is_bool(vacuum):
+            self.vacuum = Casting.str_to_bool(vacuum)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_VACUUM)
+
+        if db_owner is None:
+            self.db_owner = db_owner
+        else:
+            self.db_owner = Default.DB_OWNER
 
     def backup_db(self, dbname, bkps_dir):
         '''
@@ -145,44 +187,46 @@ class Backer:
         - bkp_vars: diccionario con los parámetros especificados en el archivo
         .cfg
     '''
-        message = Messenger.CHECKING_BACKUP_DIR
-        bkps_dir = self.bkp_path + self.server_alias + '/db_backups/'
+        self.logger.highlight('info', Messenger.CHECKING_BACKUP_DIR, 'white')
+        bkps_dir = self.bkp_path + self.group + Default.DB_BKPS_DIR
         Dir.create_dir(bkps_dir, self.logger)
-        message += Messenger.DIR_EXISTS
-        self.logger.highlight('info', message, 'white')
+        self.logger.info(Messenger.DESTINY_DIR.format(path=bkps_dir))
+
         self.logger.highlight('info', Messenger.PROCESSING_DUMPER, 'white')
         # Para cada base de datos de la que se quiere backup...
         for db in dbs_all:
             dbname = db['name']  # Almacenar nombre de la BD por claridad
-            mod_allow_conn = False  # En principio no se modifica datallowconn
+            message = Messenger.PROCESSING_DB.format(dbname=dbname)
+            self.logger.highlight('info', message, 'cyan')
             # Si se exigen copias de bases de datos sin permisos de conexión...
-            if not db['allow_connection'] and self.in_forbidden:
-                self.connecter.allow_db_conn(dbname)  # Permitir conexiones
-                mod_allow_conn = True  # Marcar que se modifica datallowconn
-                self.logger.info(Messenger.ALLOWING_DB_CONN)
-            if self.vacuum:
-                self.logger.info(Messenger.PRE_VACUUMING_DB.format(
+            if not db['allow_connection']:
+                message = Messenger.FORBIDDEN_DB_CONNECTION.format(
+                    dbname=dbname)
+                self.logger.highlight('warning', message, 'yellow',
+                                      effect='bold')
+                success = False
+            else:
+                if self.vacuum:
+                    self.logger.info(Messenger.PRE_VACUUMING_DB.format(
+                        dbname=dbname))
+                    vacuumer = Vacuumer(self.connecter, self.in_dbs,
+                                        self.in_regex, self.in_priority,
+                                        self.ex_dbs, self.ex_regex,
+                                        self.ex_templates, self.db_owner,
+                                        self.logger)
+                    success = vacuumer.vacuum_db(dbname)
+                    if success:
+                        message = Messenger.PRE_VACUUMING_DB_DONE.format(
+                            dbname=dbname)
+                        self.logger.info(message)
+                    else:
+                        message = Messenger.PRE_VACUUMING_DB_FAIL.format(
+                            dbname=dbname)
+                        self.logger.highlight('warning', message, 'yellow')
+                self.logger.info(Messenger.BEGINNING_DB_BACKER.format(
                     dbname=dbname))
-                vacuumer = Vacuumer(self.connecter, self.in_dbs, self.in_regex,
-                                    self.in_forbidden, self.in_priority,
-                                    self.ex_dbs, self.ex_regex,
-                                    self.ex_templates, self.db_owner,
-                                    self.logger)
-                success = vacuumer.vacuum_db(dbname)
-                if success:
-                    self.logger.info(Messenger.PRE_VACUUMING_DB_DONE.format(
-                        dbname=dbname))
-                else:
-                    self.logger.warning(Messenger.PRE_VACUUMING_DB_FAIL.format(
-                        dbname=dbname))
-            self.logger.info(Messenger.BEGINNING_DB_BACKER.format(
-                dbname=dbname))
-            # Realizar copia de seguridad de la base de datos
-            success = self.backup_db(dbname, bkps_dir)
-            if mod_allow_conn:  # Si se modificó datallowconn...
-                # Deshabilitar nuevamente las conexiones y dejarlo como estaba
-                self.connecter.disallow_db_conn(dbname)
-                self.logger.info(Messenger.DISALLOWING_DB_CONN)
+                # Realizar copia de seguridad de la base de datos
+                success = self.backup_db(dbname, bkps_dir)
             if success:
                 message = Messenger.DB_BACKER_DONE.format(dbname=dbname)
                 self.logger.highlight('info', message, 'green')
@@ -190,20 +234,21 @@ class Backer:
                 message = Messenger.DB_BACKER_FAIL.format(dbname=dbname)
                 self.logger.highlight('warning', message, 'yellow',
                                       effect='bold')
-        self.logger.highlight('info', Messenger.DBS_BACKER_DONE, 'green')
+        self.logger.highlight('info', Messenger.DBS_BACKER_DONE, 'green',
+                              effect='bold')
 
 
 class BackerCluster:
 
     bkp_path = ''
-    server_alias = ''
+    group = ''
     bkp_type = ''
     prefix = ''
     vacuum = True
     connecter = None
     logger = None
 
-    def __init__(self, connecter=None, bkp_path='', server_alias='',
+    def __init__(self, connecter=None, bkp_path='', group='',
                  bkp_type='dump', prefix='', vacuum=True, logger=None):
 
         if logger:
@@ -221,16 +266,27 @@ class BackerCluster:
         else:
             self.bkp_path = Default.BKP_PATH
             Dir.create_dir(self.bkp_path, self.logger)
-        if server_alias:
-            self.server_alias = server_alias
+
+        if group:
+            self.group = group
         else:
-            self.server_alias = Default.SERVER_ALIAS
-        if bkp_type:
+            self.group = Default.GROUP
+
+        if bkp_type is None:
+            self.bkp_type = Default.BKP_TYPE
+        elif Checker.check_compress_type(bkp_type):
             self.bkp_type = bkp_type
         else:
-            self.bkp_type = Default.BKP_TYPE
+            self.logger.stop_exe(Messenger.INVALID_BKP_TYPE)
+
         self.prefix = prefix
-        self.vacuum = vacuum
+
+        if isinstance(vacuum, bool):
+            self.vacuum = vacuum
+        elif Checker.str_is_bool(vacuum):
+            self.vacuum = Casting.str_to_bool(vacuum)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_VACUUM)
 
     def backup_all(self, bkps_dir):
         '''
@@ -297,22 +353,23 @@ class BackerCluster:
         - bkp_vars: diccionario con los parámetros especificados en el archivo
         .cfg
     '''
-        message = Messenger.CHECKING_BACKUP_DIR
-        bkps_dir = self.bkp_path + self.server_alias + '/cluster_backups/'
+        self.logger.highlight('info', Messenger.CHECKING_BACKUP_DIR, 'white')
+        bkps_dir = self.bkp_path + self.group + Default.CL_BKPS_DIR
         Dir.create_dir(bkps_dir, self.logger)
-        message += Messenger.DIR_EXISTS
-        self.logger.highlight('info', message, 'white')
-
-        self.logger.highlight('info', Messenger.BEGINNING_CL_BACKER, 'white')
+        self.logger.info(Messenger.DESTINY_DIR.format(path=bkps_dir))
 
         if self.vacuum:
             vacuumer = Vacuumer(connecter=self.connecter, logger=self.logger)
+            vacuumer.connecter.get_cursor_dbs(vacuumer.ex_templates,
+                                              vacuumer.db_owner)
             dbs_all = DbSelector.list_pg_dbs(self.connecter.cursor)
             vacuumer.vacuum_dbs(dbs_all)
 
+        self.logger.highlight('info', Messenger.BEGINNING_CL_BACKER, 'white')
         success = self.backup_all(bkps_dir)
         if success:
-            self.logger.highlight('info', Messenger.CL_BACKER_DONE, 'green')
+            self.logger.highlight('info', Messenger.CL_BACKER_DONE, 'green',
+                                  effect='bold')
         else:
             self.logger.highlight('warning', Messenger.CL_BACKER_FAIL,
                                   'yellow', effect='bold')

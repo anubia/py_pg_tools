@@ -3,7 +3,7 @@
 
 
 from config.config_tools import CfgParser
-from logger.logger import Logger
+#from logger.logger import Logger
 
 
 class Configurator:
@@ -13,44 +13,45 @@ class Configurator:
     parser = None
     logger = None
 
-    def __init__(self, logger=None):
-        if logger:
-            self.logger = logger
-        else:
-            self.logger = Logger()
+    def __init__(self):
+        pass
 
     def load_cfg(self, cfg_type, path):
 
         self.cfg_type = cfg_type
         self.path = path
-        self.parser = CfgParser(self.logger)
+        self.parser = CfgParser()
 
         if self.cfg_type == 'connect':
             self.parser.load_cfg(self.path)
-            self.parser.parse_pgconn()
+            self.parser.parse_connecter()
 
         elif self.cfg_type == 'backup':
             self.parser.load_cfg(self.path)
-            self.parser.parse_dump()
+            self.parser.parse_backer()
 
         elif self.cfg_type == 'backup_all':
             self.parser.load_cfg(self.path)
-            self.parser.parse_dumpall()
+            self.parser.parse_backer_cluster()
+
+        elif self.cfg_type == 'log':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_logger()
 
         elif self.cfg_type == 'vacuum':
             self.parser.load_cfg(self.path)
-            self.parser.parse_vacuum()
+            self.parser.parse_vacuumer()
 
         elif self.cfg_type == 'trim':
             self.parser.load_cfg(self.path)
-            self.parser.parse_clean()
+            self.parser.parse_trimmer()
 
         elif self.cfg_type == 'trim_all':
             self.parser.load_cfg(self.path)
-            self.parser.parse_cleanall()
+            self.parser.parse_trimmer_cluster()
 
         elif self.cfg_type == 'terminate':
             self.parser.load_cfg(self.path)
-            self.parser.parse_kill()
+            self.parser.parse_terminator()
         else:
             pass

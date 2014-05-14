@@ -7,6 +7,10 @@
 # Importar la funciones create_logger de la librería personalizada
 # logger.logger (para utilizar un logger que muestre información al usuario)
 from logger.logger import Logger
+from casting.casting import Casting
+from checker.checker import Checker
+from messenger.messenger import Messenger
+from messenger.messenger import Default
 import subprocess
 
 
@@ -16,7 +20,6 @@ class Vacuumer:
 
     in_dbs = []
     in_regex = ''
-    in_forbidden = False
     in_priority = False
     ex_dbs = []
     ex_regex = ''
@@ -26,8 +29,8 @@ class Vacuumer:
     logger = None
 
     def __init__(self, connecter=None, in_dbs=[], in_regex='',
-                 in_forbidden=False, in_priority=False, ex_dbs=['postgres'],
-                 ex_regex='', ex_templates=True, db_owner='', logger=None):
+                 in_priority=False, ex_dbs=['postgres'], ex_regex='',
+                 ex_templates=True, db_owner='', logger=None):
 
         if logger:
             self.logger = logger
@@ -37,17 +40,46 @@ class Vacuumer:
         if connecter:
             self.connecter = connecter
         else:
-            message = 'No se han especificado los parámetros de conexión.'
-            self.logger.stop_exe(message)
+            self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
-        self.in_dbs = in_dbs
-        self.in_regex = in_regex
-        self.in_forbidden = in_forbidden
-        self.in_priority = in_priority
-        self.ex_dbs = ex_dbs
-        self.ex_regex = ex_regex
-        self.ex_templates = ex_templates
-        self.db_owner = db_owner
+        if isinstance(in_dbs, list):
+            self.in_dbs = in_dbs
+        else:
+            self.in_dbs = Casting.str_to_list(in_dbs)
+
+        if Checker.check_regex(in_regex):
+            self.in_regex = in_regex
+        else:
+            self.logger.stop_exe(Messenger.INVALID_IN_REGEX)
+
+        if isinstance(in_priority, bool):
+            self.in_priority = in_priority
+        elif Checker.str_is_bool(in_priority):
+            self.in_priority = Casting.str_to_bool(in_priority)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_IN_PRIORITY)
+
+        if isinstance(ex_dbs, list):
+            self.ex_dbs = ex_dbs
+        else:
+            self.ex_dbs = Casting.str_to_list(ex_dbs)
+
+        if Checker.check_regex(ex_regex):
+            self.ex_regex = ex_regex
+        else:
+            self.logger.stop_exe(Messenger.INVALID_EX_REGEX)
+
+        if isinstance(ex_templates, bool):
+            self.ex_templates = ex_templates
+        elif Checker.str_is_bool(ex_templates):
+            self.ex_templates = Casting.str_to_bool(ex_templates)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_EX_TEMPLATES)
+
+        if db_owner is None:
+            self.db_owner = Default.DB_OWNER
+        else:
+            self.db_owner = db_owner
 
     def vacuum_db(self, dbname):
         '''
@@ -91,35 +123,30 @@ class Vacuumer:
         - bkp_vars: diccionario con los parámetros especificados en el archivo
         .cfg
     '''
-        message = 'Procesando bases de datos a limpiar...'
-        self.logger.highlight('info', message, 'white')
+        if vacuum_list:
+            self.logger.highlight('info', Messenger.BEGINNING_VACUUMER,
+                                  'white')
         # Para cada base de datos de la que se quiere backup...
         for db in vacuum_list:
             dbname = db['name']  # Almacenar nombre de la BD por claridad
-            mod_allow_conn = False  # En principio no se modifica datallowconn
             # Si se exigen copias de bases de datos sin permisos de conexión...
-            if not db['allow_connection'] and self.in_forbidden:
-                self.connecter.allow_db_conn(dbname)  # Permitir conexiones
-                mod_allow_conn = True  # Marcar que se modifica datallowconn
-                self.logger.info('Habilitando conexiones a la base de '
-                                 'datos...')
-            self.logger.info('Iniciando limpieza de la base de datos '
-                             '"{}"...'.format(dbname))
-            # Realizar copia de seguridad de la base de datos
-            success = self.vacuum_db(dbname)
-            if mod_allow_conn:  # Si se modificó datallowconn...
-                # Deshabilitar nuevamente las conexiones y dejarlo como estaba
-                self.connecter.disallow_db_conn(dbname)
-                self.logger.info('Deshabilitando conexiones a la base de '
-                                 'datos...')
-            if success:
-                message = 'Limpieza de la base de datos "{}" ' \
-                          'completada.'.format(dbname)
-                self.logger.highlight('info', message, 'green')
-            else:
-                message = 'La limpieza de la base de datos "{}" no se pudo ' \
-                          'completar.'.format(dbname)
+            message = Messenger.PROCESSING_DB.format(dbname=dbname)
+            self.logger.highlight('info', message, 'cyan')
+            if not db['allow_connection']:
+                message = Messenger.FORBIDDEN_DB_CONNECTION.format(
+                    dbname=dbname)
                 self.logger.highlight('warning', message, 'yellow',
                                       effect='bold')
-        message = 'Limpieza de bases de datos finalizada.'
-        self.logger.highlight('info', message, 'green')
+                success = False
+            else:
+                # Realizar copia de seguridad de la base de datos
+                success = self.vacuum_db(dbname)
+            if success:
+                message = Messenger.DB_VACUUMER_DONE.format(dbname=dbname)
+                self.logger.highlight('info', message, 'green')
+            else:
+                message = Messenger.DB_VACUUMER_FAIL.format(dbname=dbname)
+                self.logger.highlight('warning', message, 'yellow',
+                                      effect='bold')
+        self.logger.highlight('info', Messenger.VACUUMER_DONE, 'green',
+                              effect='bold')

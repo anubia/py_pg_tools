@@ -27,13 +27,13 @@ class Orchestrator:
     args = []
     logger = None
 
-    def __init__(self, action, args, logger=None):
+    def __init__(self, action, args):
+
         self.action = action
         self.args = args
-        if logger:
-            self.logger = logger
-        else:
-            self.logger = Logger()
+
+        self.logger = self.get_logger()
+        Dir.forbid_root(self.logger)
 
     @staticmethod
     def show_dbs(dbs_list, logger):
@@ -45,86 +45,152 @@ class Orchestrator:
             logger.info(message)
 
     @staticmethod
-    def get_cfg_vars(config_type, config_path, logger):
-        configurator = Configurator(logger)
+    def get_cfg_vars(config_type, config_path):
+        configurator = Configurator()
         configurator.load_cfg(config_type, config_path)
         return configurator.parser
 
+    def get_logger(self):
+        # Parse logger vars file
+        if self.args.config_logger:
+            config_type = 'log'
+            parser = Orchestrator.get_cfg_vars(config_type,
+                                               self.args.config_logger)
+            logger = Logger(parser.log_vars['log_dir'],
+                            parser.log_vars['level'], parser.log_vars['mute'])
+
+            if self.args.logger_logfile:
+                logger.log_dir = self.args.logger_logfile
+            if self.args.logger_level:
+                logger.level = self.args.logger_level
+            if self.args.logger_mute:
+                logger.mute = self.args.logger_mute
+        else:
+            logger = Logger(self.args.logger_logfile, self.args.logger_level,
+                            self.args.logger_mute)
+        return logger
+
     def get_connecter(self):
         # Parse connection vars file and connect to PostgreSQL
-        config_type = 'connect'
-        parser = Orchestrator.get_cfg_vars(config_type,
-                                           self.args.config_connection,
-                                           self.logger)
-        connecter = Connecter(parser.conn_vars['server'],
-                              parser.conn_vars['user'],
-                              parser.conn_vars['pwd'],
-                              parser.conn_vars['port'], self.logger)
+        if self.args.config_connection:
+            config_type = 'connect'
+            parser = Orchestrator.get_cfg_vars(config_type,
+                                               self.args.config_connection)
+
+            if self.args.pg_host:
+                parser.conn_vars['server'] = self.args.pg_host
+            if self.args.pg_user:
+                parser.conn_vars['user'] = self.args.pg_user
+            if self.args.pg_port:
+                parser.conn_vars['port'] = self.args.pg_port
+
+            connecter = Connecter(parser.conn_vars['server'],
+                                  parser.conn_vars['user'],
+                                  # parser.conn_vars['pwd'],
+                                  parser.conn_vars['port'], self.logger)
+
+        else:
+            connecter = Connecter(self.args.pg_host, self.args.pg_user,
+                                  self.args.pg_port, self.logger)
         return connecter
 
     def get_db_backer(self, connecter):
-        config_type = 'backup'
         if self.args.config:  # If config exists, load its params
-            parser = Orchestrator.get_cfg_vars(config_type,
-                                               self.args.config,
-                                               self.logger)
+            config_type = 'backup'
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+
+            # Overwrite the config vars with the console ones
+            if self.args.bkp_path:
+                parser.bkp_vars['bkp_path'] = self.args.bkp_path
+            if self.args.group:
+                parser.bkp_vars['group'] = self.args.group
+            if self.args.backup_format:
+                parser.bkp_vars['bkp_type'] = self.args.backup_format
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = self.args.db_name
+                parser.bkp_vars['ex_dbs'] = []
+                parser.bkp_vars['in_regex'] = ''
+                parser.bkp_vars['ex_regex'] = ''
+            if self.args.ex_templates:
+                parser.bkp_vars['ex_templates'] = True
+            elif self.args.no_ex_templates:
+                parser.bkp_vars['ex_templates'] = False
+            if self.args.vacuum:
+                parser.bkp_vars['vacuum'] = True
+            elif self.args.no_vacuum:
+                parser.bkp_vars['vacuum'] = False
+            if self.args.db_owner:
+                parser.bkp_vars['db_owner'] = self.args.db_owner
+
             backer = Backer(connecter, parser.bkp_vars['bkp_path'],
-                            parser.bkp_vars['server_alias'],
+                            parser.bkp_vars['group'],
                             parser.bkp_vars['bkp_type'],
                             parser.bkp_vars['prefix'],
                             parser.bkp_vars['in_dbs'],
                             parser.bkp_vars['in_regex'],
-                            parser.bkp_vars['in_forbidden'],
                             parser.bkp_vars['in_priority'],
                             parser.bkp_vars['ex_dbs'],
                             parser.bkp_vars['ex_regex'],
                             parser.bkp_vars['ex_templates'],
                             parser.bkp_vars['vacuum'],
                             parser.bkp_vars['db_owner'], self.logger)
-            # Overwrite the config vars with the console ones
-            if self.args.group:
-                backer.server_alias = self.args.group
-            if self.args.backup_format:
-                backer.bkp_type = '.' + self.args.backup_format
-            if self.args.db_name:
-                backer.in_dbs = self.args.db_name
-                backer.ex_dbs = []
-                backer.in_regex = ''
-                backer.ex_regex = ''
-                backer.ex_templates = False
+
         else:  # If config does not exist, load default params
-            if self.args.backup_format:
-                bkp_type = '.' + self.args.backup_format
+            if self.args.ex_templates:
+                ex_templates = True
+            elif self.args.no_ex_templates:
+                ex_templates = False
             else:
-                bkp_type = None
-            backer = Backer(connecter, server_alias=self.args.group,
-                            bkp_type=bkp_type, in_dbs=self.args.db_name,
+                ex_templates = True
+            if self.args.vacuum:
+                vacuum = True
+            elif self.args.no_vacuum:
+                vacuum = False
+            else:
+                vacuum = True
+            backer = Backer(connecter, bkp_path=self.args.bkp_path,
+                            group=self.args.group,
+                            bkp_type=self.args.backup_format,
+                            in_dbs=self.args.db_name,
+                            ex_templates=ex_templates, vacuum=vacuum,
+                            db_owner=self.args.db_owner,
                             logger=self.logger)
         return backer
 
     def get_cl_backer(self, connecter):
-        config_type = 'backup_all'
         if self.args.config:  # If config exists, load its params
-            parser = Orchestrator.get_cfg_vars(config_type,
-                                               self.args.config,
-                                               self.logger)
+            config_type = 'backup_all'
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+
+            # Overwrite the config vars with the console ones
+            if self.args.bkp_path:
+                parser.bkp_vars['bkp_path'] = self.args.bkp_path
+            if self.args.group:
+                parser.bkp_vars['group'] = self.args.group
+            if self.args.backup_format:
+                parser.bkp_vars['bkp_type'] = self.args.backup_format
+            if self.args.vacuum:
+                parser.bkp_vars['vacuum'] = True
+            elif self.args.no_vacuum:
+                parser.bkp_vars['vacuum'] = False
+
             backer = BackerCluster(connecter, parser.bkp_vars['bkp_path'],
-                                   parser.bkp_vars['server_alias'],
+                                   parser.bkp_vars['group'],
                                    parser.bkp_vars['bkp_type'],
                                    parser.bkp_vars['prefix'],
                                    parser.bkp_vars['vacuum'], self.logger)
-            # Overwrite the config vars with the console ones
-            if self.args.group:
-                backer.server_alias = self.args.group
-            if self.args.backup_format:
-                backer.bkp_type = '.' + self.args.backup_format
+
         else:  # If config does not exist, load default params
-            if self.args.backup_format:
-                bkp_type = '.' + self.args.backup_format
+            if self.args.vacuum:
+                vacuum = True
+            elif self.args.no_vacuum:
+                vacuum = False
             else:
-                bkp_type = None
-            backer = BackerCluster(connecter, server_alias=self.args.group,
-                                   bkp_type=bkp_type, logger=self.logger)
+                vacuum = True
+            backer = BackerCluster(connecter, bkp_path=self.args.bkp_path,
+                                   group=self.args.group,
+                                   bkp_type=self.args.backup_format,
+                                   vacuum=vacuum, logger=self.logger)
         return backer
 
     def setup_backer(self):
@@ -189,8 +255,7 @@ class Orchestrator:
 
         if self.args.config:
             config_type = 'terminate'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                               self.logger)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
             terminator = Terminator(connecter,
                                     parser.kill_vars['kill_all'],
                                     parser.kill_vars['kill_user'],
@@ -224,49 +289,90 @@ class Orchestrator:
         else:
             pass  # Info here: doing nothing
 
-    def get_trimmer(self):
+    def get_db_trimmer(self):
 
         # Parse bkp_vars depending on the action to do
-        if self.args.cluster:
-            config_type = 'trim_all'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                               self.logger)
-
-            trimmer = TrimmerCluster(parser.bkp_vars['bkp_path'],
-                                     parser.bkp_vars['prefix'],
-                                     parser.bkp_vars['min_bkps'],
-                                     parser.bkp_vars['obs_days'],
-                                     parser.bkp_vars['max_tsize'],
-                                     self.logger)
-        else:
+        if self.args.config:  # If config exists, load its params
             config_type = 'trim'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                               self.logger)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
 
-            trimmer = Trimmer(parser.bkp_vars['bkp_path'],
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = self.args.db_name
+                parser.bkp_vars['ex_dbs'] = []
+                parser.bkp_vars['in_regex'] = ''
+                parser.bkp_vars['ex_regex'] = ''
+            if self.args.bkp_folder:
+                parser.bkp_vars['bkp_path'] = self.args.bkp_folder
+            if self.args.prefix:
+                parser.bkp_vars['prefix'] = self.args.prefix
+            if self.args.n_backups:
+                parser.bkp_vars['min_n_bkps'] = self.args.n_backups
+            if self.args.expiry_days:
+                parser.bkp_vars['exp_days'] = self.args.expiry_days
+            if self.args.max_size:
+                parser.bkp_vars['max_size'] = self.args.max_size
+            if parser.bkp_vars['pg_warnings']:
+                connecter = self.get_connecter()
+            else:
+                connecter = None
+
+            trimmer = Trimmer(connecter, parser.bkp_vars['bkp_path'],
                               parser.bkp_vars['prefix'],
                               parser.bkp_vars['in_dbs'],
                               parser.bkp_vars['in_regex'],
                               parser.bkp_vars['in_priority'],
                               parser.bkp_vars['ex_dbs'],
                               parser.bkp_vars['ex_regex'],
-                              parser.bkp_vars['min_bkps'],
-                              parser.bkp_vars['obs_days'],
-                              parser.bkp_vars['max_tsize'],
-                              parser.bkp_vars['pg_warnings'],
-                              self.logger)
+                              parser.bkp_vars['min_n_bkps'],
+                              parser.bkp_vars['exp_days'],
+                              parser.bkp_vars['max_size'],
+                              parser.bkp_vars['pg_warnings'], self.logger)
+        else:
+            connecter = self.get_connecter()
+            trimmer = Trimmer(connecter=connecter,
+                              bkp_path=self.args.bkp_folder,
+                              prefix=self.args.prefix,
+                              in_dbs=self.args.db_name,
+                              min_n_bkps=self.args.n_backups,
+                              exp_days=self.args.expiry_days,
+                              max_size=self.args.max_size, logger=self.logger)
+        return trimmer
 
-            if self.args.db_name:
-                trimmer.in_dbs = self.args.db_name
-                trimmer.ex_dbs = []
-                trimmer.in_regex = ''
-                trimmer.ex_regex = ''
+    def get_cl_trimmer(self):
+
+        if self.args.config:  # If config exists, load its params
+            config_type = 'trim_all'
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            if self.args.bkp_folder:
+                parser.bkp_vars['bkp_path'] = self.args.bkp_folder
+            if self.args.prefix:
+                parser.bkp_vars['prefix'] = self.args.prefix
+            if self.args.n_backups:
+                parser.bkp_vars['min_n_bkps'] = self.args.n_backups
+            if self.args.expiry_days:
+                parser.bkp_vars['exp_days'] = self.args.expiry_days
+            if self.args.max_size:
+                parser.bkp_vars['max_size'] = self.args.max_size
+
+            trimmer = TrimmerCluster(parser.bkp_vars['bkp_path'],
+                                     parser.bkp_vars['prefix'],
+                                     parser.bkp_vars['min_n_bkps'],
+                                     parser.bkp_vars['exp_days'],
+                                     parser.bkp_vars['max_size'], self.logger)
+        else:
+            trimmer = TrimmerCluster(self.args.bkp_folder, self.args.prefix,
+                                     self.args.n_backups,
+                                     self.args.expiry_days, self.args.max_size,
+                                     self.logger)
 
         return trimmer
 
     def setup_trimmer(self):
 
-        trimmer = self.get_trimmer()
+        if self.args.cluster:
+            trimmer = self.get_cl_trimmer()
+        else:
+            trimmer = self.get_db_trimmer()
 
         bkps_list = Dir.sorted_flist(trimmer.bkp_path)
 
@@ -301,17 +407,14 @@ class Orchestrator:
 
         if self.args.cluster is False and trimmer.pg_warnings:
 
-            # Parse connection vars file and connect to PostgreSQL
-            connecter = self.get_connecter()
-
             # Ejecutar consulta de PostgreSQL y obtener nombres de todas
             # las bases de datos almacenadas, sus permisos de conexión y
             # sus propietarios
-            connecter.get_cursor_dbs(False)
+            trimmer.connecter.get_cursor_dbs(False)
 
             pg_dbs = []
             # Para cada registro de la consulta...
-            for record in connecter.cursor:
+            for record in trimmer.connecter.cursor:
                 pg_dbs.append(record['datname'])
 
             bkped_dbs = Dir.get_dbs_bkped(bkps_list)
@@ -319,24 +422,36 @@ class Orchestrator:
             Dir.show_pg_warnings(pg_dbs, bkped_dbs, self.logger)
 
             # Cerrar comunicación con la base de datos
-            connecter.pg_disconnect()
+            trimmer.connecter.pg_disconnect()
 
     def get_vacuumer(self, connecter):
 
-        config_type = 'vacuum'
-        parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                           self.logger)
+        if self.args.config:  # If config exists, load its params
 
-        vacuumer = Vacuumer(connecter,
-                            parser.bkp_vars['in_dbs'],
-                            parser.bkp_vars['in_regex'],
-                            parser.bkp_vars['in_forbidden'],
-                            parser.bkp_vars['in_priority'],
-                            parser.bkp_vars['ex_dbs'],
-                            parser.bkp_vars['ex_regex'],
-                            parser.bkp_vars['ex_templates'],
-                            parser.bkp_vars['db_owner'],
-                            self.logger)
+            config_type = 'vacuum'
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = self.args.db_name
+                parser.bkp_vars['ex_dbs'] = []
+                parser.bkp_vars['in_regex'] = ''
+                parser.bkp_vars['ex_regex'] = ''
+            if self.args.db_owner:
+                parser.bkp_vars['db_owner'] = self.args.db_owner
+
+            vacuumer = Vacuumer(connecter,
+                                parser.bkp_vars['in_dbs'],
+                                parser.bkp_vars['in_regex'],
+                                parser.bkp_vars['in_priority'],
+                                parser.bkp_vars['ex_dbs'],
+                                parser.bkp_vars['ex_regex'],
+                                parser.bkp_vars['ex_templates'],
+                                parser.bkp_vars['db_owner'],
+                                self.logger)
+        else:
+            vacuumer = Vacuumer(connecter, in_dbs=self.args.db_name,
+                                db_owner=self.args.db_owner,
+                                logger=self.logger)
         return vacuumer
 
     def setup_vacuumer(self):
@@ -380,9 +495,9 @@ class Orchestrator:
                             self.logger)
         if self.args.db_name:
             informer.show_pg_dbs_data()
+        elif self.args.users:
+            informer.show_pg_users_data()
         else:
-            # TODO Poner aquí lo que ocurre si se manda una lista de usuarios
-            # de PostgreSQL al informer
             pass
 
     def setup_replicator(self):
@@ -416,7 +531,7 @@ class Orchestrator:
         if self.action == 'B':
             self.setup_backer()
 
-        # ***************************** INFORMER ******************************
+        # ***************************** DROPPER *******************************
         elif self.action == 'd':
             self.setup_dropper()
 

@@ -12,10 +12,13 @@ from logger.logger import Logger
 # automática y localizar archivos creados por defecto)
 from dir_tools.dir_tools import Dir
 from messenger.messenger import Messenger
+from messenger.messenger import Default
 import os  # Importar la librería os (para trabajar con directorios y archivos)
 import re  # Importar la librería glob (para buscar archivos en directorios)
 import time  # Importar la librería time (para calcular intervalos de tiempo)
 from math import ceil
+from casting.casting import Casting
+from checker.checker import Checker
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -29,16 +32,16 @@ class Trimmer:
     in_priority = False
     ex_dbs = []
     ex_regex = ''
-    min_bkps = None
-    obs_days = None
-    max_tsize = None
+    min_n_bkps = None
+    exp_days = None
+    max_size = None
     pg_warnings = True
     connecter = None
     logger = None
 
     def __init__(self, bkp_path='', prefix='', in_dbs=[], in_regex='',
-                 in_priority=False, ex_dbs=[], ex_regex='', min_bkps=1,
-                 obs_days=365, max_tsize=5000, pg_warnings=True,
+                 in_priority=False, ex_dbs=[], ex_regex='', min_n_bkps=1,
+                 exp_days=365, max_size='10000MB', pg_warnings=True,
                  connecter=None, logger=None):
 
         if logger:
@@ -50,17 +53,71 @@ class Trimmer:
             self.bkp_path = bkp_path
         else:
             self.logger.stop_exe(Messenger.DIR_DOES_NOT_EXIST)
-        self.prefix = prefix
-        self.in_dbs = in_dbs
-        self.in_regex = in_regex
-        self.in_priority = in_priority
-        self.ex_dbs = ex_dbs
-        self.ex_regex = ex_regex
-        self.min_bkps = min_bkps
-        self.obs_days = obs_days
-        self.max_tsize = max_tsize
-        self.pg_warnings = pg_warnings
-        if self.pg_warnings is True:
+
+        if prefix is None:
+            self.prefix = Default.PREFIX
+        else:
+            self.prefix = prefix
+
+        if isinstance(in_dbs, list):
+            self.in_dbs = in_dbs
+        else:
+            self.in_dbs = Casting.str_to_list(in_dbs)
+
+        if Checker.check_regex(in_regex):
+            self.in_regex = in_regex
+        else:
+            self.logger.stop_exe(Messenger.INVALID_IN_REGEX)
+
+        if isinstance(in_priority, bool):
+            self.in_priority = in_priority
+        elif Checker.str_is_bool(in_priority):
+            self.in_priority = Casting.str_to_bool(in_priority)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_IN_PRIORITY)
+
+        if isinstance(ex_dbs, list):
+            self.ex_dbs = ex_dbs
+        else:
+            self.ex_dbs = Casting.str_to_list(ex_dbs)
+
+        if Checker.check_regex(ex_regex):
+            self.ex_regex = ex_regex
+        else:
+            self.logger.stop_exe(Messenger.INVALID_EX_REGEX)
+
+        if min_n_bkps is None:
+            self.min_n_bkps = Default.MIN_N_BKPS
+        elif isinstance(min_n_bkps, int):
+            self.min_n_bkps = min_n_bkps
+        elif Checker.str_is_int(min_n_bkps):
+            self.min_n_bkps = Casting.str_to_int(min_n_bkps)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_MIN_BKPS)
+
+        if exp_days is None:
+            self.exp_days = Default.EXP_DAYS
+        elif isinstance(exp_days, int) and exp_days >= -1:
+            self.exp_days = exp_days
+        elif Checker.str_is_valid_exp_days(exp_days):
+            self.exp_days = Casting.str_to_int(exp_days)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_OBS_DAYS)
+        if max_size is None:
+            self.max_size = Default.MAX_SIZE
+        elif Checker.str_is_valid_max_size(max_size):
+            self.max_size = max_size
+        else:
+            self.logger.stop_exe(Messenger.INVALID_MAX_TSIZE)
+
+        if isinstance(pg_warnings, bool):
+            self.pg_warnings = pg_warnings
+        elif Checker.str_is_bool(pg_warnings):
+            self.pg_warnings = Casting.str_to_bool(pg_warnings)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_PG_WARNINGS)
+
+        if self.pg_warnings:
             if connecter:
                 self.connecter = connecter
             else:
@@ -80,10 +137,24 @@ class Trimmer:
     '''
         # Almacenar momento del tiempo en segundos a partir del cual una copia
         # de base de datos queda obsoleta
-        x_days_ago = time.time() - (60 * 60 * 24 * self.obs_days)
+        if self.exp_days == -1:
+            x_days_ago = None
+        else:
+            x_days_ago = time.time() - (60 * 60 * 24 * self.exp_days)
         # Almacenar el máximo tamaño permitido de las copias en Bytes
-        max_tsize_mb = self.max_tsize
-        self.max_tsize *= 10 ** 6
+        max_size = Casting.str_to_max_size(self.max_size)
+
+        if max_size['unit'] == 'MB':
+            equivalence = 10 ** 6
+        elif max_size['unit'] == 'GB':
+            equivalence = 10 ** 9
+        elif max_size['unit'] == 'TB':
+            equivalence = 10 ** 12
+        elif max_size['unit'] == 'PB':
+            equivalence = 10 ** 15
+
+        self.max_size = max_size['size'] * equivalence
+
         # Almacenar número actual de copias que tiene una base de datos
         num_bkps = len(db_bkps_list)
         # Realizar una copia de la lista de copias de seguridad para poderla
@@ -97,11 +168,12 @@ class Trimmer:
 
         for f in db_bkps_list:  # Para cada copia de seguridad de esta BD...
             # Si hay menos copias de las deseadas...
-            if num_bkps <= self.min_bkps:
+            if num_bkps <= self.min_n_bkps:
                 break
             # Almacenar información del archivo
             file_info = os.stat(f)
-            if file_info.st_ctime < x_days_ago:  # Si está obsoleta...
+            # Si está obsoleta...
+            if x_days_ago and file_info.st_ctime < x_days_ago:
                 self.logger.info(Messenger.DELETING_OBSOLETE_BACKUP % f)
                 os.unlink(f)  # Eliminar copia de seguridad
                 unlinked = True
@@ -111,7 +183,7 @@ class Trimmer:
                 db_bkps_lt.remove(f)  # Actualizar lista de copias de seguridad
 
         tsize = Dir.get_files_tsize(db_bkps_lt)
-        tsize_mb = ceil(tsize / 10 ** 6)
+        tsize_unit = ceil(tsize / equivalence)
 
         ## DESCOMENTAR ESTA SECCIÓN PARA PROCEDER CON LA ELIMINACIÓN DE COPIAS
         ## SI EL TAMAÑO DEL TOTAL DE ÉSTAS SUPERA EL TAMAÑO MÁXIMO ESPECIFICADO
@@ -119,16 +191,16 @@ class Trimmer:
 
         #for f in db_bkps_list:
             ## Si hay menos copias de las deseadas...
-            #if num_bkps <= self.min_bkps:
+            #if num_bkps <= self.min_n_bkps:
                 #break
-            #if tsize <= self.max_tsize:
+            #if tsize <= self.max_size:
                 #break
             #else:
                 ## Almacenar información del archivo
                 #file_info = os.stat(f)
                 #logger.info('Tamaño de copias de seguridad en disco mayor que'
-                            #' {} Bytes: eliminando el archivo {}...' %
-                            #(max_tsize_mb, f))
+                            #' {} {}: eliminando el archivo {}...' %
+                            #(max_size['size'], max_size['unit'], f))
                 #os.unlink(f)  # Eliminar copia de seguridad
                 #unlinked = True
                 ## Reducir la variable que indica el número de copias de esta
@@ -141,9 +213,10 @@ class Trimmer:
             self.logger.info(Messenger.NO_DB_BACKUP_DELETED.format(
                 dbname=dbname))
 
-        if tsize > self.max_tsize:
+        if tsize > self.max_size:
             message = Messenger.DB_BKPS_SIZE_EXCEEDED.format(
-                dbname=dbname, tsize_mb=tsize_mb, max_tsize_mb=max_tsize_mb)
+                dbname=dbname, tsize_unit=tsize_unit, size=max_size['size'],
+                unit=max_size['unit'])
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
         self.logger.highlight('info', Messenger.DB_TRIMMER_DONE.format(
@@ -201,12 +274,12 @@ class TrimmerCluster:
 
     bkp_path = ''
     prefix = ''
-    min_bkps = None
-    obs_days = None
-    max_tsize = None
+    min_n_bkps = None
+    exp_days = None
+    max_size = None
 
-    def __init__(self, bkp_path='', prefix='', min_bkps=1, obs_days=365,
-                 max_tsize=5000, logger=None):
+    def __init__(self, bkp_path='', prefix='', min_n_bkps=1, exp_days=365,
+                 max_size=5000, logger=None):
 
         if logger:
             self.logger = logger
@@ -218,10 +291,35 @@ class TrimmerCluster:
         else:
             self.logger.stop_exe(Messenger.DIR_DOES_NOT_EXIST)
 
-        self.prefix = prefix
-        self.min_bkps = min_bkps
-        self.obs_days = obs_days
-        self.max_tsize = max_tsize
+        if prefix is None:
+            self.prefix = Default.PREFIX
+        else:
+            self.prefix = prefix
+
+        if min_n_bkps is None:
+            self.min_n_bkps = Default.MIN_N_BKPS
+        elif isinstance(min_n_bkps, int):
+            self.min_n_bkps = min_n_bkps
+        elif Checker.str_is_int(min_n_bkps):
+            self.min_n_bkps = Casting.str_to_int(min_n_bkps)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_MIN_BKPS)
+
+        if exp_days is None:
+            self.exp_days = Default.EXP_DAYS
+        elif isinstance(exp_days, int) and exp_days >= -1:
+            self.exp_days = exp_days
+        elif Checker.str_is_valid_exp_days(exp_days):
+            self.exp_days = Casting.str_to_int(exp_days)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_OBS_DAYS)
+
+        if max_size is None:
+            self.max_size = Default.MAX_SIZE
+        elif Checker.str_is_valid_max_size(max_size):
+            self.max_size = max_size
+        else:
+            self.logger.stop_exe(Messenger.INVALID_MAX_TSIZE)
 
     def trim_cluster(self, ht_bkps_list):
         '''
@@ -236,10 +334,24 @@ class TrimmerCluster:
     '''
         # Almacenar momento del tiempo en segundos a partir del cual una copia
         # de base de datos queda obsoleta
-        x_days_ago = time.time() - (60 * 60 * 24 * self.obs_days)
+        if self.exp_days == -1:
+            x_days_ago = None
+        else:
+            x_days_ago = time.time() - (60 * 60 * 24 * self.exp_days)
         # Almacenar el máximo tamaño permitido de las copias en Bytes
-        max_tsize_mb = self.max_tsize
-        self.max_tsize *= 10 ** 6
+        max_size = Casting.str_to_max_size(self.max_size)
+
+        if max_size['unit'] == 'MB':
+            equivalence = 10 ** 6
+        elif max_size['unit'] == 'GB':
+            equivalence = 10 ** 9
+        elif max_size['unit'] == 'TB':
+            equivalence = 10 ** 12
+        elif max_size['unit'] == 'PB':
+            equivalence = 10 ** 15
+
+        self.max_size = max_size['size'] * equivalence
+
         # Almacenar número actual de copias que tiene una base de datos
         num_bkps = len(ht_bkps_list)
         # Realizar una copia de la lista de copias de seguridad para poderla
@@ -252,11 +364,12 @@ class TrimmerCluster:
 
         for f in ht_bkps_list:  # Para cada copia de seguridad del clúster...
             # Si hay menos copias de las deseadas...
-            if num_bkps <= self.min_bkps:
+            if num_bkps <= self.min_n_bkps:
                 break
             # Almacenar información del archivo
             file_info = os.stat(f)
-            if file_info.st_ctime < x_days_ago:  # Si está obsoleta...
+            # Si está obsoleta...
+            if x_days_ago and file_info.st_ctime < x_days_ago:
                 self.logger.info(Messenger.DELETING_OBSOLETE_BACKUP % f)
                 os.unlink(f)  # Eliminar copia de seguridad
                 unlinked = True
@@ -266,7 +379,7 @@ class TrimmerCluster:
                 ht_bkps_lt.remove(f)  # Actualizar lista de copias de seguridad
 
         tsize = Dir.get_files_tsize(ht_bkps_lt)
-        tsize_mb = ceil(tsize / 10 ** 6)
+        tsize_unit = ceil(tsize / equivalence)
 
         ## DESCOMENTAR ESTA SECCIÓN PARA PROCEDER CON LA ELIMINACIÓN DE COPIAS
         ## SI EL TAMAÑO DEL TOTAL DE ÉSTAS SUPERA EL TAMAÑO MÁXIMO ESPECIFICADO
@@ -274,16 +387,16 @@ class TrimmerCluster:
 
         #for f in ht_bkps_list:
             ## Si hay menos copias de las deseadas...
-            #if num_bkps <= self.min_bkps:
+            #if num_bkps <= self.min_n_bkps:
                 #break
-            #if tsize <= self.max_tsize:
+            #if tsize <= self.max_size:
                 #break
             #else:
                 ## Almacenar información del archivo
                 #file_info = os.stat(f)
                 #logger.info('Tamaño de copias de seguridad en disco mayor que'
-                            #' {} Bytes: eliminando el archivo {}...' %
-                            #(max_tsize_mb, f))
+                            #' {} {}: eliminando el archivo {}...' %
+                            #(max_size['size'], max_size['unit'], f))
                 #os.unlink(f)  # Eliminar copia de seguridad
                 #unlinked = True
                 ## Reducir la variable que indica el número de copias de esta
@@ -295,9 +408,10 @@ class TrimmerCluster:
         if not unlinked:
             self.logger.info(Messenger.NO_CL_BACKUP_DELETED)
 
-        if tsize > self.max_tsize:
+        if tsize > self.max_size:
             message = Messenger.CL_BKPS_SIZE_EXCEEDED.format(
-                tsize_mb=tsize_mb, max_tsize_mb=max_tsize_mb)
+                tsize_unit=tsize_unit, size=max_size['size'],
+                unit=max_size['unit'])
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
         self.logger.highlight('info', Messenger.CL_TRIMMER_DONE, 'green')

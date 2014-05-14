@@ -3,6 +3,8 @@
 
 from logger.logger import Logger
 from messenger.messenger import Messenger
+from casting.casting import Casting
+from checker.checker import Checker
 
 
 class Terminator:
@@ -46,9 +48,21 @@ class Terminator:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
-        self.target_all = target_all
+        if target_all is None:
+            self.target_all = target_all
+        elif isinstance(target_all, bool):
+            self.target_all = target_all
+        elif Checker.str_is_bool(target_all):
+            self.target_all = Casting.str_to_bool(target_all)
+        else:
+            self.logger.stop_exe(Messenger.INVALID_TARGET_ALL)
+
         self.target_user = target_user
-        self.target_dbs = target_dbs
+
+        if isinstance(target_dbs, list):
+            self.target_dbs = target_dbs
+        else:
+            self.target_dbs = Casting.str_to_list(target_dbs)
 
     def terminate_backend_user(self):
         '''
