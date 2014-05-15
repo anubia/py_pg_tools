@@ -33,6 +33,7 @@ class Orchestrator:
         self.args = args
 
         self.logger = self.get_logger()
+
         Dir.forbid_root(self.logger)
 
     @staticmethod
@@ -45,9 +46,12 @@ class Orchestrator:
             logger.info(message)
 
     @staticmethod
-    def get_cfg_vars(config_type, config_path):
+    def get_cfg_vars(config_type, config_path, logger=None):
         configurator = Configurator()
-        configurator.load_cfg(config_type, config_path)
+        if logger:
+            configurator.load_cfg(config_type, config_path, logger)
+        else:
+            configurator.load_cfg(config_type, config_path)
         return configurator.parser
 
     def get_logger(self):
@@ -56,15 +60,15 @@ class Orchestrator:
             config_type = 'log'
             parser = Orchestrator.get_cfg_vars(config_type,
                                                self.args.config_logger)
+            if self.args.logger_logfile:
+                parser.log_vars['log_dir'] = self.args.logger_logfile
+            if self.args.logger_level:
+                parser.log_vars['level'] = self.args.logger_level
+            if self.args.logger_mute:
+                parser.log_vars['mute'] = self.args.logger_mute
+
             logger = Logger(parser.log_vars['log_dir'],
                             parser.log_vars['level'], parser.log_vars['mute'])
-
-            if self.args.logger_logfile:
-                logger.log_dir = self.args.logger_logfile
-            if self.args.logger_level:
-                logger.level = self.args.logger_level
-            if self.args.logger_mute:
-                logger.mute = self.args.logger_mute
         else:
             logger = Logger(self.args.logger_logfile, self.args.logger_level,
                             self.args.logger_mute)
@@ -75,7 +79,8 @@ class Orchestrator:
         if self.args.config_connection:
             config_type = 'connect'
             parser = Orchestrator.get_cfg_vars(config_type,
-                                               self.args.config_connection)
+                                               self.args.config_connection,
+                                               self.logger)
 
             if self.args.pg_host:
                 parser.conn_vars['server'] = self.args.pg_host
@@ -97,7 +102,8 @@ class Orchestrator:
     def get_db_backer(self, connecter):
         if self.args.config:  # If config exists, load its params
             config_type = 'backup'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
 
             # Overwrite the config vars with the console ones
             if self.args.bkp_path:
@@ -160,7 +166,8 @@ class Orchestrator:
     def get_cl_backer(self, connecter):
         if self.args.config:  # If config exists, load its params
             config_type = 'backup_all'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
 
             # Overwrite the config vars with the console ones
             if self.args.bkp_path:
@@ -255,7 +262,8 @@ class Orchestrator:
 
         if self.args.config:
             config_type = 'terminate'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
             terminator = Terminator(connecter,
                                     parser.kill_vars['kill_all'],
                                     parser.kill_vars['kill_user'],
@@ -294,7 +302,8 @@ class Orchestrator:
         # Parse bkp_vars depending on the action to do
         if self.args.config:  # If config exists, load its params
             config_type = 'trim'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
 
             if self.args.db_name:
                 parser.bkp_vars['in_dbs'] = self.args.db_name
@@ -342,7 +351,8 @@ class Orchestrator:
 
         if self.args.config:  # If config exists, load its params
             config_type = 'trim_all'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
             if self.args.bkp_folder:
                 parser.bkp_vars['bkp_path'] = self.args.bkp_folder
             if self.args.prefix:
@@ -429,7 +439,8 @@ class Orchestrator:
         if self.args.config:  # If config exists, load its params
 
             config_type = 'vacuum'
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config)
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
 
             if self.args.db_name:
                 parser.bkp_vars['in_dbs'] = self.args.db_name
@@ -477,13 +488,13 @@ class Orchestrator:
             dbs_all, vacuumer.in_dbs, vacuumer.ex_dbs, vacuumer.in_regex,
             vacuumer.ex_regex, vacuumer.in_priority, self.logger)
 
-        # Realizar las nuevas copias de seguridad (dump)
-        vacuumer.vacuum_dbs(vacuum_list)
-
         if self.args.terminate:  # Terminate dbs connections if necessary
             terminator = Terminator(connecter, target_dbs=vacuum_list,
                                     logger=self.logger)
             terminator.terminate_backend_dbs()
+
+        # Realizar las nuevas copias de seguridad (dump)
+        vacuumer.vacuum_dbs(vacuum_list)
 
         # Cerrar comunicación con la base de datos
         connecter.pg_disconnect()
@@ -505,12 +516,25 @@ class Orchestrator:
         connecter = self.get_connecter()
         replicator = Replicator(connecter, self.args.db_name[0],
                                 self.args.db_name[1], self.logger)
+
+        if self.args.terminate:  # Terminate dbs connections if necessary
+            terminator = Terminator(connecter,
+                                    target_dbs=replicator.original_dbname,
+                                    logger=self.logger)
+            terminator.terminate_backend_dbs()
+
         replicator.replicate_pg_db()
 
     def setup_dropper(self):
 
         connecter = self.get_connecter()
         dropper = Dropper(connecter, self.args.db_name, self.logger)
+
+        if self.args.terminate:  # Terminate dbs connections if necessary
+            terminator = Terminator(connecter, target_dbs=dropper.dbnames,
+                                    logger=self.logger)
+            terminator.terminate_backend_dbs()
+
         dropper.drop_pg_dbs()
 
     def setup_restorer(self):

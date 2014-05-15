@@ -9,6 +9,7 @@ from logger.logger import Logger
 from getpass import getuser
 import os  # Importar la librería os (para trabajar con directorios y archivos)
 import re  # Importar la librería glob (para buscar archivos en directorios)
+from messenger.messenger import Messenger
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -33,8 +34,7 @@ class Dir:
         except Exception as e:  # Si salta una excepción...
             logger.debug('Error en la función "forbid_root": {}.'.format(
                 str(e)))
-            logger.stop_exe('Por seguridad, no se permite la ejecución del '
-                            'programa como usuario "root".')
+            logger.stop_exe(Messenger.ROOT_NOT_ALLOWED)
 
     @staticmethod
     def create_dir(path, logger=None):
@@ -54,9 +54,7 @@ class Dir:
         except Exception as e:  # Si salta una excepción...
             logger.debug('Error en la función "create_dir": {}.'.format(
                 str(e)))
-            logger.stop_exe('El programa no pudo generar directorios o '
-                            'archivos necesarios para su funcionamiento: '
-                            'revise los permisos de las carpetas que emplea.')
+            logger.stop_exe(Messenger.USER_NOT_ALLOWED_TO_CHDIR)
 
     @staticmethod
     def default_bkps_path():
@@ -162,7 +160,7 @@ class Dir:
         return bkped_dbs  # Devolver la lista de BDs que tienen copia
 
     @staticmethod
-    def show_pg_warnings(pg_dbs=[], bkped_dbs=[], logger=None):  # CORREGIR ESTO: LOS MENSAJES ACABAN EN COMA; NO EN PUNTO
+    def show_pg_warnings(pg_dbs=[], bkped_dbs=[], logger=None):
         '''
     Objetivo:
         - advertir de las bases de datos que actualmente existen en PostgreSQL
@@ -176,33 +174,18 @@ class Dir:
     '''
         if not logger:
             logger = Logger()
-        show_msg = False
-        message = 'Las siguientes bases de datos almacenadas en PostgreSQL ' \
-                  'no tienen copias de seguridad en el directorio ' \
-                  'especificado en el archivo de configuración: '
         for dbname in pg_dbs:  # Para cada BD en PostgreSQL...
             if dbname not in bkped_dbs:  # Si no está entre las BDs con copia..
-                show_msg = True
-                if dbname is pg_dbs[-1]:
-                    message += '"{}".'.format(dbname)
-                    break
-                message += '"{}", '.format(dbname)
-        if show_msg:
-            logger.highlight('warning', message, 'purple', effect='bold')
+                message = Messenger.NO_BACKUP_FOR_POSTGRESQL_DB.format(
+                    dbname=dbname)
+                logger.highlight('warning', message, 'purple', effect='bold')
 
-        show_msg = False
-        message = 'Las siguientes bases de datos tienen copias de seguridad ' \
-                  'pero no existen en PostgreSQL: '
         for dbname in bkped_dbs:  # Para cada BD con copia...
             # Si no está entre las BDs de PostgreSQL...
             if dbname not in pg_dbs:
-                show_msg = True
-                if dbname is bkped_dbs[-1]:
-                    message += '"{}".'.format(dbname)
-                    break
-                message += '"{}", '.format(dbname)
-        if show_msg:
-            logger.highlight('warning', message, 'purple', effect='bold')
+                message = Messenger.NO_POSTGRESQL_DB_FOR_BACKUP.format(
+                    dbname=dbname)
+                logger.highlight('warning', message, 'purple', effect='bold')
 
     @staticmethod
     def get_files_tsize(files_list=[]):

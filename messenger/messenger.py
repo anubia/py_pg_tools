@@ -227,6 +227,22 @@ class Messenger:
                          'verbosidad de mensajes está dañado. Por favor, ' \
                          'revise que los nombres por defecto de secciones y ' \
                          'atributos son correctos.'
+    NO_BACKUP_FOR_POSTGRESQL_DB = 'La base de datos "{dbname}" almacenada ' \
+                                  'en PostgreSQL no tiene copias de ' \
+                                  'seguridad en el directorio especificado ' \
+                                  'en el archivo de configuración.'
+    NO_POSTGRESQL_DB_FOR_BACKUP = 'La base de datos "{dbname}" tiene copias ' \
+                                  'de seguridad en el directorio ' \
+                                  'especificado en el archivo de ' \
+                                  'configuración, pero no está almacenada ' \
+                                  'en PostgreSQL .'
+    ROOT_NOT_ALLOWED = 'Por seguridad, no se permite la ejecución del ' \
+                       'programa como usuario "root".'
+    USER_NOT_ALLOWED_TO_CHDIR = 'El programa no pudo generar directorios o ' \
+                                'archivos necesarios para su ' \
+                                'funcionamiento: revise los permisos de las ' \
+                                'carpetas que emplea.'
+    DB_ALREADY_EXISTS = 'La base de datos "{dbname}" ya existe en PostgreSQL.'
 
     def __init__(self):
         pass
@@ -235,35 +251,29 @@ class Messenger:
 class Default:
 
     BKP_PATH = '/opt/backups/pg_backups/'
-    GROUP = 'default_group'
     BKP_TYPE = 'dump'
-    PREFIX = ''
+    BKP_TYPES = ['dump', 'gz', 'bz2', 'zip']
+    DB_BKPS_DIR = '/db_backups/'
+    DB_OWNER = ''
+    CL_BKPS_DIR = '/cl_backups/'
+    EX_DBS = []
+    EX_REGEX = ''
+    EX_TEMPLATES = True
+    EXP_DAYS = 365
+    GROUP = 'default_group'
     IN_DBS = []
     IN_REGEX = ''
     IN_FORBIDDEN = False
     IN_PRIORITY = False
-    EX_DBS = []
-    EX_REGEX = ''
-    EX_TEMPLATES = True
-    VACUUM = True
-    DB_OWNER = ''
-
-    EXP_DAYS = 365
-    MIN_N_BKPS = 1
-    MAX_SIZE = '10000MB'
-
-    LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
     LOG_LEVEL = 'debug'
+    LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
+    MAX_SIZE = '10000MB'
+    MIN_N_BKPS = 1
     MUTE = False
-
-    BKP_TYPES = ['dump', 'gz', 'bz2', 'zip']
-
+    PREFIX = ''
+    VACUUM = True
     VALID_BOOLS = ['True', 'true', 'False', 'false']
-
     VALID_EXP_DAYS = [-1, int]
-
-    DB_BKPS_DIR = '/db_backups/'
-    CL_BKPS_DIR = '/cl_backups/'
 
     def __init__(self):
         pass

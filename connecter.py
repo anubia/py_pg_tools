@@ -62,7 +62,7 @@ class Connecter:
         try:  # Probar si hay excepciones en...
             # Realizar la conexión a PostgreSQL con parámetros especificados
             self.conn = psycopg2.connect(host=self.server,
-                                         database='template1', user=self.user,
+                                         database='postgres', user=self.user,
                                          port=self.port)  # password=self.pwd,
             # TODO: añadir argumento password a psycopg2.connect en caso de que
             # en futuro se quisiese añadir la opción de introducir contraseña

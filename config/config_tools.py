@@ -13,13 +13,10 @@ from messenger.messenger import Messenger
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
 
-class CfgParser:
+class LogCfgParser:
 
     logger = None
     cfg = None
-    conn_vars = {}
-    bkp_vars = {}
-    kill_vars = {}
     log_vars = {}
 
     def __init__(self):
@@ -47,7 +44,73 @@ class CfgParser:
             else:
                 raise Exception()
         except Exception as e:  # Si salta una excepción...
+            if not self.logger:
+                self.logger = Logger()
+            self.logger.debug('Error en la función "load_cfg": {}.'.format(
+                str(e)))
+            self.logger.stop_exe(Messenger.INVALID_CFG_PATH)
+
+    def parse_logger(self):
+        '''
+    Objetivo:
+        - obtener las variables del archivo de configuración y comprobar que
+        son válidas.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
+    '''
+        try:  # Comprobar si el programa falla al cargar las variables del .cfg
+            # Pasar los valores del archivo .cfg a un diccionario
+            self.log_vars = {
+                'log_dir': self.cfg.get('settings', 'log_dir').strip(),
+                'level': self.cfg.get('settings', 'level').strip(),
+                'mute': self.cfg.get('settings', 'mute').strip(),
+            }
+            # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            if not self.logger:
+                self.logger = Logger()
+            self.logger.debug('Error en la función "parse_logger": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe(Messenger.LOGGER_CFG_DAMAGED)
+
+
+class CfgParser:
+
+    logger = None
+    cfg = None
+    conn_vars = {}
+    bkp_vars = {}
+    kill_vars = {}
+
+    def __init__(self, logger):
+        if logger:
+            self.logger = logger
+        else:
             self.logger = Logger()
+
+    def load_cfg(self, cfg_file):
+        '''
+    Objetivo:
+        - cargar el archivo de configuración con todas sus variables.
+    Parámetros:
+        - logger: el logger que se empleará para mostrar y registrar el
+        mensaje.
+        - cfg_file: la ruta con el archivo de configuración a cargar.
+        - action: una acción que indicará las variables a cargar, ya que éstas
+        son diferentes a la hora de conectarse a PostgreSQL, hacer dump,
+        dumpall, vacuum, clean o cleanall.
+    Devolución:
+        - un diccionario con las variables cargadas del archivo de
+        configuración.
+    '''
+        try:  # Probar si hay excepciones en...
+            self.cfg = configparser.ConfigParser()  # Crear un Parser
+            if os.path.exists(cfg_file):
+                self.cfg.read(cfg_file)  # Parsear el archivo .cfg
+            else:
+                raise Exception()
+        except Exception as e:  # Si salta una excepción...
             self.logger.debug('Error en la función "load_cfg": {}.'.format(
                 str(e)))
             self.logger.stop_exe(Messenger.INVALID_CFG_PATH)
@@ -66,7 +129,6 @@ class CfgParser:
                 'port': self.cfg.get('postgres', 'port'),  # Puerto
             }
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_connecter": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CONNECTER_CFG_DAMAGED)
@@ -125,7 +187,6 @@ class CfgParser:
             }
 
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_backer": {}.'.format(
                 str(e)))
             self.logger.stop_exe(Messenger.DB_BACKER_CFG_DAMAGED)
@@ -159,7 +220,6 @@ class CfgParser:
 
             # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_backer_cluster": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CL_BACKER_CFG_DAMAGED)
@@ -206,7 +266,6 @@ class CfgParser:
 
             # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_vacuumer": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.VACUUMER_CFG_DAMAGED)
@@ -255,7 +314,6 @@ class CfgParser:
 
             # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_trimmer": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.DB_TRIMMER_CFG_DAMAGED)
@@ -287,7 +345,6 @@ class CfgParser:
 
             # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_trimmer_cluster": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CL_TRIMMER_CFG_DAMAGED)
@@ -314,30 +371,6 @@ class CfgParser:
             }
             # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
-            self.logger = Logger()
             self.logger.debug('Error en la función "parse_terminator": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.TERMINATOR_CFG_DAMAGED)
-
-    def parse_logger(self):
-        '''
-    Objetivo:
-        - obtener las variables del archivo de configuración y comprobar que
-        son válidas.
-    Devolución:
-        - un diccionario con las variables cargadas del archivo de
-        configuración.
-    '''
-        try:  # Comprobar si el programa falla al cargar las variables del .cfg
-            # Pasar los valores del archivo .cfg a un diccionario
-            self.log_vars = {
-                'log_dir': self.cfg.get('settings', 'log_dir').strip(),
-                'level': self.cfg.get('settings', 'level').strip(),
-                'mute': self.cfg.get('settings', 'mute').strip(),
-            }
-            # Si el programa falla al cargar las variables del .cfg...
-        except Exception as e:
-            self.logger = Logger()
-            self.logger.debug('Error en la función "parse_logger": '
-                              '{}.'.format(str(e)))
-            self.logger.stop_exe(Messenger.LOGGER_CFG_DAMAGED)

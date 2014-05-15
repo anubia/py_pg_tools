@@ -36,10 +36,6 @@ if __name__ == "__main__":
                         help='indicates the PostgreSQL username with whom you '
                         'are going to connect')
 
-    #backer.add_argument('-cP', '--pg-password',
-                        #help='indicates the password of the PostgreSQL '
-                        #'account you are going to use')
-
     backer.add_argument('-C', '--config',
                         help='load a configuration file (.cfg) to get the '
                         'backer conditions')
@@ -131,6 +127,11 @@ if __name__ == "__main__":
     dropper.add_argument('-d', '--db-name', nargs='+',
                          help='specify the PostgreSQL databases to be deleted')
 
+    dropper.add_argument('-t', '--terminate',
+                         help='terminate every connection (except yours) '
+                         'to each database which is going to be dropped',
+                         action='store_true')
+
     dropper.add_argument('-Lc', '--config-logger',
                          help='load a configuration file (.cfg) to get the '
                          'logger parameters')
@@ -221,6 +222,11 @@ if __name__ == "__main__":
                             help='specifies the new name of the database '
                             'generated and the name of the database which is '
                             'being cloned, respectively')
+
+    replicator.add_argument('-t', '--terminate',
+                            help='terminate every connection (except yours) '
+                            'to the database which is going to be replicated',
+                            action='store_true')
 
     replicator.add_argument('-Lc', '--config-logger',
                             help='load a configuration file (.cfg) to get the '

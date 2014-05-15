@@ -210,8 +210,8 @@ class Trimmer:
                 #tsize -= file_info.st_size  # Actualizar el tamaño total
 
         if not unlinked:
-            self.logger.info(Messenger.NO_DB_BACKUP_DELETED.format(
-                dbname=dbname))
+            message = Messenger.NO_DB_BACKUP_DELETED.format(dbname=dbname)
+            self.logger.highlight('warning', message, 'yellow')
 
         if tsize > self.max_size:
             message = Messenger.DB_BKPS_SIZE_EXCEEDED.format(
@@ -406,7 +406,8 @@ class TrimmerCluster:
                 #tsize -= file_info.st_size  # Actualizar el tamaño total
 
         if not unlinked:
-            self.logger.info(Messenger.NO_CL_BACKUP_DELETED)
+            message = Messenger.NO_CL_BACKUP_DELETED
+            self.logger.highlight('warning', message, 'yellow')
 
         if tsize > self.max_size:
             message = Messenger.CL_BKPS_SIZE_EXCEEDED.format(

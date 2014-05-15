@@ -32,6 +32,13 @@ class Replicator:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
+        query_db_exists = 'SELECT 1 FROM pg_database WHERE datname=(%s);'
+        self.connecter.cursor.execute(query_db_exists, (new_dbname, ))
+        result = self.connecter.cursor.fetchone()
+        if result:
+            message = Messenger.DB_ALREADY_EXISTS.format(dbname=new_dbname)
+            self.logger.stop_exe(message)
+
         if new_dbname:
             self.new_dbname = new_dbname
         else:
@@ -59,8 +66,6 @@ class Replicator:
             self.logger.highlight('info', Messenger.REPLICATE_DB_DONE.format(
                 new_dbname=self.new_dbname,
                 original_dbname=self.original_dbname), 'green')
-        # TODO capturar excepción ¿ProgrammingError?: ocurre cuando se intenta
-        # crear en PostgreSQL una base de datos con un nombre que ya existe
         except Exception as e:
             self.logger.debug('Error en la función "clone_pg_db": '
                               '{}.'.format(str(e)))

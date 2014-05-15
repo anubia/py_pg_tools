@@ -3,6 +3,7 @@
 
 
 from config.config_tools import CfgParser
+from config.config_tools import LogCfgParser
 #from logger.logger import Logger
 
 
@@ -16,11 +17,15 @@ class Configurator:
     def __init__(self):
         pass
 
-    def load_cfg(self, cfg_type, path):
+    def load_cfg(self, cfg_type, path, logger=None):
 
         self.cfg_type = cfg_type
         self.path = path
-        self.parser = CfgParser()
+
+        if self.cfg_type == 'log':
+            self.parser = LogCfgParser()
+        else:
+            self.parser = CfgParser(logger)
 
         if self.cfg_type == 'connect':
             self.parser.load_cfg(self.path)
