@@ -4,7 +4,6 @@
 
 from config.config_tools import CfgParser
 from config.config_tools import LogCfgParser
-#from logger.logger import Logger
 
 
 class Configurator:

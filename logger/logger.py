@@ -16,7 +16,7 @@ import os.path
 from date_tools.date_tools import DateTools  # Librería personalizada
 # Importar la función get_date de la librería date (para obtener la fecha
 # de la zona en el formato deseado)
-from messenger.messenger import Default
+from const.const import Default
 from checker.checker import Checker
 from casting.casting import Casting
 

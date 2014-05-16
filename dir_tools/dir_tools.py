@@ -9,7 +9,7 @@ from logger.logger import Logger
 from getpass import getuser
 import os  # Importar la librería os (para trabajar con directorios y archivos)
 import re  # Importar la librería glob (para buscar archivos en directorios)
-from messenger.messenger import Messenger
+from const.const import Messenger
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************

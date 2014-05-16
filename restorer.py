@@ -8,11 +8,12 @@
 # personalizada logger.logger (para utilizar un logger que proporcione
 # información al usuario)
 from logger.logger import Logger
-from messenger.messenger import Messenger
+from const.const import Messenger
 from replicator import Replicator
 
 import subprocess
 import re
+import os
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -36,7 +37,7 @@ class Restorer:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
-        if db_backup:
+        if db_backup and os.path.isfile(db_backup):
             self.db_backup = db_backup
         else:
             self.logger.stop_exe(Messenger.NO_BKP_TO_RESTORE)
@@ -64,7 +65,7 @@ class Restorer:
             # backup
             ext = parts[2]
         else:
-            pass
+            self.logger.stop_exe(Messenger.NO_BACKUP_FORMAT)
 
         message = Messenger.BEGINNING_DB_RESTORER.format(
             db_backup=self.db_backup, new_dbname=self.new_dbname)
@@ -126,7 +127,7 @@ class RestorerCluster:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
-        if cluster_backup:
+        if cluster_backup and os.path.isfile(cluster_backup):
             self.cluster_backup = cluster_backup
         else:
             self.logger.stop_exe(Messenger.NO_BKP_TO_RESTORE)
@@ -144,7 +145,7 @@ class RestorerCluster:
             # backup
             ext = parts[2]
         else:
-            pass
+            Messenger.NO_BACKUP_FORMAT
 
         message = Messenger.BEGINNING_CL_RESTORER.format(
             cluster_backup=self.cluster_backup)
@@ -152,23 +153,26 @@ class RestorerCluster:
         self.logger.info(Messenger.WAIT_PLEASE)
 
         if ext == 'gz':
-            command = 'gunzip -c {} -k | psql -U {} -h {} -p {} ' \
-                      'postgres'.format(
+            command = 'gunzip -c {} -k | psql postgres -U {} -h {} ' \
+                      '-p {}'.format(
                           self.cluster_backup, self.connecter.user,
                           self.connecter.server, self.connecter.port)
         elif ext == 'bz2':
-            command = 'bunzip2 -c {} -k | psql -U {} -h {} -p {} ' \
-                      'postgres'.format(
+            command = 'bunzip2 -c {} -k | psql postgres -U {} -h {} ' \
+                      '-p {}'.format(
                           self.cluster_backup, self.connecter.user,
                           self.connecter.server, self.connecter.port)
         elif ext == 'zip':
-            command = 'unzip -p {} | psql -U {} -h {} -p {} postgres'.format(
+            command = 'unzip -p {} | psql postgres -U {} -h {} -p {}'.format(
                 self.cluster_backup, self.connecter.user,
                 self.connecter.server, self.connecter.port)
         else:
             # TODO Hacer que desaparezcan todos los comandos SQL que se ven en
             # consola, crear automáticamente el clúster antes de restaurarlo
-            command = 'psql -U {} -h {} -p {} -f {} postgres'.format(
+            #command = 'psql -U {} -h {} -p {} -f {} postgres'.format(
+                #self.connecter.user, self.connecter.server,
+                #self.connecter.port, self.cluster_backup)
+            command = 'psql postgres -U {} -h {} -p {} < {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, self.cluster_backup)
 

@@ -4,6 +4,48 @@
 
 class Messenger:
 
+    PROGRAM_DESCRIPTION = 'This program allows the user the possibility to ' \
+                          ' manage PostgreSQL data in an easy way. ' \
+                          'Available options:\n' \
+                          '- Make a backup of a specified database\n' \
+                          '- Make a backup of a specified cluster\n' \
+                          '- Delete a specified database\n' \
+                          '- Get information about databases or users\n' \
+                          '- Replicate a specified database\n' \
+                          '- Terminate a specified connection to ' \
+                          'PostgreSQL\n' \
+                          '- Delete a specified backup\n' \
+                          '- Vacuum a specified database\n' \
+                          'See more information below and in the help of ' \
+                          'each command'
+    BACKER_HELP = 'BACKER: makes a backup of a PostgreSQL cluster or a ' \
+                  'specified group of databases'
+    DROPPER_HELP = 'DROPPER: deletes the specified PostgreSQL databases'
+    INFORMER_HELP = 'INFORMER: gives some information about PostgreSQL'
+    REPLICATOR_HELP = 'REPLICATOR: clones the specified PostgreSQL database'
+    RESTORER_HELP = 'RESTORER: restores a database\'s backup file in ' \
+                    'PostgreSQL'
+    TERMINATOR_HELP = 'TERMINATOR: terminates the specified connections to ' \
+                      'PostgreSQL'
+    TRIMMER_HELP = 'TRIMMER: deletes (if necessary) a group of PostgreSQL ' \
+                   'backups (cluster or databases) according to some ' \
+                   'specified conditions'
+    VACUUMER_HELP = 'VACUUMER: makes a vacuum of a specified group of ' \
+                    'PostgreSQL databases'
+    CONFIG_CONNECTION_HELP = 'load a configuration file (.cfg) to get the ' \
+                             'PostgreSQL connection parameters'
+    HOST_HELP = 'indicates the host you are going to connect to'
+    PORT_HELP = 'indicates the port you are going to connect to'
+    USER_HELP = 'indicates the PostgreSQL username with whom you are going ' \
+                'to connect'
+    CONFIG_LOGGER_HELP = 'load a configuration file (.cfg) to get the ' \
+                         'logger parameters'
+    LOGGER_LOGFILE_HELP = 'indicates the path of the file in which the ' \
+                          'logger is going to store the log info'
+    LOGGER_LEVEL_HELP = 'indicates the logger\'s verbosity level (debug, ' \
+                        'info, warning, error, critical)'
+    LOGGER_MUTE_HELP = 'indicates not to store anything'
+
     ACTION_DB_NO_SUPERUSER = 'El usuario especificado para la conexión a ' \
                              'PostgreSQL no tiene rol de superusuario: sólo ' \
                              'podrá actuar sobre las bases de datos de las ' \
@@ -134,8 +176,8 @@ class Messenger:
     DROP_DB_DONE = 'Eliminada base de datos "{dbname}".'
     DROP_DB_FAIL = 'La base de datos "{dbname}" no se pudo eliminar.'
     DROP_DBS_DONE = 'Bases de datos especificadas eliminadas en PostgreSQL.'
-    NO_BKP_TO_RESTORE = 'No se ha especificado la ruta del archivo que ' \
-                        'contiene la copia a restaurar.'
+    NO_BKP_TO_RESTORE = 'El archivo especificado que contiene la copia a ' \
+                        'restaurar no existe.'
     NO_DBNAME_TO_RESTORE = 'No se ha especificado un nombre para la nueva ' \
                            'base de datos que se generará en PostgreSQL a ' \
                            'partir de la copia.'
@@ -243,6 +285,10 @@ class Messenger:
                                 'funcionamiento: revise los permisos de las ' \
                                 'carpetas que emplea.'
     DB_ALREADY_EXISTS = 'La base de datos "{dbname}" ya existe en PostgreSQL.'
+    NO_BACKUP_FORMAT = 'La copia de seguridad que se pretende restaurar no ' \
+                       'sigue el formato estándar de nombres del programa.'
+    ANALIZING_PG_DATA = 'Analizando datos en PostgreSQL...'
+    DETECTED_DB = 'Detectada base de datos: "{dbname}".'
 
     def __init__(self):
         pass

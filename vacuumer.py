@@ -9,8 +9,8 @@
 from logger.logger import Logger
 from casting.casting import Casting
 from checker.checker import Checker
-from messenger.messenger import Messenger
-from messenger.messenger import Default
+from const.const import Messenger
+from const.const import Default
 import subprocess
 
 

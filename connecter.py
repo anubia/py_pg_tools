@@ -13,7 +13,7 @@ import psycopg2
 import psycopg2.extras
 from casting.casting import Casting
 from checker.checker import Checker
-from messenger.messenger import Messenger
+from const.const import Messenger
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************

@@ -8,7 +8,7 @@
 # personalizada logger.logger (para utilizar un logger que proporcione
 # información al usuario)
 from logger.logger import Logger
-from messenger.messenger import Messenger
+from const.const import Messenger
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************

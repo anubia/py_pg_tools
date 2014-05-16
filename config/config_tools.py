@@ -8,7 +8,7 @@ from logger.logger import Logger
 # Importar la librería configparser (para obtener datos de un archivo .cfg)
 import configparser
 import os  # Importar la librería os (para trabajar con directorios y archivos
-from messenger.messenger import Messenger
+from const.const import Messenger
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************

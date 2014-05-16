@@ -2,6 +2,6 @@
 # -*- encoding: utf-8 -*-
 
 
-__all__ = ['messenger']
+__all__ = ['const']
 
-from . import messenger
+from . import const

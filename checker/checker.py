@@ -7,7 +7,7 @@
 #from logger.logger import Logger
 # Importar la librería configparser (para obtener datos de un archivo .cfg)
 import re  # Importar la librería re (para trabajar con expresiones regulares)
-from messenger.messenger import Default
+from const.const import Default
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************

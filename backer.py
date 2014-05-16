@@ -8,8 +8,8 @@ from logger.logger import Logger
 from date_tools.date_tools import DateTools
 from db_selector.db_selector import DbSelector
 from dir_tools.dir_tools import Dir
-from messenger.messenger import Messenger
-from messenger.messenger import Default
+from const.const import Messenger
+from const.const import Default
 from casting.casting import Casting
 from checker.checker import Checker
 from vacuumer import Vacuumer

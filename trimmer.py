@@ -11,8 +11,8 @@ from logger.logger import Logger
 # librería personalizada dir_tools.dir_tools (para crear directorios de forma
 # automática y localizar archivos creados por defecto)
 from dir_tools.dir_tools import Dir
-from messenger.messenger import Messenger
-from messenger.messenger import Default
+from const.const import Messenger
+from const.const import Default
 import os  # Importar la librería os (para trabajar con directorios y archivos)
 import re  # Importar la librería glob (para buscar archivos en directorios)
 import time  # Importar la librería time (para calcular intervalos de tiempo)

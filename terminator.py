@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from logger.logger import Logger
-from messenger.messenger import Messenger
+from const.const import Messenger
 from casting.casting import Casting
 from checker.checker import Checker
 

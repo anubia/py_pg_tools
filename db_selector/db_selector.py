@@ -4,7 +4,7 @@
 
 # ************************* CARGA DE LIBRERÍAS *************************
 
-from messenger.messenger import Messenger
+from const.const import Messenger
 from logger.logger import Logger
 import re  # Importar la librería re (para trabajar con expresiones regulares)
 
