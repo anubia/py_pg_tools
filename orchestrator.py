@@ -23,15 +23,15 @@ from vacuumer import Vacuumer
 
 class Orchestrator:
 
-    action = None
-    args = []
-    logger = None
+    action = None  # The action to do
+    args = []  # The list of parameters received in console
+    logger = None  # The logger to show and log messages
 
     def __init__(self, action, args):
 
-        self.action = action  # The action to do
-        self.args = args  # The list of parameters received in console
-        self.logger = self.get_logger()  # The logger to show and log messages
+        self.action = action
+        self.args = args
+        self.logger = self.get_logger()
 
         # Stop execution if the user running the program is root
         Dir.forbid_root(self.logger)
@@ -63,8 +63,7 @@ class Orchestrator:
             sections and variables.
             - logger: the logger which will show and log the messages.
         Return:
-            - configurator.parser: the parser which will contain all the config
-            file variables.
+            - the parser which will contain all the config file variables.
         '''
         configurator = Configurator()
 
@@ -82,7 +81,7 @@ class Orchestrator:
         Target:
             - get a logger object with its variables.
         Return:
-            - logger: a logger which will show and log messages.
+            - a logger which will show and log messages.
         '''
         # If the user specified a logger config file through console...
         if self.args.config_logger:
@@ -119,7 +118,7 @@ class Orchestrator:
         Target:
             - get a connecter object with its variables.
         Return:
-            - connecter: a connecter which will allow queries to PostgreSQL.
+            - a connecter which will allow queries to PostgreSQL.
         '''
         # If the user specified a connecter config file through console...
         if self.args.config_connection:
@@ -160,7 +159,7 @@ class Orchestrator:
             - connecter: a object with connection parameters to connect to
             PostgreSQL.
         Return:
-            - backer: a backer which will backup databases.
+            - a backer which will backup databases.
         '''
         # If the user specified a backer config file through console...
         if self.args.config:
@@ -242,7 +241,7 @@ class Orchestrator:
             - connecter: a object with connection parameters to connect to
             PostgreSQL.
         Return:
-            - backer: a backer which will backup databases' clusters.
+            - a backer which will backup databases' clusters.
         '''
         # If the user specified a backer config file through console...
         if self.args.config:
@@ -296,7 +295,7 @@ class Orchestrator:
             - connecter: a object with connection parameters to connect to
             PostgreSQL.
         Return:
-            - terminator: a terminator which will terminate connections to
+            - a terminator which will terminate connections to
             PostgreSQL.
         '''
         # If the user specified a terminator config file through console...
@@ -339,7 +338,7 @@ class Orchestrator:
             - get a trimmer object with its variables to delete some databases'
             backups in a selected directory.
         Return:
-            - trimmer: a trimmer which will delete databases' backups.
+            - a trimmer which will delete databases' backups.
         '''
         # If the user specified a trimmer config file through console...
         if self.args.config:
@@ -405,7 +404,7 @@ class Orchestrator:
             - get a trimmer object with its variables to delete some clusters'
             backups in a selected directory.
         Return:
-            - trimmer: a trimmer which will delete clusters' backups.
+            - a trimmer which will delete clusters' backups.
         '''
         # If the user specified a trimmer config file through console...
         if self.args.config:
@@ -450,7 +449,7 @@ class Orchestrator:
             - connecter: a object with connection parameters to connect to
             PostgreSQL.
         Return:
-            - vacuumer: a vacuumer which will vacuum PostgreSQL databases.
+            - a vacuumer which will vacuum PostgreSQL databases.
         '''
         # If the user specified a vacuumer config file through console...
         if self.args.config:
@@ -556,13 +555,46 @@ class Orchestrator:
         # Close connection to PostgreSQL
         connecter.pg_disconnect()
 
+    def get_dropper(self, connecter):
+        '''
+        Target:
+            - get a dropper object with variables to drop some PostgreSQL
+            databases.
+        Parameters:
+            - connecter: a object with connection parameters to connect to
+            PostgreSQL.
+        Return:
+            - a dropper which will delete some PostgreSQL databases.
+        '''
+        # If the user specified a dropper config file through console...
+        if self.args.config:
+            config_type = 'drop'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = self.args.db_name
+
+            # Create the dropper with the specified variables
+            dropper = Dropper(connecter, parser.bkp_vars['in_dbs'],
+                              self.logger)
+
+        # If the user did not specify a dropper config file through console...
+        else:
+            # Create the dropper with the console variables
+            dropper = Dropper(connecter, self.args.db_name, self.logger)
+
+        return dropper
+
     def setup_dropper(self):
         '''
         Target:
             - delete specified databases in PostgreSQL.
         '''
         connecter = self.get_connecter()
-        dropper = Dropper(connecter, self.args.db_name, self.logger)
+        dropper = self.get_dropper(connecter)
 
         # Terminate every connection to the target databases if necessary
         if self.args.terminate:
@@ -777,7 +809,6 @@ class Orchestrator:
         Target:
             - call the corresponding function to the action stored.
         '''
-
         if self.action == 'B':  # Call backer
             self.setup_backer()
 

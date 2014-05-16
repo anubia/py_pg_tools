@@ -8,22 +8,33 @@ from config.config_tools import LogCfgParser
 
 class Configurator:
 
-    cfg_type = None
-    path = None
-    parser = None
-    logger = None
+    cfg_type = None  # Type of config file to load
+    path = None  # Path of the config file to load
+    parser = None  # Parser which stores the variables of the config file
+    logger = None  # Logger to show and log some messages
 
     def __init__(self):
         pass
 
     def load_cfg(self, cfg_type, path, logger=None):
-
+        '''
+        Target:
+            - store a config parser with the obtained variables.
+        Parameters:
+            - cfg_type: the type of config file which is going to be loaded.
+            - path: the path of the config file to be loaded.
+            - logger: the logger which will be show and log the messages. It
+            will be None if the config file to load is for the logger
+            configuration.
+        '''
         self.cfg_type = cfg_type
         self.path = path
 
         if self.cfg_type == 'log':
+            # Log needs other type of parser to avoid redundancy errors
             self.parser = LogCfgParser()
         else:
+            # The other actions will load with the standard parser
             self.parser = CfgParser(logger)
 
         if self.cfg_type == 'connect':
@@ -37,6 +48,10 @@ class Configurator:
         elif self.cfg_type == 'backup_all':
             self.parser.load_cfg(self.path)
             self.parser.parse_backer_cluster()
+
+        elif self.cfg_type == 'drop':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_dropper()
 
         elif self.cfg_type == 'log':
             self.parser.load_cfg(self.path)

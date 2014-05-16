@@ -10,11 +10,11 @@ from const.const import Messenger
 from orchestrator import Orchestrator
 
 
-# ***************************** PROGRAMA PRINCIPAL ****************************
+# ******************************** MAIN PROGRAM *******************************
 
 if __name__ == "__main__":
 
-    # ********************************* MAIN **********************************
+    # ***************************** MAIN PARSER *******************************
 
     arg_parser = argparse.ArgumentParser(
         description=Messenger.PROGRAM_DESCRIPTION,
@@ -112,6 +112,10 @@ if __name__ == "__main__":
 
     dropper.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
+    dropper.add_argument('-C', '--config',
+                         help='load a configuration file (.cfg) to get the '
+                         'dropper conditions')
+
     dropper.add_argument('-d', '--db-name', nargs='+',
                          help='specify the PostgreSQL databases to be deleted')
 
@@ -148,6 +152,10 @@ if __name__ == "__main__":
 
     informer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
+    informer.add_argument('-C', '--config',
+                          help='load a configuration file (.cfg) to get the '
+                          'informer conditions')
+
     groupA = informer.add_mutually_exclusive_group()
     groupA.add_argument('-d', '--db-name', nargs='+',
                         help='gives the owner and the codification of the '
@@ -183,6 +191,10 @@ if __name__ == "__main__":
                             type=int)
 
     replicator.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
+
+    replicator.add_argument('-C', '--config',
+                            help='load a configuration file (.cfg) to get the '
+                            'replicator conditions')
 
     replicator.add_argument('-d', '--db-name', nargs=2,
                             help='specifies the new name of the database '
@@ -222,6 +234,10 @@ if __name__ == "__main__":
                           type=int)
 
     restorer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
+
+    restorer.add_argument('-C', '--config',
+                          help='load a configuration file (.cfg) to get the '
+                          'restorer conditions')
 
     groupA = restorer.add_mutually_exclusive_group()
     groupA.add_argument('-d', '--db-backup', nargs=2,
@@ -424,9 +440,9 @@ if __name__ == "__main__":
     # ************************** DROPPER REQUIREMENTS *************************
 
     elif action == 'd':
-        if not args.db_name:
-            dropper.error('insufficient parameters to work - [-d/--db-name] '
-                          'must be specified')
+        if not (args.config or args.db_name):
+            dropper.error('insufficient parameters to work - [-C/--config | '
+                          '-d/--db-name] must be specified')
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
             dropper.dropper('insufficient connection parameters to work - '
@@ -436,9 +452,9 @@ if __name__ == "__main__":
     # ************************* INFORMER REQUIREMENTS *************************
 
     elif action == 'i':
-        if not (args.db_name or args.users):
-            informer.error('insufficient parameters to work - [-d/--db-name | '
-                           '-u/--users] must be specified')
+        if not (args.config or args.db_name or args.users):
+            informer.error('insufficient parameters to work - [-C/--config | '
+                           '-d/--db-name | -u/--users] must be specified')
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
             informer.error('insufficient connection parameters to work - '
@@ -448,9 +464,9 @@ if __name__ == "__main__":
     # ****************************** REPLICATOR *******************************
 
     elif action == 'r':
-        if not (args.db_name):
+        if not (args.config or args.db_name):
             replicator.error('insufficient parameters to work - '
-                             '[-d/--db-name] must be specified')
+                             '[-C/--config | -d/--db-name] must be specified')
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
             replicator.error('insufficient connection parameters to work - '
@@ -460,9 +476,9 @@ if __name__ == "__main__":
     # ******************************* RESTORER ********************************
 
     elif action == 'R':
-        if not (args.db_backup or args.cluster_backup):
-            restorer.error('insufficient parameters to work - '
-                           '[-d/--db-backup | -c/--cluster-backup] must be '
+        if not (args.config or args.db_backup or args.cluster_backup):
+            restorer.error('insufficient parameters to work - [-C/--config | '
+                           '-d/--db-backup | -c/--cluster-backup] must be '
                            ' specified')
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):

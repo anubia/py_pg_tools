@@ -2,48 +2,38 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+import configparser  # To parse config files
+import os  # To work with directories and files
 
-from logger.logger import Logger
-# Importar la librería configparser (para obtener datos de un archivo .cfg)
-import configparser
-import os  # Importar la librería os (para trabajar con directorios y archivos
 from const.const import Messenger
+from logger.logger import Logger
 
-
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 
 class LogCfgParser:
 
-    logger = None
-    cfg = None
-    log_vars = {}
+    logger = None  # Logger to show and log some messages
+    cfg = None  # Parser which stores the variables of the config file
+    log_vars = {}  # Dictionary to store the loaded logger variables
 
     def __init__(self):
         pass
 
     def load_cfg(self, cfg_file):
         '''
-    Objetivo:
-        - cargar el archivo de configuración con todas sus variables.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - cfg_file: la ruta con el archivo de configuración a cargar.
-        - action: una acción que indicará las variables a cargar, ya que éstas
-        son diferentes a la hora de conectarse a PostgreSQL, hacer dump,
-        dumpall, vacuum, clean o cleanall.
-    Devolución:
-        - un diccionario con las variables cargadas del archivo de
-        configuración.
-    '''
-        try:  # Probar si hay excepciones en...
-            self.cfg = configparser.ConfigParser()  # Crear un Parser
+        Target:
+            - create a parser and read a config file.
+        Parameters:
+            - cfg_file: the config file to be readed.
+        '''
+        try:
+            self.cfg = configparser.ConfigParser()
+            # If config file exists, read it
             if os.path.exists(cfg_file):
-                self.cfg.read(cfg_file)  # Parsear el archivo .cfg
+                self.cfg.read(cfg_file)
             else:
                 raise Exception()
-        except Exception as e:  # Si salta una excepción...
+        except Exception as e:
+            # Create logger in the exception to avoid redundancy errors
             if not self.logger:
                 self.logger = Logger()
             self.logger.debug('Error en la función "load_cfg": {}.'.format(
@@ -52,22 +42,17 @@ class LogCfgParser:
 
     def parse_logger(self):
         '''
-    Objetivo:
-        - obtener las variables del archivo de configuración y comprobar que
-        son válidas.
-    Devolución:
-        - un diccionario con las variables cargadas del archivo de
-        configuración.
-    '''
-        try:  # Comprobar si el programa falla al cargar las variables del .cfg
-            # Pasar los valores del archivo .cfg a un diccionario
+        Target:
+            - store the variables of the logger config file.
+        '''
+        try:
             self.log_vars = {
                 'log_dir': self.cfg.get('settings', 'log_dir').strip(),
                 'level': self.cfg.get('settings', 'level').strip(),
                 'mute': self.cfg.get('settings', 'mute').strip(),
             }
-            # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
+            # Create logger in the exception to avoid redundancy errors
             if not self.logger:
                 self.logger = Logger()
             self.logger.debug('Error en la función "parse_logger": '
@@ -77,11 +62,11 @@ class LogCfgParser:
 
 class CfgParser:
 
-    logger = None
-    cfg = None
-    conn_vars = {}
-    bkp_vars = {}
-    kill_vars = {}
+    logger = None  # Logger to show and log some messages
+    cfg = None  # Parser which stores the variables of the config file
+    conn_vars = {}  # Dictionary to store the loaded connection variables
+    bkp_vars = {}  # Dictionary to store the loaded backup variables
+    kill_vars = {}  # Dictionary to store the loaded terminator variables
 
     def __init__(self, logger):
         if logger:
@@ -223,6 +208,23 @@ class CfgParser:
             self.logger.debug('Error en la función "parse_backer_cluster": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CL_BACKER_CFG_DAMAGED)
+
+    def parse_dropper(self):
+        '''
+        Target:
+            - get the dropper variables from a configuration file and store
+            them in a dictionary.
+        '''
+        try:
+            self.bkp_vars = {
+                'in_dbs': self.cfg.get('includes', 'in_dbs'),
+            }
+
+        # Si el programa falla al cargar las variables del .cfg...
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_dropper": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe(Messenger.DROPPER_CFG_DAMAGED)
 
     def parse_vacuumer(self):
         '''

@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
-
-# ************************* CARGA DE LIBRERÍAS *************************
-
-# Importar la funciones create_logger y fatal_logger de la librería
-# personalizada logger.logger (para utilizar un logger que proporcione
-# información al usuario)
-from logger.logger import Logger
+from casting.casting import Casting
 from const.const import Messenger
+from logger.logger import Logger
 
 
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 class Dropper:
 
     connecter = None
@@ -30,10 +24,10 @@ class Dropper:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
-        if dbnames:
+        if isinstance(dbnames, list):
             self.dbnames = dbnames
         else:
-            self.logger.stop_exe(Messenger.NO_DBS_TO_DROP)
+            self.dbnames = Casting.str_to_list(dbnames)
 
     def drop_pg_db(self, dbname):
 

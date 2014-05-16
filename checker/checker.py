@@ -2,15 +2,10 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+import re  # To work with regular expressions
 
-#from logger.logger import Logger
-# Importar la librería configparser (para obtener datos de un archivo .cfg)
-import re  # Importar la librería re (para trabajar con expresiones regulares)
 from const.const import Default
 
-
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 
 class Checker:
 
@@ -19,6 +14,14 @@ class Checker:
 
     @staticmethod
     def str_is_bool(string):
+        '''
+        Target:
+            - check if a string could be converted into a boolean.
+        Parameters:
+            - string: the string to be checked.
+        Return:
+            - a boolean with the result.
+        '''
         if string in Default.VALID_BOOLS:
             return True
         else:
@@ -26,6 +29,14 @@ class Checker:
 
     @staticmethod
     def str_is_int(string):
+        '''
+        Target:
+            - check if a string could be converted into a integer.
+        Parameters:
+            - string: the string to be checked.
+        Return:
+            - a boolean with the result.
+        '''
         try:
             int(string)
             return True
@@ -34,6 +45,15 @@ class Checker:
 
     @staticmethod
     def str_is_valid_exp_days(string):
+        '''
+        Target:
+            - check if a string could be converted into a valid variable of
+            expiration days. It would be any positive integer, zero or -1.
+        Parameters:
+            - string: the string to be checked.
+        Return:
+            - a boolean with the result.
+        '''
         try:
             result = int(string)
             if result >= -1:
@@ -45,8 +65,19 @@ class Checker:
 
     @staticmethod
     def str_is_valid_max_size(string):
+        '''
+        Target:
+            - check if a string could be converted into a valid variable of
+            maximum size. It would be any integer followed inmediately by a
+            storing unit of measure, like MegaBytes, GigaBytes, TeraBytes or
+            PetaBytes (MB, GB, TB, PB).
+        Parameters:
+            - string: the string to be checked.
+        Return:
+            - a boolean with the result.
+        '''
         regex = r'(\d+)(MB|GB|TB|PB)$'
-        regex = re.compile(regex)  # Validar la expresión regular
+        regex = re.compile(regex)
         if re.match(regex, string):
             return True
         else:
@@ -55,35 +86,30 @@ class Checker:
     @staticmethod
     def check_regex(regex):
         '''
-    Objetivo:
-        - comprobar que una expresión regular sea correcta.
-    Parámetros:
-        - regex: la expresión regular a analizar.
-    Devolución:
-        - el resultado de la comprobación.
-    '''
-        try:  # Probar si hay excepciones en...
-            re.compile(regex)  # Compilar regex
+        Target:
+            - check if a string is a valid regex.
+        Parameters:
+            - regex: the string to be checked.
+        Return:
+            - a boolean with the result.
+        '''
+        try:
+            re.compile(regex)
             return True
-        except re.error:  # Si salta la excepción re.error...
-            #logger.debug('Error en la función "check_regex": {}.'.format(
-                #str(e)))
-            return False  # Marcar regex como incorrecta
+        except re.error:
+            return False
 
     @staticmethod
     def check_compress_type(c_type):
         '''
-    Objetivo:
-        - comprobar la validez de los tipos de extensión para comprimir
-        archivos.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - c_type: el tipo de extensión a analizar.
-    '''
-        # Comprobar si las extensiones para comprimir las copias son válidas
+        Target:
+            - check if a string is a valid compress type.
+        Parameters:
+            - c_type: the string to be checked.
+        Return:
+            - the compress type if is valid, otherwise False.
+        '''
         if c_type in Default.BKP_TYPES:
             return c_type
         else:
-            #logger.debug('Error en la función "check_compress_type".')
             return False

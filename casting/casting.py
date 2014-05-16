@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
-import re  # Importar la librería re (para trabajar con expresiones regulares)
+import re  # To work with regular expressions
 
 
 class Casting:
@@ -10,45 +10,47 @@ class Casting:
         pass
 
     @staticmethod
-    def str_to_bool(boolean):
+    def str_to_bool(string):
         '''
-    Objetivo:
-        - convierte una cadena en un booleano, si la cadena es correcta.
-    Parámetros:
-        - boolean: la cadena que se convierte a booleano.
-    Devolución:
-        - una variable de tipo booleano, "None" si la cadena era incorrecta.
-    '''
-        # Si en el .cfg se escribió True bien...
-        if boolean.lower() == 'true':
+        Target:
+            - converts a string into a boolean.
+        Parameters:
+            - string: the string to be converted.
+        Return:
+            - a boolean or None if the conversion was impossible.
+        '''
+        if string.lower() == 'true':
             return True
-        # Si en el .cfg se escribió False bien...
-        elif boolean.lower() == 'false':
+        elif string.lower() == 'false':
             return False
-        else:  # Si la cadena no se puede convertir a booleano...
+        else:
             return None
 
     @staticmethod
     def str_to_list(string):
         '''
-    Objetivo:
-        - convierte una cadena en una lista de elementos, que vendrán
-        delimitados por comas. Se emplea para cargar las variables del archivo
-        de configuración que deben ser tratadas como listas.
-    Parámetros:
-        - string: la cadena que se quiere convertir en una lista.
-    Devolución:
-        - la lista resultante de dividir la cadena por sus comas.
-    '''
-        # Partir la cadena por sus comas y generar una lista con los fragmentos
-        str_list = string.split(',')
-        for i in range(len(str_list)):  # Recorrer cada elemento de la lista
-            # Eliminar caracteres de espaciado a cada elemento de la lista
-            str_list[i] = str_list[i].strip()
-        return str_list  # Devolver una lista de elementos sin espaciados
+        Target:
+            - converts a string, delimited by commas, into a list.
+        Parameters:
+            - string: the string to be converted.
+        Return:
+            - the resultant list.
+        '''
+        str_list = string.split(',')  # Split the string on each comma
+        for i in range(len(str_list)):
+            str_list[i] = str_list[i].strip()  # Delete spaces of each element
+        return str_list
 
     @staticmethod
     def str_to_int(string):
+        '''
+        Target:
+            - converts a string into a integer.
+        Parameters:
+            - string: the string to be converted.
+        Return:
+            - the resultant integer or False if the conversion was impossible.
+        '''
         try:
             result = int(string)
             return result
@@ -57,7 +59,17 @@ class Casting:
 
     @staticmethod
     def str_to_max_size(string):
-
+        '''
+        Target:
+            - converts a string into a dictionary made up by an integer and a
+            string. The integer will be a size and the string a storing unit of
+            measure.
+        Parameters:
+            - string: the string to be converted.
+        Return:
+            - a dictionary with the size and the unit of measure used or None
+            if the conversion was impossible.
+        '''
         regex = r'(\d+)(MB|GB|TB|PB)$'
         regex = re.compile(regex)  # Validar la expresión regular
         if re.match(regex, string):

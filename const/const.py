@@ -244,6 +244,11 @@ class Messenger:
                             'clúster de PostgreSQL está dañado. Por favor, ' \
                             'revise que los nombres por defecto de ' \
                             'secciones y atributos son correctos.'
+    DROPPER_CFG_DAMAGED = 'El archivo de configuración con las condiciones ' \
+                          'para la eliminación de bases de datos en ' \
+                          'PostgreSQL está dañado. Por favor, revise que ' \
+                          'los nombres por defecto de secciones y atributos ' \
+                          'son correctos.'
     VACUUMER_CFG_DAMAGED = 'El archivo de configuración con las ' \
                            'condiciones para la limpieza de bases de datos ' \
                            'en PostgreSQL está dañado. Por favor, revise ' \
