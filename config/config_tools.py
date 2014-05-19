@@ -43,8 +43,8 @@ class LogCfgParser:
     def parse_logger(self):
         '''
         Target:
-            - get the logger variables from a configuration file and store
-            them in a dictionary.
+            - get the logger variables from a configuration file and store them
+            in a dictionary.
         '''
         try:
             self.log_vars = {
@@ -113,8 +113,8 @@ class CfgParser:
     def parse_backer(self):
         '''
         Target:
-            - get the backer variables from a configuration file and store
-            them in a dictionary (database case).
+            - get the backer variables from a configuration file and store them
+            in a dictionary (database case).
         '''
         try:
             self.bkp_vars = {
@@ -141,8 +141,8 @@ class CfgParser:
     def parse_backer_cluster(self):
         '''
         Target:
-            - get the backer variables from a configuration file and store
-            them in a dictionary (cluster case).
+            - get the backer variables from a configuration file and store them
+            in a dictionary (cluster case).
         '''
         try:
             self.bkp_vars = {
@@ -291,19 +291,15 @@ class CfgParser:
             - get the trimmer variables from a configuration file and store
             them in a dictionary (cluster case).
         '''
-        try:  # Comprobar si el programa falla al cargar las variables del .cfg
-            # Pasar los valores del archivo .cfg a un diccionario
+        try:
             self.bkp_vars = {
                 'bkp_path': self.cfg.get('dir', 'bkp_path').strip(),
-                # Prefijo a incluir en el nombre del archivo de la copia de la
-                # BD
                 'prefix': self.cfg.get('file', 'prefix').strip(),
                 'min_n_bkps': self.cfg.get('conditions', 'min_n_bkps').strip(),
                 'exp_days': self.cfg.get('conditions', 'exp_days').strip(),
                 'max_size': self.cfg.get('conditions', 'max_size').strip(),
             }
 
-            # Si el programa falla al cargar las variables del .cfg...
         except Exception as e:
             self.logger.debug('Error en la función "parse_trimmer_cluster": '
                               '{}.'.format(str(e)))

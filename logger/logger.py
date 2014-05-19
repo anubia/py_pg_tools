@@ -22,10 +22,10 @@ class CustomRotatingFileHandler(logging.handlers.RotatingFileHandler):
     def emit(self, record):
         '''
         Target:
-        - escape ANSI codes in file handlers, this way they will not be seen
-        in log files.
+            - escape ANSI codes in file handlers, this way they will not be
+            seen in log files.
         Parameters:
-        - record: a line to be written in the log file.
+            - record: a line to be written in the log file.
         '''
         record.msg = self.ansi_escape.sub('', record.msg)
         logging.handlers.RotatingFileHandler.emit(self, record)
@@ -42,7 +42,7 @@ class Logger:
     def __init__(self, log_dir=None, level=None, mute=False):
         '''
         Target:
-        - create a logger to store the activity of the program.
+            - create a logger to store the activity of the program.
         '''
         if log_dir:
             self.log_dir = log_dir
@@ -120,45 +120,45 @@ class Logger:
     def debug(self, message):
         '''
         Target:
-        - show and log a message with debug level.
+            - show and log a message with debug level.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         self.logger.debug(message)
 
     def info(self, message):
         '''
         Target:
-        - show and log a message with info level.
+            - show and log a message with info level.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         self.logger.info(message)
 
     def warning(self, message):
         '''
         Target:
-        - show and log a message with warning level.
+            - show and log a message with warning level.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         self.logger.warning(message)
 
     def error(self, message):
         '''
         Target:
-        - show and log a message with error level.
+            - show and log a message with error level.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         self.logger.error(message)
 
     def critical(self, message):
         '''
         Target:
-        - show and log a message with critical level.
+            - show and log a message with critical level.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         self.logger.critical(message)
 
@@ -166,9 +166,9 @@ class Logger:
                   effect='default'):
         '''
         Target:
-        - show a message with colors and effects in console and log it.
+            - show a message with colors and effects in console and log it.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         eff = Logger.__get_effect_code(effect)
         bg = Logger.__get_bgcolor_code(bgcolor)
@@ -193,10 +193,10 @@ class Logger:
     def stop_exe(self, message):
         '''
         Target:
-        - show and log an error message with colors and effcets, and stop the
-        execution of the program.
+            - show and log an error message with colors and effcets, and stop
+            the execution of the program.
         Parameters:
-        - message: the message to show and log.
+            - message: the message to show and log.
         '''
         self.highlight('error', message, 'white', 'red', 'bold')
         sys.exit(1)
@@ -205,11 +205,11 @@ class Logger:
     def __get_txtcolor_code(txtcolor):
         '''
         Target:
-        - turn a string with the name of a text color into its ANSI code.
+            - turn a string with the name of a text color into its ANSI code.
         Parameters:
-        - txtcolor: the common name of a color.
+            - txtcolor: the common name of a color.
         Return:
-        - an integer which gives an ANSI code.
+            - an integer which gives an ANSI code.
         '''
         txtcolors = {
             'black': 90,
@@ -235,11 +235,12 @@ class Logger:
     def __get_bgcolor_code(bgcolor):
         '''
         Target:
-        - turn a string with the name of a background color into its ANSI code.
+            - turn a string with the name of a background color into its ANSI
+            code.
         Parameters:
-        - bgcolor: the common name of a color.
+            - bgcolor: the common name of a color.
         Return:
-        - an integer which gives an ANSI code.
+            - an integer which gives an ANSI code.
         '''
         bgcolors = {
             'black': 40,
@@ -258,11 +259,11 @@ class Logger:
     def __get_effect_code(effect):
         '''
         Target:
-        - turn a string with the name of an effect into its ANSI code.
+            - turn a string with the name of an effect into its ANSI code.
         Parameters:
-        - effect: the common name of an effect.
+            - effect: the common name of an effect.
         Return:
-        - an integer which gives an ANSI code.
+            - an integer which gives an ANSI code.
         '''
         effects = {
             'default': 0,

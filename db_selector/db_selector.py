@@ -16,17 +16,17 @@ class DbSelector:
     def db_filter_include(dbs_list, in_dbs=[], in_regex='', logger=None):
         '''
         Target:
-        - filter a list of databases to get only the specified ones, taking
-        into account the received parameters.
+            - filter a list of databases to get only the specified ones, taking
+            into account the received parameters.
         Parameters:
-        - dbs_list: list to filter.
-        - in_dbs: list with the databases' names to include.
-        - in_regex: regular expression which indicates the databases' names to
-        include.
-        - logger: a logger to show and log some messages.
+            - dbs_list: list to filter.
+            - in_dbs: list with the databases' names to include.
+            - in_regex: regular expression which indicates the databases' names
+            to include.
+            - logger: a logger to show and log some messages.
         Return:
-        - a filtered list (subset of "dbs_list"), value from the addition of
-        the include conditions "in_dbs" y "in_regex".
+            - a filtered list (subset of "dbs_list"), value from the addition
+            of the include conditions "in_dbs" y "in_regex".
         '''
         if not logger:
             logger = Logger()
@@ -58,17 +58,17 @@ class DbSelector:
     def db_filter_exclude(dbs_list, ex_dbs=[], ex_regex='', logger=None):
         '''
         Target:
-        - filter a list of databases to remove only the specified ones, taking
-        into account the received parameters.
+            - filter a list of databases to remove only the specified ones,
+            taking into account the received parameters.
         Parameters:
-        - dbs_list: list to filter.
-        - ex_dbs: list with the databases' names to exclude.
-        - ex_regex: regular expression which indicates the databases' names to
-        exclude.
-        - logger: a logger to show and log some messages.
+            - dbs_list: list to filter.
+            - ex_dbs: list with the databases' names to exclude.
+            - ex_regex: regular expression which indicates the databases' names
+            to exclude.
+            - logger: a logger to show and log some messages.
         Return:
-        - a filtered list (subset of "dbs_list"), value from the addition of
-        the exclude conditions "ex_dbs" y "ex_regex".
+            - a filtered list (subset of "dbs_list"), value from the addition
+            of the exclude conditions "ex_dbs" y "ex_regex".
         '''
         if not logger:
             logger = Logger()
@@ -104,21 +104,21 @@ class DbSelector:
                          ex_regex='', in_priority=False, logger=None):
         '''
         Target:
-        - filter a database's list taking into account inclusion and exclusion
-        parameters and their priority.
+            - filter a database's list taking into account inclusion and
+            exclusion parameters and their priority.
         Parameters:
-        - dbs_all: list to filter.
-        - in_dbs: list with the databases' names to include.
-        - ex_dbs: list with the databases' names to exclude.
-        - in_regex: regular expression which indicates the databases' names to
-        include.
-        - ex_regex: regular expression which indicates the databases' names to
-        exclude.
-        - in_priority: a flag which determinates if the inclusion parameters
-        must predominate over the exclusion ones.
-        - logger: a logger to show and log some messages.
+            - dbs_all: list to filter.
+            - in_dbs: list with the databases' names to include.
+            - ex_dbs: list with the databases' names to exclude.
+            - in_regex: regular expression which indicates the databases' names
+            to include.
+            - ex_regex: regular expression which indicates the databases' names
+            to exclude.
+            - in_priority: a flag which determinates if the inclusion
+            parameters must predominate over the exclusion ones.
+            - logger: a logger to show and log some messages.
         Return:
-        - a filtered list (subset of "dbs_all").
+            - a filtered list (subset of "dbs_all").
         '''
         if not logger:
             logger = Logger()
@@ -153,17 +153,17 @@ class DbSelector:
     def dbname_filter_include(dbs_list, in_dbs=[], in_regex='', logger=None):
         '''
         Target:
-        - filter a list of databases' names to get only the specified ones,
-        taking into account the received parameters.
+            - filter a list of databases' names to get only the specified ones,
+            taking into account the received parameters.
         Parameters:
-        - dbs_list: list to filter.
-        - in_dbs: list with the databases' names to include.
-        - in_regex: regular expression which indicates the databases' names to
-        include.
-        - logger: a logger to show and log some messages.
+            - dbs_list: list to filter.
+            - in_dbs: list with the databases' names to include.
+            - in_regex: regular expression which indicates the databases' names
+            to include.
+            - logger: a logger to show and log some messages.
         Return:
-        - a filtered list (subset of "dbs_list"), value from the addition of
-        the include conditions "in_dbs" y "in_regex".
+            - a filtered list (subset of "dbs_list"), value from the addition
+            of the include conditions "in_dbs" y "in_regex".
         '''
         if not logger:
             logger = Logger()
@@ -193,17 +193,17 @@ class DbSelector:
     def dbname_filter_exclude(dbs_list, ex_dbs=[], ex_regex='', logger=None):
         '''
         Target:
-        - filter a list of databases' names to remove only the specified ones,
-        taking into account the received parameters.
+            - filter a list of databases' names to remove only the specified
+            ones, taking into account the received parameters.
         Parameters:
-        - dbs_list: list to filter.
-        - ex_dbs: list with the databases' names to exclude.
-        - ex_regex: regular expression which indicates the databases' names to
-        exclude.
-        - logger: a logger to show and log some messages.
+            - dbs_list: list to filter.
+            - ex_dbs: list with the databases' names to exclude.
+            - ex_regex: regular expression which indicates the databases' names
+            to exclude.
+            - logger: a logger to show and log some messages.
         Return:
-        - a filtered list (subset of "dbs_list"), value from the addition of
-        the exclude conditions "ex_dbs" y "ex_regex".
+            - a filtered list (subset of "dbs_list"), value from the addition
+            of the exclude conditions "ex_dbs" y "ex_regex".
         '''
         if not logger:
             logger = Logger()
@@ -237,21 +237,21 @@ class DbSelector:
                              ex_regex='', in_priority=False, logger=None):
         '''
         Target:
-        - filter a list of databases' names taking into account inclusion and
-        exclusion parameters and their priority.
+            - filter a list of databases' names taking into account inclusion
+            and exclusion parameters and their priority.
         Parameters:
-        - dbs_all: list to filter.
-        - in_dbs: list with the databases' names to include.
-        - ex_dbs: list with the databases' names to exclude.
-        - in_regex: regular expression which indicates the databases' names to
-        include.
-        - ex_regex: regular expression which indicates the databases' names to
-        exclude.
-        - in_priority: a flag which determinates if the inclusion parameters
-        must predominate over the exclusion ones.
-        - logger: a logger to show and log some messages.
+            - dbs_all: list to filter.
+            - in_dbs: list with the databases' names to include.
+            - ex_dbs: list with the databases' names to exclude.
+            - in_regex: regular expression which indicates the databases' names
+            to include.
+            - ex_regex: regular expression which indicates the databases' names
+            to exclude.
+            - in_priority: a flag which determinates if the inclusion
+            parameters must predominate over the exclusion ones.
+            - logger: a logger to show and log some messages.
         Return:
-        - a filtered list (subset of "dbs_all").
+            - a filtered list (subset of "dbs_all").
         '''
         if not logger:
             logger = Logger()
@@ -285,12 +285,12 @@ class DbSelector:
     def list_pg_dbs(cursor):
         '''
         Target:
-        - turns a cursor's data into a list.
+            - turns a cursor's data into a list.
         Parameters:
-        - cursor: a connection cursor with data stored.
+            - cursor: a connection cursor with data stored.
         Return:
-        - a list with dictionaries which have databases' name, connection
-        permissions and their owner stored.
+            - a list with dictionaries which have databases' name, connection
+            permissions and their owner stored.
         '''
         dbs_all = []
 
@@ -308,11 +308,11 @@ class DbSelector:
     def list_pg_dbnames(cursor):
         '''
         Target:
-        - turns a cursor's data into a list.
+            - turns a cursor's data into a list.
         Parameters:
-        - cursor: a connection cursor with data stored.
+            - cursor: a connection cursor with data stored.
         Return:
-        - a list with databases' name.
+            - a list with databases' name.
         '''
         dbs_all = []
 

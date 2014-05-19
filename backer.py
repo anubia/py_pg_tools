@@ -125,12 +125,12 @@ class Backer:
     def backup_db(self, dbname, bkps_dir):
         '''
         Target:
-        - make a backup of a specified database.
+            - make a backup of a specified database.
         Parameters:
-        - dbname: name of the database which is going to be backuped.
-        - bkps_dir: directory where the backup is going to be stored.
+            - dbname: name of the database which is going to be backuped.
+            - bkps_dir: directory where the backup is going to be stored.
         Return:
-        - a boolean which indicates the success of the process.
+            - a boolean which indicates the success of the process.
         '''
         success = True
         # Get date and time of the zone
@@ -177,9 +177,9 @@ class Backer:
     def backup_dbs(self, dbs_all):
         '''
         Target:
-        - make a backup of some specified databases.
+            - make a backup of some specified databases.
         Parameters:
-        - dbs_all: names of the databases which are going to be backuped.
+            - dbs_all: names of the databases which are going to be backuped.
         '''
         self.logger.highlight('info', Messenger.CHECKING_BACKUP_DIR, 'white')
 
@@ -300,11 +300,11 @@ class BackerCluster:
     def backup_all(self, bkps_dir):
         '''
         Target:
-        - make a backup of a cluster.
+            - make a backup of a cluster.
         Parameters:
-        - bkps_dir: directory where the backup is going to be stored.
+            - bkps_dir: directory where the backup is going to be stored.
         Return:
-        - a boolean which indicates the success of the process.
+            - a boolean which indicates the success of the process.
         '''
         success = True
         # Get date and time of the zone
@@ -354,7 +354,7 @@ class BackerCluster:
     def backup_cl(self):
         '''
         Target:
-        - vacuum if necessary and make a backup of a cluster.
+            - vacuum if necessary and make a backup of a cluster.
         '''
         self.logger.highlight('info', Messenger.CHECKING_BACKUP_DIR, 'white')
 

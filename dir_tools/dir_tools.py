@@ -21,7 +21,7 @@ class Dir:
     def forbid_root(logger=None):
         '''
         Target:
-        - stop the execution of the program if this is being run by "root".
+            - stop the execution of the program if this is being run by "root".
         '''
         if not logger:
             logger = Logger()
@@ -37,10 +37,10 @@ class Dir:
     def create_dir(path, logger=None):
         '''
         Target:
-        - stop the execution of the program if this is being run by "root".
+            - stop the execution of the program if this is being run by "root".
         Parameters:
-        - path: directory to create.
-        - logger: a logger to show and log some messages.
+            - path: directory to create.
+            - logger: a logger to show and log some messages.
         '''
         if not logger:
             logger = Logger()
@@ -57,10 +57,10 @@ class Dir:
     def default_bkps_path():
         '''
         Target:
-        - get the default directory where the backups must be stored.
+            - get the default directory where the backups must be stored.
         Return:
-        - A string which gives the absolute path where the backups will be
-        stored.
+            - A string which gives the absolute path where the backups will be
+            stored.
         '''
         ## Get the script's directory
         #script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -76,13 +76,14 @@ class Dir:
     def default_cfg_path(subpath):
         '''
         Target:
-        - get the default directory where the configuration files should be.
+            - get the default directory where the configuration files should
+            be.
         Parameters:
-        - subpath: the last part of the default path which depends on the type
-        of configuration file.
+            - subpath: the last part of the default path which depends on the
+            type of configuration file.
         Return:
-        - a string which gives the absolute path where a specific configuration
-        file should be.
+            - a string which gives the absolute path where a specific
+            configuration file should be.
         '''
         # Get the script's directory
         script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -98,12 +99,12 @@ class Dir:
     def sorted_flist(path):
         '''
         Target:
-        - generate a list which contains every file in the specified directory
-        (and its subdirectories) sorted by modification date.
+            - generate a list which contains every file in the specified
+            directory (and its subdirectories) sorted by modification date.
         Parameters:
-        - path: the directory where the files are.
+            - path: the directory where the files are.
         Return:
-        - a sorted list with all the files in the directory.
+            - a sorted list with all the files in the directory.
         '''
         files_list = []
 
@@ -120,12 +121,13 @@ class Dir:
     def get_dbs_bkped(bkps_list=[]):
         '''
         Target:
-        - extract the databases' names from the files' names of the list
-        received and store them in a list.
+            - extract the databases' names from the files' names of the list
+            received and store them in a list.
         Parameters:
-        - bkps_list: a list with backup's files.
+            - bkps_list: a list with backup's files.
         Return:
-        - a list with those databases' names extracted from the backup's list.
+            - a list with those databases' names extracted from the backup's
+            list.
         '''
         bkped_dbs = []
 
@@ -159,14 +161,14 @@ class Dir:
     def show_pg_warnings(pg_dbs=[], bkped_dbs=[], logger=None):
         '''
         Target:
-        - compare two lists with databases. This function will be used to show
-        which PostgreSQL databases do not have a backup in a specified
-        directory and which databases have a backup but are not stored in
-        PostgreSQL.
+            - compare two lists with databases. This function will be used to
+            show which PostgreSQL databases do not have a backup in a specified
+            directory and which databases have a backup but are not stored in
+            PostgreSQL.
         Parameters:
-        - pg_dbs: list of PostgreSQL databases.
-        - bkped_dbs: list of databases which have a backup.
-        - logger: a logger to show and log some messages.
+            - pg_dbs: list of PostgreSQL databases.
+            - bkped_dbs: list of databases which have a backup.
+            - logger: a logger to show and log some messages.
         '''
         if not logger:
             logger = Logger()
@@ -188,11 +190,11 @@ class Dir:
     def get_files_tsize(files_list=[]):
         '''
         Target:
-        - give the total size in Bytes of a files' list.
+            - give the total size in Bytes of a files' list.
         Parameters:
-        - files_list: a list with some files' absolute paths.
+            - files_list: a list with some files' absolute paths.
         Return:
-        - an integer which gives the total size in bytes
+            - an integer which gives the total size in bytes
         '''
         tsize = 0
 
@@ -206,9 +208,9 @@ class Dir:
     def remove_empty_dir(path):
         '''
         Target:
-        - remove a directory if empty.
+            - remove a directory if empty.
         Parameters:
-        - path: the absolute path of the directory.
+            - path: the absolute path of the directory.
         '''
         try:
             os.rmdir(path)  # Remove dir (will give an exception if not empty)
@@ -219,10 +221,10 @@ class Dir:
     def remove_empty_dirs(path):
         '''
         Target:
-        - remove every subdirectory if empty (even the whole directory in case
-        it turns empty).
+            - remove every subdirectory if empty (even the whole directory in
+            case it turns empty).
         Parameters:
-        - path: the absolute path of the directory.
+            - path: the absolute path of the directory.
         '''
         for root, dirnames, filenames in os.walk(path, topdown=False):
             for dirname in dirnames:

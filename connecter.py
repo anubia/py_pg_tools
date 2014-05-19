@@ -28,12 +28,12 @@ class Connecter:
     def __init__(self, server, user, port, logger=None):
         '''
         Target:
-        - init a connection to PostgreSQL.
+            - init a connection to PostgreSQL.
         Parameters:
-        - server: a server which has PostgreSQL installed.
-        - user: PostgreSQL user who makes the connection.
-        - port: the target port of the connection.
-        - logger: a logger to show and log some messages.
+            - server: a server which has PostgreSQL installed.
+            - user: PostgreSQL user who makes the connection.
+            - port: the target port of the connection.
+            - logger: a logger to show and log some messages.
         '''
         if logger:
             self.logger = logger
@@ -68,7 +68,7 @@ class Connecter:
     def pg_disconnect(self):
         '''
         Target:
-        - disconnect from PostgreSQL.
+            - disconnect from PostgreSQL.
         '''
         try:
             self.cursor.close()
@@ -81,11 +81,11 @@ class Connecter:
     def get_pid_str(self):
         '''
         Target:
-        - get the name of the process id depending on the PostgreSQL version
-        which is being used. Before the version 9.2 this variable was called
-        "procpid", afterwards became "pid".
+            - get the name of the process id depending on the PostgreSQL
+            version which is being used. Before the version 9.2 this variable
+            was called "procpid", afterwards became "pid".
         Return:
-        - a string which gives the name of the vaiable process id.
+            - a string which gives the name of the vaiable process id.
         '''
         pg_version = self.conn.server_version  # Get PostgreSQL version
 
@@ -97,10 +97,10 @@ class Connecter:
     def is_pg_superuser(self):
         '''
         Target:
-        - check if a user connected to PostgreSQL has a superuser role.
+            - check if a user connected to PostgreSQL has a superuser role.
         Return:
-        - a boolean which indicates whether a user is a PostgreSQL
-        superuser or not.
+            - a boolean which indicates whether a user is a PostgreSQL
+            superuser or not.
         '''
         query_is_superuser = (
             'SELECT usesuper '
@@ -115,13 +115,13 @@ class Connecter:
     def get_cursor_dbs(self, ex_templates=True, db_owner=''):
         '''
         Target:
-        - do different queries to PostgreSQL depending on the parameters
-        received, and store the results in the connection cursor.
+            - do different queries to PostgreSQL depending on the parameters
+            received, and store the results in the connection cursor.
         Parameters:
-        - ex_templates: flag which determinates whether or not get those
-        databases which are templates.
-        - db_owner: the name of the user whose databases are going to be
-        obtained.
+            - ex_templates: flag which determinates whether or not get those
+            databases which are templates.
+            - db_owner: the name of the user whose databases are going to be
+            obtained.
         '''
         query_get_dbs = (
             'SELECT d.datname, d.datallowconn, '
@@ -163,10 +163,10 @@ class Connecter:
     def allow_db_conn(self, dbname):
         '''
         Target:
-        - enable connections to a specified PostgreSQL database.
+            - enable connections to a specified PostgreSQL database.
         Parameters:
-        - dbname: name of the database whose property "datallowconn" is going
-        to be changed to allow connections to itself.
+            - dbname: name of the database whose property "datallowconn" is
+            going to be changed to allow connections to itself.
         '''
         query_db_allow_conn = (
             'UPDATE pg_database '
@@ -180,10 +180,10 @@ class Connecter:
     def disallow_db_conn(self, dbname):
         '''
         Target:
-        - disable connections to a specified PostgreSQL database.
+            - disable connections to a specified PostgreSQL database.
         Parameters:
-        - dbname: name of the database whose property "datallowconn" is going
-        to be changed to disallow connections to itself.
+            - dbname: name of the database whose property "datallowconn" is
+            going to be changed to disallow connections to itself.
         '''
         query_db_disallow_conn = (
             'UPDATE pg_database '
