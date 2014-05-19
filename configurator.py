@@ -53,9 +53,25 @@ class Configurator:
             self.parser.load_cfg(self.path)
             self.parser.parse_dropper()
 
+        elif self.cfg_type == 'inform':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_informer()
+
         elif self.cfg_type == 'log':
             self.parser.load_cfg(self.path)
             self.parser.parse_logger()
+
+        elif self.cfg_type == 'replicate':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_replicator()
+
+        elif self.cfg_type == 'restore':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_restorer()
+
+        elif self.cfg_type == 'restore_all':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_restorer_cluster()
 
         elif self.cfg_type == 'vacuum':
             self.parser.load_cfg(self.path)

@@ -2,61 +2,57 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+import logging  # to create logger objects
+import logging.handlers  # to create console and file handlers
+import os.path  # to check the existance of some paths
+import re  # to work with regular expressions
+import sys  # to work with the argv array
 
-import sys  # Importar la librería sys (para trabajar con el vector argv)
-import logging
-# Importar la librería logging (para crear un logger y poder mostrar mensajes
-# por consola y registrar más información en un archivo)
-import logging.handlers
-# Importar la librería logging.handlers (para crear handlers para consola y
-# archivo en el logger)
-import os.path
-# Importar la librería os.path (para comprobar la existencia de archivos)
-from date_tools.date_tools import DateTools  # Librería personalizada
-# Importar la función get_date de la librería date (para obtener la fecha
-# de la zona en el formato deseado)
-from const.const import Default
-from checker.checker import Checker
 from casting.casting import Casting
+from checker.checker import Checker
+from const.const import Default
+from date_tools.date_tools import DateTools
 
-
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 
 class CustomRotatingFileHandler(logging.handlers.RotatingFileHandler):
 
-    import re
+    # Regular expression to escape colors in file handler
     ansi_escape = re.compile(r'\x1b[^m]*m')
 
     def emit(self, record):
+        '''
+        Target:
+        - escape ANSI codes in file handlers, this way they will not be seen
+        in log files.
+        Parameters:
+        - record: a line to be written in the log file.
+        '''
         record.msg = self.ansi_escape.sub('', record.msg)
         logging.handlers.RotatingFileHandler.emit(self, record)
 
 
 class Logger:
 
-    logger = None
-    log_dir = None
-    level = None
+    logger = None  # A logger to show and log some messages
+    log_dir = None  # The directory where the log files will be stored
+    level = None  # The verbosity level of the file handler
+    # A flag to determinate if use a file handler and create log files
     mute = False
 
     def __init__(self, log_dir=None, level=None, mute=False):
         '''
-    Objetivo:
-        - generar un logger con handlers para consola (en nivel INFO) y para
-        archivo (en nivel DEBUG). Crear directorio "log" si no existe y
-        almacenar en su interior los archivos "log" generados.
-    Devolución:
-        - el logger que se usará para mostrar mensajes.
-    '''
+        Target:
+        - create a logger to store the activity of the program.
+        '''
         if log_dir:
             self.log_dir = log_dir
         else:
-            # Obtener directorio de esta librería
+            # Get script's directory
             script_dir = os.path.dirname(os.path.realpath(__file__))
-            # Obtener directorio padre de esta librería
+            # Get program's main directory
             script_pardir = os.path.abspath(os.path.join(script_dir,
                                                          os.pardir))
+            # Get directory to store log files
             self.log_dir = os.path.join(script_pardir, 'log/')
 
         if level in Default.LOG_LEVELS:
@@ -71,37 +67,37 @@ class Logger:
         else:
             self.mute = Default.MUTE
 
-        # Obtener fecha y hora actuales de la zona
+        # Get current date and time of the zone
         init_ts = DateTools.get_date()
-        # Obtener nombre de este archivo
+        # Get file's name
         script_filename = os.path.basename(sys.argv[0])
-        # Obtener nombre de este script
+        # Get main program's name
         script_name = os.path.splitext(script_filename)[0]
-        # Establecer formato para el nombre de los archivos "logs"
+        # Set format for the log files' names
         log_name = script_name + '_' + init_ts + '.log'
-        # Establecer ruta completa de los archivos "logs"
+        # Set absolute path for log files
         log_file = os.path.join(self.log_dir, log_name)
-        # Crear logger con el mismo nombre de este script
+        # Create logger with the main program's name
         self.logger = logging.getLogger(script_name)
-        # Establecer DEBUG como nivel máximo para el logger
+        # Set DEBUG as maximum verbosity level
         self.logger.setLevel(logging.DEBUG)
-        # Crear un handler para consola
+        # Create a handler for console
         ch = logging.StreamHandler()
-        # Poner el nivel del handler de consola a sólo "INFO" (no ver "DEBUG")
+        # Set the verbosity of console handler to "INFO"
         ch.setLevel(logging.INFO)
-        # Si en el directorio actual no existe un directario llamado "log"...
+        # Create a format for console and file logs
         formatter = logging.Formatter('%(asctime)s - %(levelname)-4s - '
                                       '%(message)s',
                                       datefmt='%Y.%m.%d_%H:%M:%S_%Z')
-        if self.mute is False:
+        if self.mute is False:  # If log files are required...
+            # Create directory for log files if it does not exist yet
             if not os.path.exists(self.log_dir):
-                os.makedirs(self.log_dir)  # Crear directorio "log"
-            # Establecer tamaño que tendrán los archivos "log"
+                os.makedirs(self.log_dir)
+            # Set size for each log file
             max_bytes = 4 * 1024 * 1024  # 4MiB
-            # Crear un handler para un archivo
+            # Create a file handler
             fh = CustomRotatingFileHandler(log_file, 'a', max_bytes, 10)
-            # Poner el nivel del handler de archivo a "DEBUG" (ver todos los
-            # mensajes)
+            # Set the verbosity of console handler to the selected level
             if self.level == 'debug':
                 fh.setLevel(logging.DEBUG)
             if self.level == 'info':
@@ -112,33 +108,68 @@ class Logger:
                 fh.setLevel(logging.ERROR)
             if self.level == 'critical':
                 fh.setLevel(logging.CRITICAL)
-            # Establecer un formato para los mensajes del logger
-            fh.setFormatter(formatter)  # Añadir formato al handler del archivo
 
-        ch.setFormatter(formatter)  # Añadir formato al handler de la consola
-        self.logger.addHandler(ch)  # Añadir handler de la consola al logger
+            fh.setFormatter(formatter)  # Set format for file handler
 
-        if self.mute is False:
-            self.logger.addHandler(fh)  # Añadir handler del archivo al logger
+        ch.setFormatter(formatter)  # Set format for console handler
+        self.logger.addHandler(ch)  # Add console handler
+
+        if self.mute is False:  # If log files are required...
+            self.logger.addHandler(fh)  # Add file handler
 
     def debug(self, message):
+        '''
+        Target:
+        - show and log a message with debug level.
+        Parameters:
+        - message: the message to show and log.
+        '''
         self.logger.debug(message)
 
     def info(self, message):
+        '''
+        Target:
+        - show and log a message with info level.
+        Parameters:
+        - message: the message to show and log.
+        '''
         self.logger.info(message)
 
     def warning(self, message):
+        '''
+        Target:
+        - show and log a message with warning level.
+        Parameters:
+        - message: the message to show and log.
+        '''
         self.logger.warning(message)
 
     def error(self, message):
+        '''
+        Target:
+        - show and log a message with error level.
+        Parameters:
+        - message: the message to show and log.
+        '''
         self.logger.error(message)
 
     def critical(self, message):
+        '''
+        Target:
+        - show and log a message with critical level.
+        Parameters:
+        - message: the message to show and log.
+        '''
         self.logger.critical(message)
 
     def highlight(self, level, message, txtcolor='default', bgcolor='black',
                   effect='default'):
-
+        '''
+        Target:
+        - show a message with colors and effects in console and log it.
+        Parameters:
+        - message: the message to show and log.
+        '''
         eff = Logger.__get_effect_code(effect)
         bg = Logger.__get_bgcolor_code(bgcolor)
         txt = Logger.__get_txtcolor_code(txtcolor)
@@ -161,21 +192,25 @@ class Logger:
 
     def stop_exe(self, message):
         '''
-    Objetivo:
-        - mostrar y registrar un mensaje de error, e interrumpir la ejecución
-        del programa.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - message: el mensaje a mostrar al usuario y registrar en log.
-    '''
+        Target:
+        - show and log an error message with colors and effcets, and stop the
+        execution of the program.
+        Parameters:
+        - message: the message to show and log.
+        '''
         self.highlight('error', message, 'white', 'red', 'bold')
-        sys.exit(1)  # Interrumpir la ejecución del programa
+        sys.exit(1)
 
     @staticmethod
     def __get_txtcolor_code(txtcolor):
-        # Declarar un diccionario con los códigos ANSI de colores de texto
-        # en consola
+        '''
+        Target:
+        - turn a string with the name of a text color into its ANSI code.
+        Parameters:
+        - txtcolor: the common name of a color.
+        Return:
+        - an integer which gives an ANSI code.
+        '''
         txtcolors = {
             'black': 90,
             'darkred': 31,
@@ -193,12 +228,19 @@ class Logger:
             'white': 97,
             'default': 37,
         }
+
         return txtcolors[txtcolor]
 
     @staticmethod
     def __get_bgcolor_code(bgcolor):
-        # Declarar un diccionario con los códigos ANSI de colores de fondo en
-        # consola
+        '''
+        Target:
+        - turn a string with the name of a background color into its ANSI code.
+        Parameters:
+        - bgcolor: the common name of a color.
+        Return:
+        - an integer which gives an ANSI code.
+        '''
         bgcolors = {
             'black': 40,
             'red': 41,
@@ -209,11 +251,19 @@ class Logger:
             'cyan': 46,
             'white': 47,
         }
+
         return bgcolors[bgcolor]
 
     @staticmethod
     def __get_effect_code(effect):
-        # Declarar un diccionario con los códigos ANSI de efectos en consola
+        '''
+        Target:
+        - turn a string with the name of an effect into its ANSI code.
+        Parameters:
+        - effect: the common name of an effect.
+        Return:
+        - an integer which gives an ANSI code.
+        '''
         effects = {
             'default': 0,
             'bold': 1,
@@ -222,4 +272,5 @@ class Logger:
             'inverse': 7,
             'hidden': 8,
         }
+
         return effects[effect]

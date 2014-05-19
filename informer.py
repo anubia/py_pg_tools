@@ -9,6 +9,7 @@
 # información al usuario)
 from logger.logger import Logger
 from const.const import Messenger
+from casting.casting import Casting
 
 
 # ************************* DEFINICIÓN DE FUNCIONES *************************
@@ -31,8 +32,15 @@ class Informer:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
-        self.dbnames = dbnames
-        self.usernames = usernames
+        if isinstance(dbnames, list) or dbnames is None:
+            self.dbnames = dbnames
+        else:
+            self.dbnames = Casting.str_to_list(dbnames)
+
+        if isinstance(dbnames, list) or dbnames is None:
+            self.usernames = usernames
+        else:
+            self.usernames = Casting.str_to_list(usernames)
 
     def get_pg_db_data(self, dbname):
 

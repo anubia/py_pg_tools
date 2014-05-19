@@ -2,15 +2,11 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+import datetime  # to manipulate dates
+import time  # to manipulate dates
 
-import datetime  # Importar la librería datetime (para manejar fechas)
-import time  # Importar la librería time (para manejar fechas)
-from dateutil.tz import tzlocal
-# Importar la librería tzlocal del paquete dateutil.tz (para manejar fechas)
+from dateutil.tz import tzlocal  # to manipulate dates
 
-
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 
 class DateTools:
 
@@ -20,42 +16,53 @@ class DateTools:
     @staticmethod
     def get_date(fmt='%Y%m%d_%H%M%S_%Z'):
         '''
-    Objetivo:
-        - obtener la fecha actual de la zona en un formato determinado.
-    Devolución:
-        - la fecha actual en el formato establecido.
-    '''
-        # Obtener fecha y hora actuales de la zona
+        Target:
+            - get the current date of the zone in the specified format.
+        Parameters:
+            - fmt: the date format used.
+        Return:
+            - the current date of the zone in the specified format.
+        '''
+        # Get date and time of the zone
         init_time = datetime.datetime.now(tzlocal())
-        init_ts = init_time.strftime(fmt)  # Cambiar el formato de la fecha
-        return init_ts  # Devolver la fecha actual en el formato deseado
+        init_ts = init_time.strftime(fmt)  # Change date's format
+
+        return init_ts
 
     @staticmethod
     def get_year(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
         '''
-    Objetivo:
-        - obtener el año de una fecha dada en formato string.
-    Devolución:
-        - el año de la fecha dada en formato string.
-    '''
-        # Convertir string a objeto date
+        Target:
+            - extract the year of a date stored in a string.
+        Parameters:
+            - date_str: the string with the date.
+            - fmt: the date format used.
+        Return:
+            - the year of the received date.
+        '''
+        # Turn string into a date object
         init_ts = time.strptime(date_str, fmt)
-        yy = init_ts.tm_year  # Obtener el año
-        # Añadir ceros a la derecha a los años de menos de cuatro dígitos
+        yy = init_ts.tm_year  # Get the year
+        # Add some zeros on the left in case of years having less than 4 digits
         year = str(yy).rjust(4, '0')
-        return year  # Devolver el año
+
+        return year
 
     @staticmethod
     def get_month(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
         '''
-    Objetivo:
-        - obtener el mes de una fecha dada en formato string.
-    Devolución:
-        - el mes de la fecha dada en formato string.
-    '''
-        # Convertir string a objeto date
+        Target:
+            - extract the month of a date stored in a string.
+        Parameters:
+            - date_str: the string with the date.
+            - fmt: the date format used.
+        Return:
+            - the month of the received date.
+        '''
+        # Turn string into a date object
         init_ts = time.strptime(date_str, fmt)
-        mm = init_ts.tm_mon  # Obtener el mes
-        # Añadir un cero a la derecha a los meses de un dígito
+        mm = init_ts.tm_mon  # Get the month
+        # Add a zero on the left in case of months having less than 2 digits
         month = str(mm).rjust(2, '0')
-        return month  # Devolver el mes
+
+        return month

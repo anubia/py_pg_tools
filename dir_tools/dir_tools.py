@@ -2,17 +2,15 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+import os  # to work with directories and files
+import re  # to work with regular expressions
 
-from logger.logger import Logger
-# Importar la librería getpass (para obtener nombres de usuarios del sistema)
 from getpass import getuser
-import os  # Importar la librería os (para trabajar con directorios y archivos)
-import re  # Importar la librería glob (para buscar archivos en directorios)
+
 from const.const import Messenger
+from const.const import Default
+from logger.logger import Logger
 
-
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 
 class Dir:
 
@@ -22,16 +20,15 @@ class Dir:
     @staticmethod
     def forbid_root(logger=None):
         '''
-    Objetivo:
-        - comprobar que no se ejecute el programa como usuario "root".
-    '''
-        # Si el usuario del sistema que lanza el programa es "root"...
+        Target:
+        - stop the execution of the program if this is being run by "root".
+        '''
         if not logger:
             logger = Logger()
         try:
-            if getuser() == 'root':
-                raise Exception()  # Lanzar una excepción
-        except Exception as e:  # Si salta una excepción...
+            if getuser() == 'root':  # Get system username
+                raise Exception()
+        except Exception as e:
             logger.debug('Error en la función "forbid_root": {}.'.format(
                 str(e)))
             logger.stop_exe(Messenger.ROOT_NOT_ALLOWED)
@@ -39,19 +36,19 @@ class Dir:
     @staticmethod
     def create_dir(path, logger=None):
         '''
-    Objetivo:
-        - comprobar que exista una ruta determinada, de no ser así, crearla.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - path: la ruta que debe existir o generarse.
-    '''
+        Target:
+        - stop the execution of the program if this is being run by "root".
+        Parameters:
+        - path: directory to create.
+        - logger: a logger to show and log some messages.
+        '''
         if not logger:
             logger = Logger()
-        try:  # Comprobar si al intentar leer o generar un directorio hay error
-            if not os.path.exists(path):  # Si la ruta no existe...
-                os.makedirs(path)  # Generar ruta
-        except Exception as e:  # Si salta una excepción...
+
+        try:
+            if not os.path.exists(path):  # If path does not exist...
+                os.makedirs(path)  # Create it
+        except Exception as e:
             logger.debug('Error en la función "create_dir": {}.'.format(
                 str(e)))
             logger.stop_exe(Messenger.USER_NOT_ALLOWED_TO_CHDIR)
@@ -59,129 +56,129 @@ class Dir:
     @staticmethod
     def default_bkps_path():
         '''
-    Objetivo:
-        - devuelve la ruta por defecto donde debe estar el archivo de
-        configuración en caso de que no se indique una ruta mediante el comando
-        -c en la llamada al programa desde consola.
-    Devolución:
-        - la ruta absoluta que debe tener el archivo de configuración por
-        defecto.
-    '''
-        ## Obtener el directorio donde se encuentra este script
+        Target:
+        - get the default directory where the backups must be stored.
+        Return:
+        - A string which gives the absolute path where the backups will be
+        stored.
+        '''
+        ## Get the script's directory
         #script_dir = os.path.dirname(os.path.realpath(__file__))
-        ## Cuidado con la ubicación de la librería dir_tools
+        ## Get the program's main directory
         #parent_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
+        ## Get the final path of the backups
         #bkps_folder = 'pg_backups/'
-        ## Localizar el archivo .cfg que contiene la información deseada
         #bkps_file = os.path.join(parent_dir, bkps_folder)
-        bkps_file = '/opt/backups/pg_backups/'
-        return bkps_file
+
+        return Default.BKP_PATH
 
     @staticmethod
     def default_cfg_path(subpath):
         '''
-    Objetivo:
-        - devuelve la ruta por defecto donde debe estar el archivo de
-        configuración en caso de que no se indique una ruta mediante el comando
-        -c en la llamada al programa desde consola.
-    Parámetros:
-        - subpath: el nombre del archivo de configuración por defecto, que
-        podrá tener diversos nombres según la operación que se esté llevando a
-        cabo, y la carpeta que lo contiene.
-    Devolución:
-        - la ruta absoluta que debe tener el archivo de configuración por
-        defecto.
-    '''
-        # Obtener el directorio donde se encuentra este script
+        Target:
+        - get the default directory where the configuration files should be.
+        Parameters:
+        - subpath: the last part of the default path which depends on the type
+        of configuration file.
+        Return:
+        - a string which gives the absolute path where a specific configuration
+        file should be.
+        '''
+        # Get the script's directory
         script_dir = os.path.dirname(os.path.realpath(__file__))
-        # Localizar el archivo .cfg que contiene la información deseada
+        # Get the program's main directory
         parent_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
+        # Get the final path of the configuration file
         cfg_folder = 'config/' + subpath
         cfg_file = os.path.join(parent_dir, cfg_folder)
+
         return cfg_file
 
     @staticmethod
     def sorted_flist(path):
         '''
-    Objetivo:
-        - genera una lista en la que se ordena descendentemente por fecha de
-        modificación los archivos que se encuentran en el directorio o ruta
-        especificados.
-    Parámetros:
-        - path: la ruta o directorio donde se encuentran los archivos que se
-        desean ordenar.
-    Devolución:
-        - una lista con los archivos ordenados.
-    '''
-        #mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
-        #return list(sorted(os.listdir(path), key=mtime))
+        Target:
+        - generate a list which contains every file in the specified directory
+        (and its subdirectories) sorted by modification date.
+        Parameters:
+        - path: the directory where the files are.
+        Return:
+        - a sorted list with all the files in the directory.
+        '''
         files_list = []
+
         for dirname, dirnames, filenames in os.walk(path):
             for file in filenames:
                 filepath = os.path.realpath(os.path.join(dirname, file))
                 files_list.append(filepath)
+
         sorted_list = sorted(files_list, key=lambda f: os.stat(f).st_mtime)
+
         return sorted_list
 
     @staticmethod
     def get_dbs_bkped(bkps_list=[]):
         '''
-    Objetivo:
-        - extrae los nombres de las bases de datos que tienen un backup de la
-        lista con los archivos de backups que recibe. Genera una lista con el
-        resultado obtenido.
-    Parámetros:
-        - bkps_list: una lista de archivos de backups.
-    Devolución:
-        - una lista con los nombres de las bases de datos que tienen un backup
-        en la lista que se pasó por parámetro.
-    '''
-        bkped_dbs = []  # De momento no hay ninguna base de datos con backup
-        # Declarar la expresión regular que detecta si el nombre del archivo
-        # de backup se corresponde con una copia generada por el programa
-        # dump.py
+        Target:
+        - extract the databases' names from the files' names of the list
+        received and store them in a list.
+        Parameters:
+        - bkps_list: a list with backup's files.
+        Return:
+        - a list with those databases' names extracted from the backup's list.
+        '''
+        bkped_dbs = []
+
+        # Regular expression which each backup's name must match
         regex = r'(.*)?db_(.+)_(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
-        regex = re.compile(regex)  # Validar la expresión regular
-        for f in bkps_list:  # Para cada archivo de la lista...
-            # Si su nombre sigue el patrón de dump.py...
+        regex = re.compile(regex)
+
+        for f in bkps_list:
+
+            # Get the file name from the absolute path
             filename = os.path.basename(f)
+
+            # If the file is a backup (matches the established pattern)...
             if re.match(regex, filename):
-                # Extraer las partes del nombre ([prefix], dbname, date)
+
+                # Extract name's parts ([prefix], dbname, date)
                 parts = regex.search(filename).groups()
-                # Si el nombre de la BD no está en la lista de BDs con backup,
-                # se añade (si está, no se añade, para evitar nombres
-                # repetidos)
-                if parts[1] not in bkped_dbs:
-                    # Añadir nombre de BD a la lista
-                    bkped_dbs.append(parts[1])
-            # Si el archivo no es un backup o no cumple el patrón dump.py...
+
+                # If the database's name is not in the list yet, add it
+                # (this condition is to avoid repeated names)
+                dbname = parts[1]
+                if dbname not in bkped_dbs:
+                    bkped_dbs.append(dbname)
+
             else:
-                continue  # Se ignora...
-        return bkped_dbs  # Devolver la lista de BDs que tienen copia
+                continue
+
+        return bkped_dbs
 
     @staticmethod
     def show_pg_warnings(pg_dbs=[], bkped_dbs=[], logger=None):
         '''
-    Objetivo:
-        - advertir de las bases de datos que actualmente existen en PostgreSQL
-        y que no tienen una copia de seguridad y de las copias de seguridad de
-        bases de datos que no existen en PostgreSQL.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - pg_dbs: las bases de datos que hay en PostgreSQL.
-        - bkped_dbs: las bases de datos que tienen una copia de seguridad.
-    '''
+        Target:
+        - compare two lists with databases. This function will be used to show
+        which PostgreSQL databases do not have a backup in a specified
+        directory and which databases have a backup but are not stored in
+        PostgreSQL.
+        Parameters:
+        - pg_dbs: list of PostgreSQL databases.
+        - bkped_dbs: list of databases which have a backup.
+        - logger: a logger to show and log some messages.
+        '''
         if not logger:
             logger = Logger()
-        for dbname in pg_dbs:  # Para cada BD en PostgreSQL...
-            if dbname not in bkped_dbs:  # Si no está entre las BDs con copia..
+
+        for dbname in pg_dbs:
+            if dbname not in bkped_dbs:  # PostgreSQL without backup
                 message = Messenger.NO_BACKUP_FOR_POSTGRESQL_DB.format(
                     dbname=dbname)
                 logger.highlight('warning', message, 'purple', effect='bold')
 
-        for dbname in bkped_dbs:  # Para cada BD con copia...
-            # Si no está entre las BDs de PostgreSQL...
+        for dbname in bkped_dbs:
+            # Backup of an nonexistent PostgreSQL database
             if dbname not in pg_dbs:
                 message = Messenger.NO_POSTGRESQL_DB_FOR_BACKUP.format(
                     dbname=dbname)
@@ -190,31 +187,43 @@ class Dir:
     @staticmethod
     def get_files_tsize(files_list=[]):
         '''
-    Objetivo:
-        - devuelve el tamaño total en disco del conjunto de archivos que
-        componen la lista obtenida por parámetro.
-    Parámetros:
-        - files_list: la lista con el conjunto de archivos del que se desea
-        calcular el tamaño en disco.
-    Devolución:
-        - el tamaño en disco del conjuntos de archivos que componen la lista.
-    '''
-        tsize = 0  # Inicializar tamaño a 0 bytes
-        for f in files_list:  # Para cada archivo de la lista...
-            file_info = os.stat(f)  # Almacenar información del archivo
-            # Añadir el tamaño del archivo al tamaño total
-            tsize += file_info.st_size
-        return tsize  # Devolver tamaño total de la lista de archivos
+        Target:
+        - give the total size in Bytes of a files' list.
+        Parameters:
+        - files_list: a list with some files' absolute paths.
+        Return:
+        - an integer which gives the total size in bytes
+        '''
+        tsize = 0
+
+        for f in files_list:
+            file_info = os.stat(f)  # Get file's data
+            tsize += file_info.st_size  # Add file's size to the total
+
+        return tsize
 
     @staticmethod
     def remove_empty_dir(path):
+        '''
+        Target:
+        - remove a directory if empty.
+        Parameters:
+        - path: the absolute path of the directory.
+        '''
         try:
-            os.rmdir(path)
+            os.rmdir(path)  # Remove dir (will give an exception if not empty)
         except OSError:
             pass
 
     @staticmethod
     def remove_empty_dirs(path):
+        '''
+        Target:
+        - remove every subdirectory if empty (even the whole directory in case
+        it turns empty).
+        Parameters:
+        - path: the absolute path of the directory.
+        '''
         for root, dirnames, filenames in os.walk(path, topdown=False):
             for dirname in dirnames:
                 Dir.remove_empty_dir(os.path.realpath(os.path.join(root,

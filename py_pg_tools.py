@@ -241,15 +241,18 @@ if __name__ == "__main__":
 
     groupA = restorer.add_mutually_exclusive_group()
     groupA.add_argument('-d', '--db-backup', nargs=2,
-                        help='specifies the path of the backup\'s file which '
-                        'is going to be loaded and the name of the PostgreSQL '
-                        'database which is going to be generated, '
-                        'respectively')
+                        help='specifies the path of the backup\'s file '
+                        '(database) which is going to be loaded and the name '
+                        'of the PostgreSQL database which is going to be '
+                        'generated, respectively')
+    groupA.add_argument('-p', '--cluster-backup',
+                        help='specifies the path of the backup\'s file '
+                        '(cluster) which is going to be loaded')
 
-    groupA.add_argument('-c', '--cluster-backup',
-                        help='specifies the new name of the database '
-                        'generated and the name of the database which is '
-                        'being cloned, respectively')
+    restorer.add_argument('-c', '--cluster',
+                          help='specifies whether the specified path is a '
+                          'database\'s backup or a cluster\'s backup',
+                          action='store_true')
 
     restorer.add_argument('-Lc', '--config-logger',
                           help=Messenger.CONFIG_LOGGER_HELP)
@@ -476,10 +479,12 @@ if __name__ == "__main__":
     # ******************************* RESTORER ********************************
 
     elif action == 'R':
-        if not (args.config or args.db_backup or args.cluster_backup):
+        if not (args.config or args.db_backup or
+                (args.cluster and args.cluster_backup)):
             restorer.error('insufficient parameters to work - [-C/--config | '
-                           '-d/--db-backup | -c/--cluster-backup] must be '
-                           ' specified')
+                           '-d/--db-backup | (-c/--cluster & '
+                           '-p/--cluster-backup)] must be specified')
+
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
             restorer.error('insufficient connection parameters to work - '

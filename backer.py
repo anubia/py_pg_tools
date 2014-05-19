@@ -2,38 +2,42 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+import subprocess  # To execute some commands in the shell
 
-from logger.logger import Logger
+from casting.casting import Casting
+from checker.checker import Checker
+from const.const import Default
+from const.const import Messenger
 from date_tools.date_tools import DateTools
 from db_selector.db_selector import DbSelector
 from dir_tools.dir_tools import Dir
-from const.const import Messenger
-from const.const import Default
-from casting.casting import Casting
-from checker.checker import Checker
+from logger.logger import Logger
 from vacuumer import Vacuumer
-import subprocess
 
-
-# ************************** DEFINICIÓN DE FUNCIONES **************************
 
 class Backer:
 
-    bkp_path = ''
-    group = ''
-    bkp_type = ''
-    prefix = ''
-    in_dbs = []
-    in_regex = ''
+    bkp_path = ''  # The path where the backups are stored
+    group = ''  # The name of the subdirectory where the backups are stored
+    bkp_type = ''  # The type of the backups' files
+    prefix = ''  # The prefix of the backups' names
+    in_dbs = []  # List of databases to be included in the process
+    in_regex = ''  # Regular expression which must match the included databases
+    # Flag which determinates whether inclusion conditions predominate over the
+    # exclusion ones
     in_priority = False
-    ex_dbs = []
-    ex_regex = ''
+    ex_dbs = []  # List of databases to be excluded in the process
+    ex_regex = ''  # Regular expression which must match the excluded databases
+    # Flag which determinates whether the templates must be included
     ex_templates = True
+    # Flag which determinates whether the included databases must be vacuumed
+    # before the backup process
     vacuum = True
+    # Use other PostgreSQL user during the backup process (only for superusers)
     db_owner = ''
+    # An object with connection parameters to connect to PostgreSQL
     connecter = None
-    logger = None
+    logger = None  # Logger to show and log some messages
 
     def __init__(self, connecter=None, bkp_path='', group='',
                  bkp_type='dump', prefix='', in_dbs=[], in_regex='',
@@ -50,6 +54,8 @@ class Backer:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
+        # If backup directory is not specified, create a default one to store
+        # the backups
         if bkp_path:
             self.bkp_path = bkp_path
         else:
@@ -118,94 +124,89 @@ class Backer:
 
     def backup_db(self, dbname, bkps_dir):
         '''
-    Objetivo:
-        - crear una copia de seguridad de la base de datos especificada.
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - bkps_dir: directorio donde se guardan las copias de seguridad.
-        - bkp_type: tipo de extensión que tendrá el archivo que contiene la
-        copia.
-        - dbname: nombre de la base de datos de la que se quiere realizar una
-        copia de seguridad.
-        - conn: conexión realizada desde el script a PostgreSQL.
-        - prefix: prefijo a incluir en el nombre de las copias de seguridad.
-    '''
+        Target:
+        - make a backup of a specified database.
+        Parameters:
+        - dbname: name of the database which is going to be backuped.
+        - bkps_dir: directory where the backup is going to be stored.
+        Return:
+        - a boolean which indicates the success of the process.
+        '''
         success = True
-        # Obtener fecha y hora actuales de la zona
+        # Get date and time of the zone
         init_ts = DateTools.get_date()
-        # Obtener el año de la fecha almacenada
+        # Get current year
         year = str(DateTools.get_year(init_ts))
-        # Obtener el mes de la fecha almacenada
+        # Get current month
         month = str(DateTools.get_month(init_ts))
+        # Create new directories with the year and the month of the backup
         bkp_dir = bkps_dir + year + '/' + month + '/'
         Dir.create_dir(bkp_dir, self.logger)
-        # Establecer nombre del archivo que contiene la copia de seguridad
+        # Set backup's name
         file_name = self.prefix + 'db_' + dbname + '_' + init_ts + '.' + \
             self.bkp_type
-        # Almacenar la instrucción a realizar en consola
-        if self.bkp_type == 'gz':  # Comprimir con gzip
+        # Store the command to do depending on the backup type
+        if self.bkp_type == 'gz':  # Zip with gzip
             command = 'pg_dump {} -Fc -U {} -h {} -p {} | gzip > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == 'bz2':  # Comprimir con bzip2
+        elif self.bkp_type == 'bz2':  # Zip with bzip2
             command = 'pg_dump {} -Fc -U {} -h {} -p {} | bzip2 > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == 'zip':  # Comprimir con zip
+        elif self.bkp_type == 'zip':  # Zip with zip
             command = 'pg_dump {} -Fc -U {} -h {} -p {} | zip > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        else:  # No comprimir la copia
+        else:  # Do not zip
             command = 'pg_dump {} -Fc -U {} -h {} -p {} > {}'.format(
                 dbname, self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        try:  # Probar que la copia se realiza correctamente
-            # Ejecutar la instrucción de la copia de seguridad en consola
+        try:
+            # Execute the command in console
             result = subprocess.call(command, shell=True)
-            if result != 0:  # Si el comando no de resultados en consola...
-                raise Exception()  # Lanzar excepción
+            if result != 0:
+                raise Exception()
         except Exception as e:
             self.logger.debug('Error en la función "backup_db": {}.'.format(
                 str(e)))
             success = False
+
         return success
 
     def backup_dbs(self, dbs_all):
         '''
-    Objetivo:
-        - crear copias de seguridad de las bases de datos especificadas, las
-        que están incluidas en la variable "dbs_all".
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - conn: conexión realizada desde el script a PostgreSQL.
-        - dbs_all: una lista con todos los nombres de las bases de datos de
-        PostgreSQL de las que se desea hacer una copia de seguridad (vienen
-        dadas por el archivo de configuración).
-        - bkp_dir: directorio donde se guardan las copias de seguridad.
-        - bkp_vars: diccionario con los parámetros especificados en el archivo
-        .cfg
-    '''
+        Target:
+        - make a backup of some specified databases.
+        Parameters:
+        - dbs_all: names of the databases which are going to be backuped.
+        '''
         self.logger.highlight('info', Messenger.CHECKING_BACKUP_DIR, 'white')
+
+        # Create a new directory with the name of the group
         bkps_dir = self.bkp_path + self.group + Default.DB_BKPS_DIR
         Dir.create_dir(bkps_dir, self.logger)
+
         self.logger.info(Messenger.DESTINY_DIR.format(path=bkps_dir))
 
         self.logger.highlight('info', Messenger.PROCESSING_DUMPER, 'white')
-        # Para cada base de datos de la que se quiere backup...
+
         for db in dbs_all:
-            dbname = db['name']  # Almacenar nombre de la BD por claridad
+
+            dbname = db['name']
             message = Messenger.PROCESSING_DB.format(dbname=dbname)
             self.logger.highlight('info', message, 'cyan')
-            # Si se exigen copias de bases de datos sin permisos de conexión...
+
+            # Let the user know whether the database connection is allowed
             if not db['allow_connection']:
                 message = Messenger.FORBIDDEN_DB_CONNECTION.format(
                     dbname=dbname)
                 self.logger.highlight('warning', message, 'yellow',
                                       effect='bold')
                 success = False
+
             else:
+                # Vaccum the database before the backup process if necessary
                 if self.vacuum:
                     self.logger.info(Messenger.PRE_VACUUMING_DB.format(
                         dbname=dbname))
@@ -214,6 +215,8 @@ class Backer:
                                         self.ex_dbs, self.ex_regex,
                                         self.ex_templates, self.db_owner,
                                         self.logger)
+
+                    # Vacuum the database
                     success = vacuumer.vacuum_db(dbname)
                     if success:
                         message = Messenger.PRE_VACUUMING_DB_DONE.format(
@@ -225,7 +228,8 @@ class Backer:
                         self.logger.highlight('warning', message, 'yellow')
                 self.logger.info(Messenger.BEGINNING_DB_BACKER.format(
                     dbname=dbname))
-                # Realizar copia de seguridad de la base de datos
+
+                # Make the backup of the database
                 success = self.backup_db(dbname, bkps_dir)
             if success:
                 message = Messenger.DB_BACKER_DONE.format(dbname=dbname)
@@ -240,13 +244,16 @@ class Backer:
 
 class BackerCluster:
 
-    bkp_path = ''
-    group = ''
-    bkp_type = ''
-    prefix = ''
+    bkp_path = ''  # The path where the backups are stored
+    group = ''  # The name of the subdirectory where the backups are stored
+    bkp_type = ''  # The type of the backups' files
+    prefix = ''  # The prefix of the backups' names
+    # Flag which determinates whether the databases must be vacuumed before the
+    # backup process
     vacuum = True
+    # An object with connection parameters to connect to PostgreSQL
     connecter = None
-    logger = None
+    logger = None  # Logger to show and log some messages
 
     def __init__(self, connecter=None, bkp_path='', group='',
                  bkp_type='dump', prefix='', vacuum=True, logger=None):
@@ -261,6 +268,8 @@ class BackerCluster:
         else:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
+        # If backup directory is not specified, create a default one to store
+        # the backups
         if bkp_path:
             self.bkp_path = bkp_path
         else:
@@ -290,74 +299,72 @@ class BackerCluster:
 
     def backup_all(self, bkps_dir):
         '''
-    Objetivo:
-        - crear una copia de seguridad del cluster de PostgreSQL del servidor
-        especificado.
-    Parámetros:
-        - bkp_dir: directorio donde se guardan las copias de seguridad.
-        - ext: tipo de extensión que tendrá el archivo que contiene la copia.
-        - conn: conexión realizada desde el script a PostgreSQL.
-        - prefix: prefijo a incluir en el nombre de las copias de seguridad
-    '''
+        Target:
+        - make a backup of a cluster.
+        Parameters:
+        - bkps_dir: directory where the backup is going to be stored.
+        Return:
+        - a boolean which indicates the success of the process.
+        '''
         success = True
-        # Obtener fecha y hora actuales de la zona
+        # Get date and time of the zone
         init_ts = DateTools.get_date()
-        # Obtener el año de la fecha almacenada
+        # Get current year
         year = str(DateTools.get_year(init_ts))
-        # Obtener el mes de la fecha almacenada
+        # Get current month
         month = str(DateTools.get_month(init_ts))
+        # Create new directories with the year and the month of the backup
         bkp_dir = bkps_dir + year + '/' + month + '/'
         Dir.create_dir(bkp_dir, self.logger)
-        # Establecer nombre del archivo que contiene la copia de seguridad
+
+        # Set backup's name
         file_name = self.prefix + 'ht_' + self.connecter.server + \
             str(self.connecter.port) + '_cluster_' + init_ts + '.' + \
             self.bkp_type
-        # Almacenar la instrucción a realizar en consola
-        if self.bkp_type == 'gz':  # Comprimir con gzip
+
+        # Store the command to do depending on the backup type
+        if self.bkp_type == 'gz':  # Zip with gzip
             command = 'pg_dumpall -U {} -h {} -p {} | gzip > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == 'bz2':  # Comprimir con bzip2
+        elif self.bkp_type == 'bz2':  # Zip with bzip2
             command = 'pg_dumpall -U {} -h {} -p {} | bzip2 > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        elif self.bkp_type == 'zip':  # Comprimir con zip
+        elif self.bkp_type == 'zip':  # Zip with zip
             command = 'pg_dumpall -U {} -h {} -p {} | zip > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        else:  # No comprimir la copia
+        else:  # Do not zip
             command = 'pg_dumpall -U {} -h {} -p {} > {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, bkp_dir + file_name)
-        try:  # Probar que la copia se realiza correctamente
-            # Ejecutar la instrucción de la copia de seguridad en consola
+        try:
+            # Execute the command in console
             result = subprocess.call(command, shell=True)
-            if result != 0:  # Si el comando no de resultados en consola...
-                raise Exception()  # Lanzar excepción
+            if result != 0:
+                raise Exception()
         except Exception as e:
             self.logger.debug('Error en la función "backup_all": {}.'.format(
                 str(e)))
             success = False
+
         return success
 
     def backup_cl(self):
         '''
-    Objetivo:
-        - crear copias de seguridad de las bases de datos especificadas, las
-        que están incluidas en la variable "dbs_all".
-    Parámetros:
-        - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
-        - bkp_dir: directorio donde se guardan las copias de seguridad.
-        - conn: conexión realizada desde el script a PostgreSQL.
-        - bkp_vars: diccionario con los parámetros especificados en el archivo
-        .cfg
-    '''
+        Target:
+        - vacuum if necessary and make a backup of a cluster.
+        '''
         self.logger.highlight('info', Messenger.CHECKING_BACKUP_DIR, 'white')
+
+        # Create a new directory with the name of the group
         bkps_dir = self.bkp_path + self.group + Default.CL_BKPS_DIR
         Dir.create_dir(bkps_dir, self.logger)
+
         self.logger.info(Messenger.DESTINY_DIR.format(path=bkps_dir))
 
+        # Vaccum the databases before the backup process if necessary
         if self.vacuum:
             vacuumer = Vacuumer(connecter=self.connecter, logger=self.logger)
             vacuumer.connecter.get_cursor_dbs(vacuumer.ex_templates,
@@ -366,6 +373,8 @@ class BackerCluster:
             vacuumer.vacuum_dbs(dbs_all)
 
         self.logger.highlight('info', Messenger.BEGINNING_CL_BACKER, 'white')
+
+        # Make the backup of the cluster
         success = self.backup_all(bkps_dir)
         if success:
             self.logger.highlight('info', Messenger.CL_BACKER_DONE, 'green',

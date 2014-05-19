@@ -49,6 +49,7 @@ class Restorer:
 
     def restore_db_backup(self):
 
+        # TODO cambiar template0 por otra
         replicator = Replicator(self.connecter, self.new_dbname, 'template0',
                                 self.logger)
         self.connecter.allow_db_conn('template0')

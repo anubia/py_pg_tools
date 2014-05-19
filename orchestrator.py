@@ -25,7 +25,7 @@ class Orchestrator:
 
     action = None  # The action to do
     args = []  # The list of parameters received in console
-    logger = None  # The logger to show and log messages
+    logger = None  # A logger to show and log some messages
 
     def __init__(self, action, args):
 
@@ -43,7 +43,7 @@ class Orchestrator:
             - show in console and log a list of databases.
         Parameters:
             - dbs_list: the list of databases to be shown.
-            - logger: the logger which will show and log the messages.
+            - logger: a logger to show and log some messages.
         '''
 
         logger.highlight('info', Messenger.ANALIZING_PG_DATA, 'white')
@@ -61,7 +61,7 @@ class Orchestrator:
             - config_type: the type of config file which is going to be loaded,
             to differ it from the other types which will have different
             sections and variables.
-            - logger: the logger which will show and log the messages.
+            - logger: a logger to show and log some messages.
         Return:
             - the parser which will contain all the config file variables.
         '''
@@ -81,7 +81,7 @@ class Orchestrator:
         Target:
             - get a logger object with its variables.
         Return:
-            - a logger which will show and log messages.
+            - a logger to show and log some messages.
         '''
         # If the user specified a logger config file through console...
         if self.args.config_logger:
@@ -156,7 +156,7 @@ class Orchestrator:
         Target:
             - get a backer object with variables to backup databases.
         Parameters:
-            - connecter: a object with connection parameters to connect to
+            - connecter: an object with connection parameters to connect to
             PostgreSQL.
         Return:
             - a backer which will backup databases.
@@ -238,7 +238,7 @@ class Orchestrator:
         Target:
             - get a backer object with variables to backup databases' clusters.
         Parameters:
-            - connecter: a object with connection parameters to connect to
+            - connecter: an object with connection parameters to connect to
             PostgreSQL.
         Return:
             - a backer which will backup databases' clusters.
@@ -286,13 +286,190 @@ class Orchestrator:
 
         return backer
 
+    def get_dropper(self, connecter):
+        '''
+        Target:
+            - get a dropper object with variables to drop some PostgreSQL
+            databases.
+        Parameters:
+            - connecter: an object with connection parameters to connect to
+            PostgreSQL.
+        Return:
+            - a dropper which will delete some PostgreSQL databases.
+        '''
+        # If the user specified a dropper config file through console...
+        if self.args.config:
+            config_type = 'drop'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = self.args.db_name
+
+            # Create the dropper with the specified variables
+            dropper = Dropper(connecter, parser.bkp_vars['in_dbs'],
+                              self.logger)
+
+        # If the user did not specify a dropper config file through console...
+        else:
+            # Create the dropper with the console variables
+            dropper = Dropper(connecter, self.args.db_name, self.logger)
+
+        return dropper
+
+    def get_informer(self, connecter):
+        '''
+        Target:
+            - get an informer object with variables to show some PostgreSQL
+            information.
+        Parameters:
+            - connecter: an object with connection parameters to connect to
+            PostgreSQL.
+        Return:
+            - a informer which will get and show some PostgreSQL information.
+        '''
+        # If the user specified a informer config file through console...
+        if self.args.config:
+            config_type = 'inform'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = self.args.db_name
+                parser.bkp_vars['in_users'] = []
+            elif self.args.users:
+                parser.bkp_vars['in_dbs'] = []
+                parser.bkp_vars['in_users'] = self.args.users
+
+            # Create the informer with the specified variables
+            informer = Informer(connecter, parser.bkp_vars['in_dbs'],
+                                parser.bkp_vars['in_users'], self.logger)
+
+        # If the user did not specify a informer config file through console...
+        else:
+            # Create the informer with the console variables
+            informer = Informer(connecter, self.args.db_name, self.args.users,
+                                self.logger)
+
+        return informer
+
+    def get_replicator(self, connecter):
+        '''
+        Target:
+            - get a replicator object with variables to clone a PostgreSQL
+            database.
+        Parameters:
+            - connecter: an object with connection parameters to connect to
+            PostgreSQL.
+        Return:
+            - a replicator which will clone a PostgreSQL database.
+        '''
+        # If the user specified a replicator config file through console...
+        if self.args.config:
+            config_type = 'replicate'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.db_name:
+                parser.bkp_vars['new_dbname'] = self.args.db_name[0]
+                parser.bkp_vars['original_dbname'] = self.args.db_name[1]
+
+            # Create the replicator with the specified variables
+            replicator = Replicator(connecter, parser.bkp_vars['new_dbname'],
+                                    parser.bkp_vars['original_dbname'],
+                                    self.logger)
+
+        # If the user did not specify a replicator config file through
+        # console...
+        else:
+            # Create the replicator with the console variables
+            replicator = Replicator(connecter, self.args.db_name[0],
+                                    self.args.db_name[1], self.logger)
+
+        return replicator
+
+    def get_db_restorer(self, connecter):
+        '''
+        Target:
+            - get a restorer object with variables to restore a database backup
+            in PostgreSQL.
+        Parameters:
+            - connecter: an object with connection parameters to connect to
+            PostgreSQL.
+        Return:
+            - a restorer which will restore a PostgreSQL database.
+        '''
+        # If the user specified a restorer config file through console...
+        if self.args.config:
+            config_type = 'restore'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.db_backup:
+                parser.bkp_vars['bkp_path'] = self.args.db_backup[0]
+                parser.bkp_vars['new_dbname'] = self.args.db_backup[1]
+
+            # Create the restorer with the specified variables
+            restorer = Restorer(connecter, parser.bkp_vars['bkp_path'],
+                                parser.bkp_vars['new_dbname'], self.logger)
+
+        # If the user did not specify a restorer config file through console...
+        else:
+            # Create the restorer with the console variables
+            restorer = Restorer(connecter, self.args.db_backup[0],
+                                self.args.db_backup[1], self.logger)
+
+        return restorer
+
+    def get_cl_restorer(self, connecter):
+        '''
+        Target:
+            - get a restorer object with variables to restore a cluster backup
+            in PostgreSQL.
+        Parameters:
+            - connecter: an object with connection parameters to connect to
+            PostgreSQL.
+        Return:
+            - a restorer which will restore a PostgreSQL cluster.
+        '''
+        # If the user specified a restorer config file through console...
+        if self.args.config:
+            config_type = 'restore_all'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.cluster_backup:
+                parser.bkp_vars['bkp_path'] = self.args.cluster_backup
+
+            # Create the restorer with the specified variables
+            restorer = RestorerCluster(connecter, parser.bkp_vars['bkp_path'],
+                                       self.logger)
+
+        # If the user did not specify a restorer config file through console...
+        else:
+            # Create the restorer with the console variables
+            restorer = Restorer(connecter, self.args.cluster_backup,
+                                self.logger)
+
+        return restorer
+
     def get_terminator(self, connecter):
         '''
         Target:
             - get a terminator object with variables to terminate connections
             to PostgreSQL.
         Parameters:
-            - connecter: a object with connection parameters to connect to
+            - connecter: an object with connection parameters to connect to
             PostgreSQL.
         Return:
             - a terminator which will terminate connections to
@@ -446,7 +623,7 @@ class Orchestrator:
             - get a vacuumer object with variables to vacuum databases in
             PostgreSQL.
         Parameters:
-            - connecter: a object with connection parameters to connect to
+            - connecter: an object with connection parameters to connect to
             PostgreSQL.
         Return:
             - a vacuumer which will vacuum PostgreSQL databases.
@@ -555,39 +732,6 @@ class Orchestrator:
         # Close connection to PostgreSQL
         connecter.pg_disconnect()
 
-    def get_dropper(self, connecter):
-        '''
-        Target:
-            - get a dropper object with variables to drop some PostgreSQL
-            databases.
-        Parameters:
-            - connecter: a object with connection parameters to connect to
-            PostgreSQL.
-        Return:
-            - a dropper which will delete some PostgreSQL databases.
-        '''
-        # If the user specified a dropper config file through console...
-        if self.args.config:
-            config_type = 'drop'
-            # Get the variables from the config file
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                               self.logger)
-
-            # Overwrite the config variables with the console ones if necessary
-            if self.args.db_name:
-                parser.bkp_vars['in_dbs'] = self.args.db_name
-
-            # Create the dropper with the specified variables
-            dropper = Dropper(connecter, parser.bkp_vars['in_dbs'],
-                              self.logger)
-
-        # If the user did not specify a dropper config file through console...
-        else:
-            # Create the dropper with the console variables
-            dropper = Dropper(connecter, self.args.db_name, self.logger)
-
-        return dropper
-
     def setup_dropper(self):
         '''
         Target:
@@ -614,12 +758,11 @@ class Orchestrator:
             - give information about PostgreSQL to the user.
         '''
         connecter = self.get_connecter()
-        informer = Informer(connecter, self.args.db_name, self.args.users,
-                            self.logger)
+        informer = self.get_informer(connecter)
 
-        if self.args.db_name:  # Give information about databases
+        if informer.dbnames:  # Give information about databases
             informer.show_pg_dbs_data()
-        elif self.args.users:  # Give information about users
+        elif informer.usernames:  # Give information about users
             informer.show_pg_users_data()
         else:
             pass
@@ -633,8 +776,7 @@ class Orchestrator:
             - clone a database in PostgreSQL.
         '''
         connecter = self.get_connecter()
-        replicator = Replicator(connecter, self.args.db_name[0],
-                                self.args.db_name[1], self.logger)
+        replicator = self.get_replicator(connecter)
 
         # Terminate every connection to the database which is going to be
         # replicated, if necessary
@@ -658,14 +800,12 @@ class Orchestrator:
         '''
         connecter = self.get_connecter()
 
-        if self.args.db_backup:  # Restore a database
-            restorer = Restorer(connecter, self.args.db_backup[0],
-                                self.args.db_backup[1], self.logger)
-            restorer.restore_db_backup()
-        else:  # Restore a cluster (must be created first)
-            restorer = RestorerCluster(connecter, self.args.cluster_backup,
-                                       self.logger)
+        if self.args.cluster:  # Restore a cluster (must be created first)
+            restorer = self.get_cl_restorer(connecter)
             restorer.restore_cluster_backup()
+        else:  # Restore a database
+            restorer = self.get_db_restorer(connecter)
+            restorer.restore_db_backup()
 
         # Close connection to PostgreSQL
         connecter.pg_disconnect()

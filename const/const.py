@@ -249,11 +249,32 @@ class Messenger:
                           'PostgreSQL está dañado. Por favor, revise que ' \
                           'los nombres por defecto de secciones y atributos ' \
                           'son correctos.'
-    VACUUMER_CFG_DAMAGED = 'El archivo de configuración con las ' \
-                           'condiciones para la limpieza de bases de datos ' \
-                           'en PostgreSQL está dañado. Por favor, revise ' \
-                           'que los nombres por defecto de secciones y ' \
-                           'atributos son correctos.'
+    INFORMER_CFG_DAMAGED = 'El archivo de configuración con las condiciones ' \
+                           'para obtener información de PostgreSQL está ' \
+                           'dañado. Por favor, revise que los nombres por ' \
+                           'defecto de secciones y atributos son correctos.'
+    REPLICATOR_CFG_DAMAGED = 'El archivo de configuración con las ' \
+                             'condiciones para clonar una base de datos de ' \
+                             'PostgreSQL está dañado. Por favor, revise que ' \
+                             'los nombres por defecto de secciones y ' \
+                             'atributos son correctos.'
+    DB_RESTORER_CFG_DAMAGED = 'El archivo de configuración con las ' \
+                              'condiciones para restaurar la copia de ' \
+                              'seguridad de una base de datos en ' \
+                              'PostgreSQL está dañado. Por favor, revise ' \
+                              'que los nombres por defecto de secciones y ' \
+                              'atributos son correctos.'
+    CL_RESTORER_CFG_DAMAGED = 'El archivo de configuración con las ' \
+                              'condiciones para restaurar la copia de ' \
+                              'seguridad de un clúster de bases de datos ' \
+                              'en PostgreSQL está dañado. Por favor, ' \
+                              'revise que los nombres por defecto de ' \
+                              'secciones y atributos son correctos.'
+    TERMINATOR_CFG_DAMAGED = 'El archivo de configuración con las ' \
+                             'condiciones para la finalización de ' \
+                             'conexiones a PostgreSQL está dañado. Por ' \
+                             'favor, revise que los nombres por defecto de ' \
+                             'secciones y atributos son correctos.'
     DB_TRIMMER_CFG_DAMAGED = 'El archivo de configuración con las ' \
                              'condiciones para la limpieza de copias de ' \
                              'seguridad de bases de datos de PostgreSQL ' \
@@ -265,11 +286,11 @@ class Messenger:
                              'seguridad de clústers de PostgreSQL está ' \
                              'dañado. Por favor, revise que los nombres por ' \
                              'defecto de secciones y atributos son correctos.'
-    TERMINATOR_CFG_DAMAGED = 'El archivo de configuración con las ' \
-                             'condiciones para la finalización de ' \
-                             'conexiones a PostgreSQL está dañado. Por ' \
-                             'favor, revise que los nombres por defecto de ' \
-                             'secciones y atributos son correctos.'
+    VACUUMER_CFG_DAMAGED = 'El archivo de configuración con las ' \
+                           'condiciones para la limpieza de bases de datos ' \
+                           'en PostgreSQL está dañado. Por favor, revise ' \
+                           'que los nombres por defecto de secciones y ' \
+                           'atributos son correctos.'
     LOGGER_CFG_DAMAGED = 'El archivo de configuración con los parámetros de ' \
                          'verbosidad de mensajes está dañado. Por favor, ' \
                          'revise que los nombres por defecto de secciones y ' \
