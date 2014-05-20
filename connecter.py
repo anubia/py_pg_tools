@@ -26,15 +26,7 @@ class Connecter:
     pg_pid_92 = 'pid'  # Name for PostgreSQL PID variable since version 9.2
 
     def __init__(self, server, user, port, logger=None):
-        '''
-        Target:
-            - init a connection to PostgreSQL.
-        Parameters:
-            - server: a server which has PostgreSQL installed.
-            - user: PostgreSQL user who makes the connection.
-            - port: the target port of the connection.
-            - logger: a logger to show and log some messages.
-        '''
+
         if logger:
             self.logger = logger
         else:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
+
 from casting.casting import Casting
 from const.const import Messenger
 from logger.logger import Logger
@@ -8,9 +9,10 @@ from logger.logger import Logger
 
 class Dropper:
 
+    # An object with connection parameters to connect to PostgreSQL
     connecter = None
-    logger = None
-    dbnames = []
+    logger = None  # Logger to show and log some messages
+    dbnames = []  # List of databases to be removed
 
     def __init__(self, connecter=None, dbnames=[], logger=None):
 
@@ -30,7 +32,13 @@ class Dropper:
             self.dbnames = Casting.str_to_list(dbnames)
 
     def drop_pg_db(self, dbname):
-
+        '''
+        Target:
+            - remove a database in PostgreSQL.
+        Parameters:
+            - dbname: the PostgreSQL database's name which is going to be
+            removed.
+        '''
         query_drop_db = (
             'DROP DATABASE %s;'
         )
@@ -47,6 +55,10 @@ class Dropper:
                 dbname=dbname), 'yellow')
 
     def drop_pg_dbs(self):
+        '''
+        Target:
+            - remove a list of databases in PostgreSQL.
+        '''
         self.logger.highlight('info', Messenger.BEGINNING_DROPPER, 'white')
         for dbname in self.dbnames:
             self.drop_pg_db(dbname)

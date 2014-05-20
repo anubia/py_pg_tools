@@ -2,42 +2,38 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
+from math import ceil  # To round up some values
+import os  # To work with directories and files
+import re  # To work with regular expressions
+import time  # To calculate time intervals
 
-# Importar la funciones create_logger de la librería personalizada
-# logger.logger (para utilizar un logger que muestre información al usuario)
-from logger.logger import Logger
-# Importar las funciones create_dir, default_bkps_path, default_cfg_path de la
-# librería personalizada dir_tools.dir_tools (para crear directorios de forma
-# automática y localizar archivos creados por defecto)
-from dir_tools.dir_tools import Dir
-from const.const import Messenger
-from const.const import Default
-import os  # Importar la librería os (para trabajar con directorios y archivos)
-import re  # Importar la librería glob (para buscar archivos en directorios)
-import time  # Importar la librería time (para calcular intervalos de tiempo)
-from math import ceil
 from casting.casting import Casting
 from checker.checker import Checker
+from const.const import Default
+from const.const import Messenger
+from dir_tools.dir_tools import Dir
+from logger.logger import Logger
 
-
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 
 class Trimmer:
 
-    bkp_path = ''
-    prefix = ''
-    in_dbs = []
-    in_regex = ''
+    bkp_path = ''  # The path where the backups are stored
+    prefix = ''  # The prefix of the backups' names
+    in_dbs = []  # List of databases to be included in the process
+    in_regex = ''  # Regular expression which must match the included databases
+    # Flag which determinates whether inclusion conditions predominate over the
+    # exclusion ones
     in_priority = False
-    ex_dbs = []
-    ex_regex = ''
-    min_n_bkps = None
-    exp_days = None
-    max_size = None
+    ex_dbs = []  # List of databases to be excluded in the process
+    ex_regex = ''  # Regular expression which must match the excluded databases
+    min_n_bkps = None  # Minimum number of a database's backups to keep
+    exp_days = None  # Number of days which make a backup obsolete
+    max_size = None  # Maximum size of a group of database's backups
+    # Flag which determinates whether show alerts about PostgreSQL
     pg_warnings = True
+    # An object with connection parameters to connect to PostgreSQL
     connecter = None
-    logger = None
+    logger = None  # Logger to show and log some messages
 
     def __init__(self, bkp_path='', prefix='', in_dbs=[], in_regex='',
                  in_priority=False, ex_dbs=[], ex_regex='', min_n_bkps=1,
@@ -125,23 +121,21 @@ class Trimmer:
 
     def trim_db(self, dbname, db_bkps_list):
         '''
-    Objetivo:
-        - elimina los archivos de copias de seguridad de bases de datos,
-        teniendo en cuenta los parámetros de configuración del programa y su
-        prioridad (mínimo número de copias > copias obsoletas > tamaño máximo
-        del conjunto de copias).
-    Parámetros:
-        - dbname: el nombre de la base de datos de la que se hará una limpieza.
-        - db_bkps_list: lista de archivos de copias de seguridad de una base de
-        datos concreta.
-    '''
-        # Almacenar momento del tiempo en segundos a partir del cual una copia
-        # de base de datos queda obsoleta
-        if self.exp_days == -1:
+        Target:
+            - remove (if necessary) some database's backups, taking into
+            account some parameters in the following order: minimum number of
+            backups to keep > obsolete backups.
+        Parameters:
+            - dbname: name of the database whose backups are going to be
+            trimmed.
+            - db_bkps_list: list of backups of a database to analyse and trim.
+        '''
+        if self.exp_days == -1:  # No expiration date
             x_days_ago = None
         else:
             x_days_ago = time.time() - (60 * 60 * 24 * self.exp_days)
-        # Almacenar el máximo tamaño permitido de las copias en Bytes
+
+        # Split a string with size and unit of measure into a dictionary
         max_size = Casting.str_to_max_size(self.max_size)
 
         if max_size['unit'] == 'MB':
@@ -155,10 +149,9 @@ class Trimmer:
 
         self.max_size = max_size['size'] * equivalence
 
-        # Almacenar número actual de copias que tiene una base de datos
+        # Store the total number of backups of the database
         num_bkps = len(db_bkps_list)
-        # Realizar una copia de la lista de copias de seguridad para poderla
-        # manipular sin problemas en mitad de un bucle
+        # Clone the list to avoid conflict errors when removing
         db_bkps_lt = db_bkps_list[:]
 
         unlinked = False
@@ -166,23 +159,26 @@ class Trimmer:
         message = Messenger.BEGINNING_DB_TRIMMER.format(dbname=dbname)
         self.logger.highlight('info', message, 'white')
 
-        for f in db_bkps_list:  # Para cada copia de seguridad de esta BD...
-            # Si hay menos copias de las deseadas...
+        for f in db_bkps_list:
+
+            # Break if number of backups do not exceed the minimum
             if num_bkps <= self.min_n_bkps:
                 break
-            # Almacenar información del archivo
+
             file_info = os.stat(f)
-            # Si está obsoleta...
+
+            # Obsolete backup
             if x_days_ago and file_info.st_ctime < x_days_ago:
                 self.logger.info(Messenger.DELETING_OBSOLETE_BACKUP % f)
-                os.unlink(f)  # Eliminar copia de seguridad
+                os.unlink(f)  # Remove backup's file
                 unlinked = True
-                # Reducir la variable que indica el número de copias de esta BD
-                # almacenadas en el directorio
+                # Update the number of backups of the database
                 num_bkps -= 1
-                db_bkps_lt.remove(f)  # Actualizar lista de copias de seguridad
+                db_bkps_lt.remove(f)  # Update the list of database's backups
 
+        # Get total size of the backups in Bytes
         tsize = Dir.get_files_tsize(db_bkps_lt)
+        # Get total size of the backups in the selected unit of measure
         tsize_unit = ceil(tsize / equivalence)
 
         ## DESCOMENTAR ESTA SECCIÓN PARA PROCEDER CON LA ELIMINACIÓN DE COPIAS
@@ -213,7 +209,8 @@ class Trimmer:
             message = Messenger.NO_DB_BACKUP_DELETED.format(dbname=dbname)
             self.logger.highlight('warning', message, 'yellow')
 
-        if tsize > self.max_size:
+        if tsize > self.max_size:  # Total size exceeds the maximum
+
             message = Messenger.DB_BKPS_SIZE_EXCEEDED.format(
                 dbname=dbname, tsize_unit=tsize_unit, size=max_size['size'],
                 unit=max_size['unit'])
@@ -223,60 +220,66 @@ class Trimmer:
             dbname=dbname), 'green')
 
     def trim_dbs(self, bkps_list, dbs_to_clean):
-
-        # Declarar la expresión regular que detecta si el nombre del archivo
-        # de backup se corresponde con una copia generada por el programa
-        # dump.py
+        '''
+        Target:
+            - remove (if necessary) some backups of a group of databases,
+            taking into account some parameters in the following order: minimum
+            number of backups to keep > obsolete backups.
+        Parameters:
+            - bkps_list: list of backups found in the specified directory.
+            - dbs_to_clean: name of the database whose backups are going to be
+            trimmed.
+        '''
+        # If not prefix specified, trim all the backups (not only the ones
+        # without prefix)
         if self.prefix:
             regex = r'(' + self.prefix + ')db_(.+)_(\d{8}_\d{6}_.+)\.' \
                     '(?:dump|bz2|gz|zip)$'
         else:
             regex = r'(.*)?db_(.+)_(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
-        regex = re.compile(regex)  # Validar la expresión regular
+        regex = re.compile(regex)
 
-        # Para cada BD de la que se desea limpiar sus copias...
         for dbname in dbs_to_clean:
 
-            # Inicializar lista de backups de una DB concreta
             db_bkps_list = []
 
-            for file in bkps_list:  # Para cada archivo del directorio...
+            for file in bkps_list:
 
+                # Extract file's name from the absolute path
                 filename = os.path.basename(file)
 
-                # Si es un backup (su nombre sigue el patrón de dump.py)...
+                # If file matches regex (it means that file is a backup)
                 if re.match(regex, filename):
 
-                    # Extraer las partes del nombre ([prefix], dbname, date)
+                    # Extract parts of the name ([prefix], dbname, date)
                     parts = regex.search(filename).groups()
-                    # Almacenar el nombre de la BD a la que pertenece ese
-                    # backup
+                    # Store the database's name whose this backup belongs to
                     fdbname = parts[1]
 
-                    # Si es un backup de una BD de la que se desea realizar una
-                    # limpieza de backups...
+                    # If that backup belongs to a database which is has to be
+                    # trimmed
                     if dbname == fdbname:
-                        # Añadir a la lista de backups de esta BD
+                        # Append backup to the group of database's backups
                         db_bkps_list.append(file)
-                    # Si el archivo es un backup pero no se desea eliminar...
                     else:
                         continue
-                else:  # Si el archivo no es un backup...
+                else:
                     continue
 
-            # Eliminar (si procede) las copias de seguridad de esta BD
+            # Remove (if necessary) some backups of the specified database
             self.trim_db(dbname, db_bkps_list)
 
+        # Remove directories which could be empty after the trim
         Dir.remove_empty_dirs(self.bkp_path)
 
 
 class TrimmerCluster:
 
-    bkp_path = ''
-    prefix = ''
-    min_n_bkps = None
-    exp_days = None
-    max_size = None
+    bkp_path = ''  # The path where the backups are stored
+    prefix = ''  # The prefix of the backups' names
+    min_n_bkps = None  # Minimum number of a database's backups to keep
+    exp_days = None  # Number of days which make a backup obsolete
+    max_size = None  # Maximum size of a group of database's backups
 
     def __init__(self, bkp_path='', prefix='', min_n_bkps=1, exp_days=365,
                  max_size=5000, logger=None):
@@ -323,22 +326,18 @@ class TrimmerCluster:
 
     def trim_cluster(self, ht_bkps_list):
         '''
-    Objetivo:
-        - elimina los archivos de copias de seguridad de bases de datos,
-        teniendo en cuenta los parámetros de configuración del programa y su
-        prioridad (mínimo número de copias > copias obsoletas > tamaño máximo
-        del conjunto de copias).
-    Parámetros:
-        - ht_bkps_list: lista de archivos de copias de seguridad de un host
-        concreto.
-    '''
-        # Almacenar momento del tiempo en segundos a partir del cual una copia
-        # de base de datos queda obsoleta
-        if self.exp_days == -1:
+        Target:
+            - remove (if necessary) some cluster's backups, taking into
+            account some parameters in the following order: minimum number of
+            backups to keep > obsolete backups.
+        Parameters:
+            - ht_bkps_list: list of backups of a cluster to analyse and trim.
+        '''
+        if self.exp_days == -1:  # No expiration date
             x_days_ago = None
         else:
             x_days_ago = time.time() - (60 * 60 * 24 * self.exp_days)
-        # Almacenar el máximo tamaño permitido de las copias en Bytes
+
         max_size = Casting.str_to_max_size(self.max_size)
 
         if max_size['unit'] == 'MB':

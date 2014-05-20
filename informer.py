@@ -2,23 +2,18 @@
 # -*- encoding: utf-8 -*-
 
 
-# ************************* CARGA DE LIBRERÍAS *************************
-
-# Importar la funciones create_logger y fatal_logger de la librería
-# personalizada logger.logger (para utilizar un logger que proporcione
-# información al usuario)
-from logger.logger import Logger
-from const.const import Messenger
 from casting.casting import Casting
+from const.const import Messenger
+from logger.logger import Logger
 
 
-# ************************* DEFINICIÓN DE FUNCIONES *************************
 class Informer:
 
+    # An object with connection parameters to connect to PostgreSQL
     connecter = None
-    logger = None
-    dbnames = []
-    usernames = []
+    logger = None  # Logger to show and log some messages
+    dbnames = []  # List of databases to get some info about
+    usernames = []  # List of users to get some info about
 
     def __init__(self, connecter=None, dbnames=[], usernames=[], logger=None):
 
@@ -43,7 +38,13 @@ class Informer:
             self.usernames = Casting.str_to_list(usernames)
 
     def get_pg_db_data(self, dbname):
-
+        '''
+        Target:
+            - show some info about a specified database.
+        Parameters:
+            - dbname: name of the database whose information is going to be
+            shown.
+        '''
         query_get_db_data = (
             'SELECT d.datname, d.datctype, '
             'pg_catalog.pg_get_userbyid(d.datdba) as owner '
@@ -59,7 +60,10 @@ class Informer:
             self.connecter.cursor = None
 
     def show_pg_dbs_data(self):
-
+        '''
+        Target:
+            - show some info about every PostgreSQL database.
+        '''
         dbs_data = []
         for dbname in self.dbnames:
             self.get_pg_db_data(dbname)
@@ -81,7 +85,13 @@ class Informer:
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
     def get_pg_user_data(self, username):
-
+        '''
+        Target:
+            - show some info about a specified user.
+        Parameters:
+            - username: name of the user whose information is going to be
+            shown.
+        '''
         query_get_user_data = (
             'SELECT usename, usesysid, usesuper '
             'FROM pg_user '
@@ -96,7 +106,10 @@ class Informer:
             self.connecter.cursor = None
 
     def show_pg_users_data(self):
-
+        '''
+        Target:
+            - show some info about every PostgreSQL user.
+        '''
         users_data = []
         for username in self.usernames:
             self.get_pg_user_data(username)
