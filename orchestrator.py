@@ -546,7 +546,7 @@ class Orchestrator:
                 connecter = None
 
             # Create the trimmer with the specified variables
-            trimmer = Trimmer(connecter, parser.bkp_vars['bkp_path'],
+            trimmer = Trimmer(parser.bkp_vars['bkp_path'],
                               parser.bkp_vars['prefix'],
                               parser.bkp_vars['in_dbs'],
                               parser.bkp_vars['in_regex'],
@@ -556,7 +556,8 @@ class Orchestrator:
                               parser.bkp_vars['min_n_bkps'],
                               parser.bkp_vars['exp_days'],
                               parser.bkp_vars['max_size'],
-                              parser.bkp_vars['pg_warnings'], self.logger)
+                              parser.bkp_vars['pg_warnings'], connecter,
+                              self.logger)
 
         # If the user did not specify a trimmer config file through console...
         else:
@@ -678,8 +679,10 @@ class Orchestrator:
         # Get databases or clusters' backer depending on the option selected
         # by the user in console
         if self.args.cluster:
+            self.logger.debug(Messenger.BEGINNING_EXE_CL_BACKER)
             backer = self.get_cl_backer(connecter)
         else:
+            self.logger.debug(Messenger.BEGINNING_EXE_DB_BACKER)
             backer = self.get_db_backer(connecter)
 
         # Check if the role of user connected to PostgreSQL is superuser
@@ -738,6 +741,7 @@ class Orchestrator:
             - delete specified databases in PostgreSQL.
         '''
         connecter = self.get_connecter()
+        self.logger.debug(Messenger.BEGINNING_EXE_DROPPER)
         dropper = self.get_dropper(connecter)
 
         # Terminate every connection to the target databases if necessary
@@ -758,6 +762,7 @@ class Orchestrator:
             - give information about PostgreSQL to the user.
         '''
         connecter = self.get_connecter()
+        self.logger.debug(Messenger.BEGINNING_EXE_INFORMER)
         informer = self.get_informer(connecter)
 
         if informer.dbnames:  # Give information about databases
@@ -776,6 +781,7 @@ class Orchestrator:
             - clone a database in PostgreSQL.
         '''
         connecter = self.get_connecter()
+        self.logger.debug(Messenger.BEGINNING_EXE_REPLICATOR)
         replicator = self.get_replicator(connecter)
 
         # Terminate every connection to the database which is going to be
@@ -802,9 +808,11 @@ class Orchestrator:
 
         if self.args.cluster:  # Restore a cluster (must be created first)
             restorer = self.get_cl_restorer(connecter)
+            self.logger.debug(Messenger.BEGINNING_EXE_CL_RESTORER)
             restorer.restore_cluster_backup()
         else:  # Restore a database
             restorer = self.get_db_restorer(connecter)
+            self.logger.debug(Messenger.BEGINNING_EXE_DB_RESTORER)
             restorer.restore_db_backup()
 
         # Close connection to PostgreSQL
@@ -817,6 +825,7 @@ class Orchestrator:
             variables.
         '''
         connecter = self.get_connecter()
+        self.logger.debug(Messenger.BEGINNING_EXE_TERMINATOR)
         terminator = self.get_terminator(connecter)
 
         if terminator.target_all:  # Terminate all connections
@@ -840,8 +849,10 @@ class Orchestrator:
         # Get databases or clusters' trimmer depending on the option selected
         # by the user in console
         if self.args.cluster:
+            self.logger.debug(Messenger.BEGINNING_EXE_CL_TRIMMER)
             trimmer = self.get_cl_trimmer()
         else:
+            self.logger.debug(Messenger.BEGINNING_EXE_DB_TRIMMER)
             trimmer = self.get_db_trimmer()
 
         # Get a list with all the files stored in the specified directory and
@@ -909,7 +920,7 @@ class Orchestrator:
             variables.
         '''
         connecter = self.get_connecter()
-
+        self.logger.debug(Messenger.BEGINNING_EXE_VACUUMER)
         vacuumer = self.get_vacuumer(connecter)
 
         # Check if the role of user connected to PostgreSQL is superuser

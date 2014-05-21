@@ -86,8 +86,8 @@ class Logger:
         # Set the verbosity of console handler to "INFO"
         ch.setLevel(logging.INFO)
         # Create a format for console and file logs
-        formatter = logging.Formatter('%(asctime)s - %(levelname)-4s - '
-                                      '%(message)s',
+        formatter = logging.Formatter('%(asctime)s - PID %(process)d - '
+                                      '%(levelname)-4s - %(message)s',
                                       datefmt='%Y.%m.%d_%H:%M:%S_%Z')
         if self.mute is False:  # If log files are required...
             # Create directory for log files if it does not exist yet

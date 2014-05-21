@@ -1,2 +1,22 @@
 py_pg_tools:
-A group of scripts made to dump and vacuum PostgreSQL databases, dump PostgreSQL clusters, and clean PostgreSQL databases/clusters backups.
+    A group of scripts made to dump and vacuum PostgreSQL databases, dump PostgreSQL clusters, and clean PostgreSQL databases/clusters backups.
+
+imported packages:
+    python3
+    python3-dateutil
+    python3-psycopg2
+
+imported modules:
+    argparse
+    configparser
+    dateutil
+    getpass
+    logging
+    math
+    os
+    os.path
+    psycopg2
+    re
+    subprocess
+    sys
+    time

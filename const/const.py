@@ -46,6 +46,20 @@ class Messenger:
                         'info, warning, error, critical)'
     LOGGER_MUTE_HELP = 'indicates not to store anything'
 
+    BEGINNING_EXE_DB_BACKER = 'INICIANDO EJECUCIÓN DE BACKER (BASES DE DATOS)'
+    BEGINNING_EXE_CL_BACKER = 'INICIANDO EJECUCIÓN DE BACKER (CLÚSTER)'
+    BEGINNING_EXE_DROPPER = 'INICIANDO EJECUCIÓN DE DROPPER'
+    BEGINNING_EXE_INFORMER = 'INICIANDO EJECUCIÓN DE INFORMER'
+    BEGINNING_EXE_REPLICATOR = 'INICIANDO EJECUCIÓN DE REPLICATOR'
+    BEGINNING_EXE_DB_RESTORER = 'INICIANDO EJECUCIÓN DE RESTORER (BASES DE ' \
+                                'DATOS)'
+    BEGINNING_EXE_CL_RESTORER = 'INICIANDO EJECUCIÓN DE RESTORER (CLÚSTER)'
+    BEGINNING_EXE_TERMINATOR = 'INICIANDO EJECUCIÓN DE TERMINATOR'
+    BEGINNING_EXE_DB_TRIMMER = 'INICIANDO EJECUCIÓN DE TRIMMER (BASES DE ' \
+                               'DATOS)'
+    BEGINNING_EXE_CL_TRIMMER = 'INICIANDO EJECUCIÓN DE TRIMMER (CLÚSTER)'
+    BEGINNING_EXE_VACUUMER = 'INICIANDO EJECUCIÓN DE VACUUMER'
+
     ACTION_DB_NO_SUPERUSER = 'El usuario especificado para la conexión a ' \
                              'PostgreSQL no tiene rol de superusuario: sólo ' \
                              'podrá actuar sobre las bases de datos de las ' \
