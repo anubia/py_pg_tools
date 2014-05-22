@@ -330,30 +330,10 @@ class Orchestrator:
         Return:
             - a informer which will get and show some PostgreSQL information.
         '''
-        # If the user specified a informer config file through console...
-        if self.args.config:
-            config_type = 'inform'
-            # Get the variables from the config file
-            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                               self.logger)
-
-            # Overwrite the config variables with the console ones if necessary
-            if self.args.db_name:
-                parser.bkp_vars['in_dbs'] = self.args.db_name
-                parser.bkp_vars['in_users'] = []
-            elif self.args.users:
-                parser.bkp_vars['in_dbs'] = []
-                parser.bkp_vars['in_users'] = self.args.users
-
-            # Create the informer with the specified variables
-            informer = Informer(connecter, parser.bkp_vars['in_dbs'],
-                                parser.bkp_vars['in_users'], self.logger)
-
-        # If the user did not specify a informer config file through console...
-        else:
-            # Create the informer with the console variables
-            informer = Informer(connecter, self.args.db_name, self.args.users,
-                                self.logger)
+        # Create the informer with the console variables
+        informer = Informer(connecter, self.args.details_conns,
+                            self.args.details_dbs, self.args.details_users,
+                            self.logger)
 
         return informer
 
@@ -765,12 +745,26 @@ class Orchestrator:
         self.logger.debug(Messenger.BEGINNING_EXE_INFORMER)
         informer = self.get_informer(connecter)
 
-        if informer.dbnames:  # Give information about databases
+        if self.args.details_conns is not None:
+            informer.show_pg_conns_data()
+        if self.args.list_conns:
+            informer.show_pg_connpids()
+        if self.args.details_dbs is not None:
             informer.show_pg_dbs_data()
-        elif informer.usernames:  # Give information about users
+        if self.args.list_dbs:
+            informer.show_pg_dbnames()
+        if self.args.details_users is not None:
             informer.show_pg_users_data()
-        else:
-            pass
+        if self.args.list_users:
+            informer.show_pg_usernames()
+        if self.args.version_pg:
+            informer.show_pg_version()
+        if self.args.version_num_pg:
+            informer.show_pg_nversion()
+        if self.args.time_start:
+            informer.show_pg_time_start()
+        if self.args.time_up:
+            informer.show_pg_time_up()
 
         # Close connection to PostgreSQL
         connecter.pg_disconnect()

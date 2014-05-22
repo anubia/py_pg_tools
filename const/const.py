@@ -160,20 +160,97 @@ class Messenger:
                                    'especificadas...'
     BEGINNING_TERMINATE_ALL_CONN = 'Terminando todas las conexiones a ' \
                                    'PostgreSQL...'
-    SEARCHING_SELECTED_DBS_DATA = 'Analizando información de las bases de ' \
-                                  'datos de PostgreSQL...'
+
+    SHOWING_DBS_DATA = 'Información de las bases de datos de PostgreSQL'
+    SHOWING_DBS_NAME = 'Bases de datos de PostgreSQL'
     NO_DB_DATA_TO_SHOW = 'No hay información disponible para las bases de ' \
                          'datos especificadas.'
-    DBNAME = 'Nombre: '
-    DBENCODING = 'Codificación: '
-    DBOWNER = 'Propietario: '
-    SEARCHING_SELECTED_USERS_DATA = 'Analizando información de los usuarios ' \
-                                    'de PostgreSQL...'
+
+    DATNAME = 'Datname:\t\t'
+    OWNER = 'Owner:\t\t'
+    ENCODING = 'Encoding:\t\t'
+    DATSIZE = 'Size:\t\t'
+    DATCOLLATE = 'Datcollate:\t'
+    DATCTYPE = 'Datctype:\t\t'
+    DATISTEMPLATE = 'Datistemplate:\t'
+    DATALLOWCONN = 'Datallowconn:\t'
+    DATCONNLIMIT = 'Datconnlimit:\t'
+    DATLASTSYSOID = 'Datlastsysoid:\t'
+    DATFROZENXID = 'Datfrozenxid:\t'
+    DATTABLESPACE = 'Dattablespace:\t'
+    DATACL = 'Datacl:\t\t'
+
+    SHOWING_USERS_DATA = 'Información de los usuarios de PostgreSQL'
+    SHOWING_USERS_NAME = 'Usuarios de PostgreSQL'
     NO_USER_DATA_TO_SHOW = 'No hay información disponible para los usuarios ' \
                            'especificados.'
-    USERNAME = 'Nombre: '
-    USERID = 'System ID: '
-    SUPERUSER = 'Superusuario: '
+
+    USENAME = 'Usename:\t\t'
+    USESYSID = 'Usesysid:\t\t'
+    USECREATEDB = 'Usecreatedb:\t'
+    USESUPER = 'Usesuper:\t\t'
+    USECATUPD = 'Usecatupd:\t'
+    USEREPL = 'Userepl:\t\t'
+    PASSWD = 'Passwd:\t\t'
+    VALUNTIL = 'Valuntil:\t\t'
+    USECONFIG = 'Useconfig:\t'
+
+    SHOWING_CONNS_DATA = 'Información de las conexiones a PostgreSQL'
+    SHOWING_CONNS_PID = 'PIDs de conexiones a PostgreSQL'
+    NO_CONN_DATA_TO_SHOW = 'No hay información disponible para las ' \
+                           'conexiones con el PID especificado.'
+
+    PID = 'Pid:\t\t'
+    PROCPID = 'Procpid:\t\t'
+    DATID = 'Datid:\t\t'
+    APPLICATION_NAME = 'Application_name:\t'
+    CLIENT_ADDR = 'Client_addr:\t'
+    CLIENT_HOSTNAME = 'Client_hostname:\t'
+    CLIENT_PORT = 'Client_port:\t'
+    BACKEND_START = 'Backend_start:\t'
+    XACT_START = 'Xact_start:\t'
+    QUERY_START = 'Query_start:\t'
+    STATE_CHANGE = 'State_change:\t'
+    WAITING = 'Waiting:\t\t'
+    STATE = 'State:\t\t'
+    QUERY = 'Query:\t\t'
+
+    SHOWING_PG_VERSION = 'Versión de PostgreSQL'
+    NO_PG_VERSION_TO_SHOW = 'No hay información acerca de la versión de ' \
+                            'PostgreSQL.'
+
+    SHOWING_PG_TIME_START = 'Fecha de inicio de ejecución de PostgreSQL'
+    NO_PG_TIME_START_TO_SHOW = 'No hay información acerca de la fecha de ' \
+                               'inicio de ejecución de PostgreSQL.'
+    SHOWING_PG_TIME_UP = 'Tiempo que lleva PostgreSQL en marcha'
+    NO_PG_TIME_UP_TO_SHOW = 'No hay información acerca del tiempo que ' \
+                            'lleva PostgreSQL en marcha.'
+
+    CONNECT_FAIL = 'Se produjo un error al realizar la conexión a ' \
+                   'PostgreSQL. Por favor, revise que el servidor, puerto y ' \
+                   'usuario especificados sean correctos.'
+    DISCONNECT_FAIL = 'Se produjo un error al realizar la desconexión de ' \
+                      'PostgreSQL.'
+    GET_PG_VERSION_FAIL = 'Ha ocurrido un problema al recuperar la versión ' \
+                          'de PostgreSQL.'
+    GET_PG_TIME_START_FAIL = 'Ha ocurrido un problema al recuperar la ' \
+                             'fecha de inicio de ejecución de PostgreSQL.'
+    GET_PG_TIME_UP_FAIL = 'Ha ocurrido un problema al recuperar el tiempo ' \
+                          'que lleva PostgreSQL ejecutándose.'
+    GET_PG_DB_DATA = 'Ha ocurrido un problema al recuperar información de ' \
+                     'la base de datos "{dbname}" de PostgreSQL.'
+    GET_PG_USER_DATA = 'Ha ocurrido un problema al recuperar información ' \
+                       'del usuario "{username}" de PostgreSQL.'
+    GET_PG_CONN_DATA = 'Ha ocurrido un problema al recuperar información ' \
+                       'del proceso {connpid} conectado a PostgreSQL.'
+    GET_PG_DBNAMES_DATA = 'Ha ocurrido un problema al recuperar los nombres ' \
+                          'de las bases de datos de PostgreSQL.'
+    GET_PG_USERNAMES_DATA = 'Ha ocurrido un problema al recuperar los ' \
+                            'nombres de los usuarios de PostgreSQL.'
+    GET_PG_CONNPIDS_DATA = 'Ha ocurrido un problema al recuperar los ' \
+                           'identificadores de procesos conectados a ' \
+                           'PostgreSQL.'
+
     NO_NEW_DBNAME = 'No se ha especificado un nombre para la nueva base de ' \
                     'datos.'
     NO_ORIGINAL_DBNAME = 'No se ha especificado el nombre de la base de ' \
@@ -263,10 +340,6 @@ class Messenger:
                           'PostgreSQL está dañado. Por favor, revise que ' \
                           'los nombres por defecto de secciones y atributos ' \
                           'son correctos.'
-    INFORMER_CFG_DAMAGED = 'El archivo de configuración con las condiciones ' \
-                           'para obtener información de PostgreSQL está ' \
-                           'dañado. Por favor, revise que los nombres por ' \
-                           'defecto de secciones y atributos son correctos.'
     REPLICATOR_CFG_DAMAGED = 'El archivo de configuración con las ' \
                              'condiciones para clonar una base de datos de ' \
                              'PostgreSQL está dañado. Por favor, revise que ' \
