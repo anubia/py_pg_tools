@@ -8,10 +8,7 @@ from logger.logger import Logger
 
 
 class Informer:
-    '''This class is meant to provide information ragarding:
-        - databases and their configuration and properties
-        - users and permissions
-    '''
+
     # An object with connection parameters to connect to PostgreSQL
     connecter = None
     logger = None  # Logger to show and log some messages
@@ -85,26 +82,6 @@ class Informer:
     def show_pg_connpids(self):
         '''
         Target:
-<<<<<<< HEAD
-            - show some info about a specified database.
-        Parameters:
-            - dbname: name of the database whose information is going to be
-              shown.
-        '''
-        query_get_db_data = (
-            'SELECT d.datname, d.datctype, '
-            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-            'FROM pg_catalog.pg_database d '
-            'WHERE d.datname = (%s);'
-        )
-
-        try:
-            self.connecter.cursor.execute(query_get_db_data, (dbname, ))
-        except Exception as e:
-            self.logger.debug('Error en la función "get_pg_db_data": '
-                              '{}.'.format(str(e)))
-            self.connecter.cursor = None
-=======
             - show the PIDs of every PostgreSQL backend.
         '''
         msg_len = len(Messenger.SHOWING_CONNS_PID)
@@ -124,7 +101,6 @@ class Informer:
         else:
             message = Messenger.NO_CONN_DATA_TO_SHOW
             self.logger.highlight('warning', message, 'yellow', effect='bold')
->>>>>>> 7520ec2ef9c9199681126b24add98eff0b3ebc0a
 
     def show_pg_dbs_data(self):
         '''
@@ -182,30 +158,6 @@ class Informer:
             message = Messenger.NO_DB_DATA_TO_SHOW
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
-<<<<<<< HEAD
-    def get_pg_user_data(self, username):
-        '''
-        Target:
-            - show some info about a specified user.
-        Parameters:
-            - username: name of the user whose information is going to be
-              shown.
-        '''
-        query_get_user_data = (
-            'SELECT usename, usesysid, usesuper '
-            'FROM pg_user '
-            'WHERE usename = (%s);'
-        )
-
-        try:
-            self.connecter.cursor.execute(query_get_user_data, (username, ))
-        except Exception as e:
-            self.logger.debug('Error en la función "get_pg_user_data": '
-                              '{}.'.format(str(e)))
-            self.connecter.cursor = None
-
-=======
->>>>>>> 7520ec2ef9c9199681126b24add98eff0b3ebc0a
     def show_pg_users_data(self):
         '''
         Target:

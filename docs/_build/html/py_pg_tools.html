@@ -444,6 +444,154 @@ obtained.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_conn_data">
+<tt class="descname">get_pg_conn_data</tt><big>(</big><em>connpid</em><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_conn_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show some info about backends.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>connpid: PID of the backend whose information is going to be
+shown.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_connpids">
+<tt class="descname">get_pg_connpids</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_connpids" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get PostgreSQL backends&#8217; PIDs.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_db_data">
+<tt class="descname">get_pg_db_data</tt><big>(</big><em>dbname</em><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_db_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show some info about a specified database.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbname: name of the database whose information is going to be
+shown.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_dbnames">
+<tt class="descname">get_pg_dbnames</tt><big>(</big><em>ex_templates=False</em><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_dbnames" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get PostgreSQL databases&#8217; names depending on the parameters
+received, and store the results in the connection cursor.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>ex_templates: flag which determinates whether or not get those
+databases which are templates.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_time_start">
+<tt class="descname">get_pg_time_start</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_time_start" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the time when PostgreSQL was started.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a date which indicates the time when PostgreSQL was started.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_time_up">
+<tt class="descname">get_pg_time_up</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_time_up" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get how long PostgreSQL has been working.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a date which indicates how long PostgreSQL has been working.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_user_data">
+<tt class="descname">get_pg_user_data</tt><big>(</big><em>username</em><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_user_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show some info about a specified user.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>username: name of the user whose information is going to be
+shown.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_usernames">
+<tt class="descname">get_pg_usernames</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_usernames" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get PostgreSQL users&#8217; names.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pg_version">
+<tt class="descname">get_pg_version</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pg_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the PostgreSQL version.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a integer which gives the PostgreSQL version.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="py_pg_tools.connecter.Connecter.get_pid_str">
 <tt class="descname">get_pid_str</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pid_str" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
@@ -457,6 +605,23 @@ was called &#8220;procpid&#8221;, afterwards became &#8220;pid&#8221;.</li>
 <dt>Return:</dt>
 <dd><ul class="first last simple">
 <li>a string which gives the name of the vaiable process id.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.connecter.Connecter.get_pretty_pg_version">
+<tt class="descname">get_pretty_pg_version</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.connecter.Connecter.get_pretty_pg_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the pretty PostgreSQL version.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a string which gives the PostgreSQL version and more details.</li>
 </ul>
 </dd>
 </dl>
@@ -583,14 +748,16 @@ removed.</li>
 <span id="py-pg-tools-informer-module"></span><h2>py_pg_tools.informer module<a class="headerlink" href="#module-py_pg_tools.informer" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="py_pg_tools.informer.Informer">
-<em class="property">class </em><tt class="descclassname">py_pg_tools.informer.</tt><tt class="descname">Informer</tt><big>(</big><em>connecter=None</em>, <em>dbnames=</em>, <span class="optional">[</span><span class="optional">]</span><em>usernames=</em>, <span class="optional">[</span><span class="optional">]</span><em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">py_pg_tools.informer.</tt><tt class="descname">Informer</tt><big>(</big><em>connecter=None</em>, <em>connpids=</em>, <span class="optional">[</span><span class="optional">]</span><em>dbnames=</em>, <span class="optional">[</span><span class="optional">]</span><em>usernames=</em>, <span class="optional">[</span><span class="optional">]</span><em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
-<p>This class is meant to provide information ragarding:
-- databases and their configuration and properties
-- users and permissions</p>
 <dl class="attribute">
 <dt id="py_pg_tools.informer.Informer.connecter">
 <tt class="descname">connecter</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.informer.Informer.connecter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.informer.Informer.connpids">
+<tt class="descname">connpids</tt><em class="property"> = []</em><a class="headerlink" href="#py_pg_tools.informer.Informer.connpids" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -598,46 +765,46 @@ removed.</li>
 <tt class="descname">dbnames</tt><em class="property"> = []</em><a class="headerlink" href="#py_pg_tools.informer.Informer.dbnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="py_pg_tools.informer.Informer.get_pg_db_data">
-<tt class="descname">get_pg_db_data</tt><big>(</big><em>dbname</em><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.get_pg_db_data" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Target:</dt>
-<dd><ul class="first last simple">
-<li>show some info about a specified database.</li>
-</ul>
-</dd>
-<dt>Parameters:</dt>
-<dd><ul class="first last simple">
-<li>dbname: name of the database whose information is going to be
-shown.</li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="py_pg_tools.informer.Informer.get_pg_user_data">
-<tt class="descname">get_pg_user_data</tt><big>(</big><em>username</em><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.get_pg_user_data" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Target:</dt>
-<dd><ul class="first last simple">
-<li>show some info about a specified user.</li>
-</ul>
-</dd>
-<dt>Parameters:</dt>
-<dd><ul class="first last simple">
-<li>username: name of the user whose information is going to be
-shown.</li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="py_pg_tools.informer.Informer.logger">
 <tt class="descname">logger</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.informer.Informer.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_connpids">
+<tt class="descname">show_pg_connpids</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_connpids" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show the PIDs of every PostgreSQL backend.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_conns_data">
+<tt class="descname">show_pg_conns_data</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_conns_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show some info about every PostgreSQL backend.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_dbnames">
+<tt class="descname">show_pg_dbnames</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_dbnames" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show the names of every PostgreSQL database.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="py_pg_tools.informer.Informer.show_pg_dbs_data">
@@ -652,12 +819,72 @@ shown.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_nversion">
+<tt class="descname">show_pg_nversion</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_nversion" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show PostgreSQL version in numeric format.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_time_start">
+<tt class="descname">show_pg_time_start</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_time_start" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show when PostgreSQL was started.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_time_up">
+<tt class="descname">show_pg_time_up</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_time_up" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show how long PostgreSQL has been working.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_usernames">
+<tt class="descname">show_pg_usernames</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_usernames" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show the names of every PostgreSQL user.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="py_pg_tools.informer.Informer.show_pg_users_data">
 <tt class="descname">show_pg_users_data</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_users_data" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Target:</dt>
 <dd><ul class="first last simple">
 <li>show some info about every PostgreSQL user.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.informer.Informer.show_pg_version">
+<tt class="descname">show_pg_version</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.informer.Informer.show_pg_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show PostgreSQL version.</li>
 </ul>
 </dd>
 </dl>
@@ -1631,6 +1858,9 @@ dadas por el archivo de configuración).</li>
 </dd></dl>
 
 </div>
+<div class="section" id="module-py_pg_tools">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-py_pg_tools" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -1657,6 +1887,7 @@ dadas por el archivo de configuración).</li>
 <li><a class="reference internal" href="#module-py_pg_tools.terminator">py_pg_tools.terminator module</a></li>
 <li><a class="reference internal" href="#module-py_pg_tools.trimmer">py_pg_tools.trimmer module</a></li>
 <li><a class="reference internal" href="#module-py_pg_tools.vacuumer">py_pg_tools.vacuumer module</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools">Module contents</a></li>
 </ul>
 </li>
 </ul>

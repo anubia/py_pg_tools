@@ -174,26 +174,6 @@ class CfgParser:
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.DROPPER_CFG_DAMAGED)
 
-<<<<<<< HEAD
-    def parse_informer(self):
-        '''
-        Target:
-            - get the informer variables from a configuration file and store
-              them in a dictionary.
-        '''
-        try:
-            self.bkp_vars = {
-                'in_dbs': self.cfg.get('includes', 'in_dbs'),
-                'in_users': self.cfg.get('includes', 'in_users'),
-            }
-
-        except Exception as e:
-            self.logger.debug('Error en la función "parse_informer": '
-                              '{}.'.format(str(e)))
-            self.logger.stop_exe(Messenger.INFORMER_CFG_DAMAGED)
-
-=======
->>>>>>> 7520ec2ef9c9199681126b24add98eff0b3ebc0a
     def parse_replicator(self):
         '''
         Target:

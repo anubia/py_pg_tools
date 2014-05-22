@@ -127,7 +127,6 @@ class Connecter:
         Return:
             - a boolean which indicates whether a user is a PostgreSQL
               superuser or not.
-        
         '''
         query_is_superuser = (
             'SELECT usesuper '
@@ -238,7 +237,7 @@ class Connecter:
             - show some info about a specified database.
         Parameters:
             - dbname: name of the database whose information is going to be
-            shown.
+              shown.
         '''
         query_get_db_data = (
             'SELECT datname, pg_get_userbyid(datdba) as owner, '
@@ -269,7 +268,7 @@ class Connecter:
             - show some info about a specified user.
         Parameters:
             - username: name of the user whose information is going to be
-            shown.
+              shown.
         '''
         query_get_user_data_91 = (
             'SELECT usename, usesysid, usecreatedb, usesuper, usecatupd, '
@@ -309,7 +308,7 @@ class Connecter:
             - show some info about backends.
         Parameters:
             - connpid: PID of the backend whose information is going to be
-            shown.
+              shown.
         '''
         query_get_conn_data_91 = (
             'SELECT datid, datname, procpid, usesysid, usename, '
@@ -348,10 +347,10 @@ class Connecter:
         '''
         Target:
             - get PostgreSQL databases' names depending on the parameters
-            received, and store the results in the connection cursor.
+              received, and store the results in the connection cursor.
         Parameters:
             - ex_templates: flag which determinates whether or not get those
-            databases which are templates.
+              databases which are templates.
         '''
         query_get_dbnames = (
             'SELECT datname '

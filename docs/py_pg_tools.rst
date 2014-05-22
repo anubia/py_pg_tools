@@ -123,3 +123,11 @@ py_pg_tools.vacuumer module
     :undoc-members:
     :show-inheritance:
 
+
+Module contents
+---------------
+
+.. automodule:: py_pg_tools
+    :members:
+    :undoc-members:
+    :show-inheritance:
