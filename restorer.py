@@ -136,7 +136,7 @@ class RestorerCluster:
         '''
         Target:
             - restore a cluster's backup in PostgreSQL. The cluster must have
-            been created before this process.
+              been created before this process.
         '''
         # Regular expression which must match the backup's name
         regex = r'.*ht_(.+_cluster)_(\d{8}_\d{6}_.+)\.(dump|bz2|gz|zip)$'

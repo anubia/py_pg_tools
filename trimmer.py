@@ -123,11 +123,11 @@ class Trimmer:
         '''
         Target:
             - remove (if necessary) some database's backups, taking into
-            account some parameters in the following order: minimum number of
-            backups to keep > obsolete backups.
+              account some parameters in the following order: minimum number of
+              backups to keep > obsolete backups.
         Parameters:
             - dbname: name of the database whose backups are going to be
-            trimmed.
+              trimmed.
             - db_bkps_list: list of backups of a database to analyse and trim.
         '''
         if self.exp_days == -1:  # No expiration date
@@ -223,12 +223,12 @@ class Trimmer:
         '''
         Target:
             - remove (if necessary) some backups of a group of databases,
-            taking into account some parameters in the following order: minimum
-            number of backups to keep > obsolete backups.
+              taking into account some parameters in the following order: minimum
+              number of backups to keep > obsolete backups.
         Parameters:
             - bkps_list: list of backups found in the specified directory.
             - dbs_to_clean: name of the database whose backups are going to be
-            trimmed.
+              trimmed.
         '''
         # If not prefix specified, trim all the backups (not only the ones
         # without prefix)
@@ -328,8 +328,8 @@ class TrimmerCluster:
         '''
         Target:
             - remove (if necessary) some cluster's backups, taking into
-            account some parameters in the following order: minimum number of
-            backups to keep > obsolete backups.
+              account some parameters in the following order: minimum number of
+              backups to keep > obsolete backups.
         Parameters:
             - ht_bkps_list: list of backups of a cluster to analyse and trim.
         '''

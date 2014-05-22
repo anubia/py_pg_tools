@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py_pg_tools.checker package &mdash; py_pg_tools 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="py_pg_tools 0.1.1 documentation" href="index.html" />
+    <link rel="up" title="py_pg_tools package" href="py_pg_tools.html" />
+    <link rel="next" title="py_pg_tools.config package" href="py_pg_tools.config.html" />
+    <link rel="prev" title="py_pg_tools.casting package" href="py_pg_tools.casting.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.config.html" title="py_pg_tools.config package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.casting.html" title="py_pg_tools.casting package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" accesskey="U">py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="py-pg-tools-checker-package">
+<h1>py_pg_tools.checker package<a class="headerlink" href="#py-pg-tools-checker-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-py_pg_tools.checker.checker">
+<span id="py-pg-tools-checker-checker-module"></span><h2>py_pg_tools.checker.checker module<a class="headerlink" href="#module-py_pg_tools.checker.checker" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py_pg_tools.checker.checker.Checker">
+<em class="property">class </em><tt class="descclassname">py_pg_tools.checker.checker.</tt><tt class="descname">Checker</tt><a class="headerlink" href="#py_pg_tools.checker.checker.Checker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="staticmethod">
+<dt id="py_pg_tools.checker.checker.Checker.check_compress_type">
+<em class="property">static </em><tt class="descname">check_compress_type</tt><big>(</big><em>c_type</em><big>)</big><a class="headerlink" href="#py_pg_tools.checker.checker.Checker.check_compress_type" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>check if a string is a valid compress type.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>c_type: the string to be checked.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>the compress type if is valid, otherwise False.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.checker.checker.Checker.check_regex">
+<em class="property">static </em><tt class="descname">check_regex</tt><big>(</big><em>regex</em><big>)</big><a class="headerlink" href="#py_pg_tools.checker.checker.Checker.check_regex" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>check if a string is a valid regex.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>regex: the string to be checked.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a boolean with the result.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.checker.checker.Checker.str_is_bool">
+<em class="property">static </em><tt class="descname">str_is_bool</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#py_pg_tools.checker.checker.Checker.str_is_bool" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>check if a string could be converted into a boolean.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>string: the string to be checked.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a boolean with the result.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.checker.checker.Checker.str_is_int">
+<em class="property">static </em><tt class="descname">str_is_int</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#py_pg_tools.checker.checker.Checker.str_is_int" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>check if a string could be converted into a integer.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>string: the string to be checked.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a boolean with the result.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.checker.checker.Checker.str_is_valid_exp_days">
+<em class="property">static </em><tt class="descname">str_is_valid_exp_days</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#py_pg_tools.checker.checker.Checker.str_is_valid_exp_days" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>check if a string could be converted into a valid variable of
+expiration days. It would be any positive integer, zero or -1.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>string: the string to be checked.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a boolean with the result.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.checker.checker.Checker.str_is_valid_max_size">
+<em class="property">static </em><tt class="descname">str_is_valid_max_size</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#py_pg_tools.checker.checker.Checker.str_is_valid_max_size" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>check if a string could be converted into a valid variable of
+maximum size. It would be any integer followed inmediately by a
+storing unit of measure, like MegaBytes, GigaBytes, TeraBytes or
+PetaBytes (MB, GB, TB, PB).</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>string: the string to be checked.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a boolean with the result.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-py_pg_tools.checker">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-py_pg_tools.checker" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">py_pg_tools.checker package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.checker.checker">py_pg_tools.checker.checker module</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.checker">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="py_pg_tools.casting.html"
+                        title="previous chapter">py_pg_tools.casting package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="py_pg_tools.config.html"
+                        title="next chapter">py_pg_tools.config package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/py_pg_tools.checker.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.config.html" title="py_pg_tools.config package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.casting.html" title="py_pg_tools.casting package"
+             >previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" >py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Juan Formoso Vasco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

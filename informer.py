@@ -8,7 +8,10 @@ from logger.logger import Logger
 
 
 class Informer:
-
+    '''This class is meant to provide information ragarding:
+        - databases and their configuration and properties
+        - users and permissions
+    '''
     # An object with connection parameters to connect to PostgreSQL
     connecter = None
     logger = None  # Logger to show and log some messages
@@ -43,7 +46,7 @@ class Informer:
             - show some info about a specified database.
         Parameters:
             - dbname: name of the database whose information is going to be
-            shown.
+              shown.
         '''
         query_get_db_data = (
             'SELECT d.datname, d.datctype, '
@@ -90,7 +93,7 @@ class Informer:
             - show some info about a specified user.
         Parameters:
             - username: name of the user whose information is going to be
-            shown.
+              shown.
         '''
         query_get_user_data = (
             'SELECT usename, usesysid, usesuper '

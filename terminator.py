@@ -69,7 +69,7 @@ class Terminator:
         '''
         Target:
             - terminate every connection of a specific user to PostgreSQL (as
-            long as the target user is the one who is running the program).
+              long as the target user is the one who is running the program).
         '''
         message = Messenger.BEGINNING_TERMINATE_USER_CONN.format(
             target_user=self.target_user)
@@ -96,7 +96,7 @@ class Terminator:
         '''
         Target:
             - terminate every connection to a PostgreSQL database (except the
-            current one, if it is connected to the target database).
+              current one, if it is connected to the target database).
         '''
         sql = self.query_terminate_backend_db
 
@@ -131,8 +131,8 @@ class Terminator:
         '''
         Target:
             - terminate every connection to some PostgreSQL databases (except
-            the current one, if it is connected to one of the target
-            databases).
+              the current one, if it is connected to one of the target
+              databases).
         '''
         message = Messenger.BEGINNING_TERMINATE_DBS_CONN
         self.logger.highlight('info', message, 'white')

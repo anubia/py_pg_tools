@@ -37,7 +37,7 @@ class Dropper:
             - remove a database in PostgreSQL.
         Parameters:
             - dbname: the PostgreSQL database's name which is going to be
-            removed.
+              removed.
         '''
         query_drop_db = (
             'DROP DATABASE %s;'

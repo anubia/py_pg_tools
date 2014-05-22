@@ -2,13 +2,18 @@
 # -*- encoding: utf-8 -*-
 
 
-__all__ = ['backer', 'casting', 'checker', 'config',  'configurator',
-           'connecter', 'const', 'date_tools', 'db_selector', 'dir_tools',
-           'dropper', 'informer', 'logger', 'orchestrator', 'replicator',
-           'restorer', 'terminator', 'trimmer', 'vacuumer']
+import sys
+import os
+sys.path.append(os.path.abspath('.'))
 
-from . import backer
+__all__ = ['casting', 'backer', 'checker', 'config',  'configurator',
+           'connecter', 'const', 'date_tools', 'db_selector', 'dir_tools',
+           'dropper', 'informer', 'logger', 'mailer', 'orchestrator', 'proof',
+           'py_pg_tools', 'replicator', 'restorer', 'terminator', 'trimmer',
+           'vacuumer']
+
 from . import casting
+from . import backer
 from . import checker
 from . import config
 from . import configurator
@@ -20,7 +25,10 @@ from . import dir_tools
 from . import dropper
 from . import informer
 from . import logger
+from . import mailer
 from . import orchestrator
+from . import proof
+from . import py_pg_tools
 from . import replicator
 from . import restorer
 from . import terminator

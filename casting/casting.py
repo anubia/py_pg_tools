@@ -62,13 +62,13 @@ class Casting:
         '''
         Target:
             - converts a string into a dictionary made up by an integer and a
-            string. The integer will be a size and the string a storing unit of
-            measure.
+              string. The integer will be a size and the string a storing unit of
+              measure.
         Parameters:
             - string: the string to be converted.
         Return:
             - a dictionary with the size and the unit of measure used or None
-            if the conversion was impossible.
+              if the conversion was impossible.
         '''
         regex = r'(\d+)(MB|GB|TB|PB)$'
         regex = re.compile(regex)  # Validar la expresión regular

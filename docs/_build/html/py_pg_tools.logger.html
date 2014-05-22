@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py_pg_tools.logger package &mdash; py_pg_tools 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="py_pg_tools 0.1.1 documentation" href="index.html" />
+    <link rel="up" title="py_pg_tools package" href="py_pg_tools.html" />
+    <link rel="next" title="py_pg_tools.mailer package" href="py_pg_tools.mailer.html" />
+    <link rel="prev" title="py_pg_tools.dir_tools package" href="py_pg_tools.dir_tools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.mailer.html" title="py_pg_tools.mailer package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.dir_tools.html" title="py_pg_tools.dir_tools package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" accesskey="U">py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="py-pg-tools-logger-package">
+<h1>py_pg_tools.logger package<a class="headerlink" href="#py-pg-tools-logger-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-py_pg_tools.logger.logger">
+<span id="py-pg-tools-logger-logger-module"></span><h2>py_pg_tools.logger.logger module<a class="headerlink" href="#module-py_pg_tools.logger.logger" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py_pg_tools.logger.logger.CustomRotatingFileHandler">
+<em class="property">class </em><tt class="descclassname">py_pg_tools.logger.logger.</tt><tt class="descname">CustomRotatingFileHandler</tt><big>(</big><em>filename</em>, <em>mode='a'</em>, <em>maxBytes=0</em>, <em>backupCount=0</em>, <em>encoding=None</em>, <em>delay=False</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.CustomRotatingFileHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">logging.handlers.RotatingFileHandler</span></tt></p>
+<dl class="attribute">
+<dt id="py_pg_tools.logger.logger.CustomRotatingFileHandler.ansi_escape">
+<tt class="descname">ansi_escape</tt><em class="property"> = re.compile('\\x1b[^m]*m')</em><a class="headerlink" href="#py_pg_tools.logger.logger.CustomRotatingFileHandler.ansi_escape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.CustomRotatingFileHandler.emit">
+<tt class="descname">emit</tt><big>(</big><em>record</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.CustomRotatingFileHandler.emit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>escape ANSI codes in file handlers, this way they will not be
+seen in log files.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>record: a line to be written in the log file.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="py_pg_tools.logger.logger.Logger">
+<em class="property">class </em><tt class="descclassname">py_pg_tools.logger.logger.</tt><tt class="descname">Logger</tt><big>(</big><em>log_dir=None</em>, <em>level=None</em>, <em>mute=False</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.critical">
+<tt class="descname">critical</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.critical" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show and log a message with critical level.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.debug">
+<tt class="descname">debug</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.debug" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show and log a message with debug level.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.error">
+<tt class="descname">error</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.error" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show and log a message with error level.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.highlight">
+<tt class="descname">highlight</tt><big>(</big><em>level</em>, <em>message</em>, <em>txtcolor='default'</em>, <em>bgcolor='black'</em>, <em>effect='default'</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.highlight" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show a message with colors and effects in console and log it.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.info">
+<tt class="descname">info</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.info" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show and log a message with info level.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.logger.logger.Logger.level">
+<tt class="descname">level</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.level" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.logger.logger.Logger.log_dir">
+<tt class="descname">log_dir</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.log_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.logger.logger.Logger.logger">
+<tt class="descname">logger</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.logger.logger.Logger.mute">
+<tt class="descname">mute</tt><em class="property"> = False</em><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.mute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.stop_exe">
+<tt class="descname">stop_exe</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.stop_exe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show and log an error message with colors and effcets, and stop
+the execution of the program.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.logger.logger.Logger.warning">
+<tt class="descname">warning</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#py_pg_tools.logger.logger.Logger.warning" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>show and log a message with warning level.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>message: the message to show and log.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-py_pg_tools.logger">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-py_pg_tools.logger" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">py_pg_tools.logger package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.logger.logger">py_pg_tools.logger.logger module</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.logger">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="py_pg_tools.dir_tools.html"
+                        title="previous chapter">py_pg_tools.dir_tools package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="py_pg_tools.mailer.html"
+                        title="next chapter">py_pg_tools.mailer package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/py_pg_tools.logger.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.mailer.html" title="py_pg_tools.mailer package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.dir_tools.html" title="py_pg_tools.dir_tools package"
+             >previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" >py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Juan Formoso Vasco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

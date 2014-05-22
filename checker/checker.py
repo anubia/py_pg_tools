@@ -48,7 +48,7 @@ class Checker:
         '''
         Target:
             - check if a string could be converted into a valid variable of
-            expiration days. It would be any positive integer, zero or -1.
+              expiration days. It would be any positive integer, zero or -1.
         Parameters:
             - string: the string to be checked.
         Return:
@@ -68,9 +68,9 @@ class Checker:
         '''
         Target:
             - check if a string could be converted into a valid variable of
-            maximum size. It would be any integer followed inmediately by a
-            storing unit of measure, like MegaBytes, GigaBytes, TeraBytes or
-            PetaBytes (MB, GB, TB, PB).
+              maximum size. It would be any integer followed inmediately by a
+              storing unit of measure, like MegaBytes, GigaBytes, TeraBytes or
+              PetaBytes (MB, GB, TB, PB).
         Parameters:
             - string: the string to be checked.
         Return:

@@ -87,9 +87,9 @@ class Vacuumer:
         - crear una copia de seguridad de la base de datos especificada.
     Parámetros:
         - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
+          mensaje.
         - dbname: nombre de la base de datos de la que se quiere realizar una
-        copia de seguridad.
+          copia de seguridad.
         - conn: conexión realizada desde el script a PostgreSQL
     '''
         success = True
@@ -112,16 +112,16 @@ class Vacuumer:
         '''
     Objetivo:
         - crear copias de seguridad de las bases de datos especificadas, las
-        que están incluidas en la variable "dbs_all".
+          que están incluidas en la variable "dbs_all".
     Parámetros:
         - logger: el logger que se empleará para mostrar y registrar el
-        mensaje.
+          mensaje.
         - conn: conexión realizada desde el script a PostgreSQL
         - dbs_all: una lista con todos los nombres de las bases de datos de
-        PostgreSQL de las que se desea hacer una copia de seguridad (vienen
-        dadas por el archivo de configuración).
+          PostgreSQL de las que se desea hacer una copia de seguridad (vienen
+          dadas por el archivo de configuración).
         - bkp_vars: diccionario con los parámetros especificados en el archivo
-        .cfg
+          .cfg
     '''
         if vacuum_list:
             self.logger.highlight('info', Messenger.BEGINNING_VACUUMER,

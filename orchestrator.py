@@ -59,8 +59,8 @@ class Orchestrator:
             - get all the variables stored in a config file with cfg extension.
         Parameters:
             - config_type: the type of config file which is going to be loaded,
-            to differ it from the other types which will have different
-            sections and variables.
+              to differ it from the other types which will have different
+              sections and variables.
             - logger: a logger to show and log some messages.
         Return:
             - the parser which will contain all the config file variables.
@@ -157,7 +157,7 @@ class Orchestrator:
             - get a backer object with variables to backup databases.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a backer which will backup databases.
         '''
@@ -239,7 +239,7 @@ class Orchestrator:
             - get a backer object with variables to backup databases' clusters.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a backer which will backup databases' clusters.
         '''
@@ -290,10 +290,10 @@ class Orchestrator:
         '''
         Target:
             - get a dropper object with variables to drop some PostgreSQL
-            databases.
+              databases.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a dropper which will delete some PostgreSQL databases.
         '''
@@ -323,10 +323,10 @@ class Orchestrator:
         '''
         Target:
             - get an informer object with variables to show some PostgreSQL
-            information.
+              information.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a informer which will get and show some PostgreSQL information.
         '''
@@ -361,10 +361,10 @@ class Orchestrator:
         '''
         Target:
             - get a replicator object with variables to clone a PostgreSQL
-            database.
+              database.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a replicator which will clone a PostgreSQL database.
         '''
@@ -398,10 +398,10 @@ class Orchestrator:
         '''
         Target:
             - get a restorer object with variables to restore a database backup
-            in PostgreSQL.
+              in PostgreSQL.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a restorer which will restore a PostgreSQL database.
         '''
@@ -433,10 +433,10 @@ class Orchestrator:
         '''
         Target:
             - get a restorer object with variables to restore a cluster backup
-            in PostgreSQL.
+              in PostgreSQL.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a restorer which will restore a PostgreSQL cluster.
         '''
@@ -467,13 +467,13 @@ class Orchestrator:
         '''
         Target:
             - get a terminator object with variables to terminate connections
-            to PostgreSQL.
+              to PostgreSQL.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a terminator which will terminate connections to
-            PostgreSQL.
+              PostgreSQL.
         '''
         # If the user specified a terminator config file through console...
         if self.args.config:
@@ -513,7 +513,7 @@ class Orchestrator:
         '''
         Target:
             - get a trimmer object with its variables to delete some databases'
-            backups in a selected directory.
+              backups in a selected directory.
         Return:
             - a trimmer which will delete databases' backups.
         '''
@@ -580,7 +580,7 @@ class Orchestrator:
         '''
         Target:
             - get a trimmer object with its variables to delete some clusters'
-            backups in a selected directory.
+              backups in a selected directory.
         Return:
             - a trimmer which will delete clusters' backups.
         '''
@@ -622,10 +622,10 @@ class Orchestrator:
         '''
         Target:
             - get a vacuumer object with variables to vacuum databases in
-            PostgreSQL.
+              PostgreSQL.
         Parameters:
             - connecter: an object with connection parameters to connect to
-            PostgreSQL.
+              PostgreSQL.
         Return:
             - a vacuumer which will vacuum PostgreSQL databases.
         '''
@@ -671,8 +671,8 @@ class Orchestrator:
         '''
         Target:
             - executes the backer depending on the type of backup to make, the
-            role of the user who is connected to PostgreSQL and the rest of the
-            conditions. It calls a terminator if necessary.
+              role of the user who is connected to PostgreSQL and the rest of the
+              conditions. It calls a terminator if necessary.
         '''
         connecter = self.get_connecter()
 
@@ -802,7 +802,7 @@ class Orchestrator:
         '''
         Target:
             - restore a specified backup file as a new database or cluster in
-            PostgreSQL.
+              PostgreSQL.
         '''
         connecter = self.get_connecter()
 
@@ -822,7 +822,7 @@ class Orchestrator:
         '''
         Target:
             - executes the terminator taking into account the value of its
-            variables.
+              variables.
         '''
         connecter = self.get_connecter()
         self.logger.debug(Messenger.BEGINNING_EXE_TERMINATOR)
@@ -844,7 +844,7 @@ class Orchestrator:
         '''
         Target:
             - executes the trimmer in a specified directory and delete its
-            selected backups.
+              selected backups.
         '''
         # Get databases or clusters' trimmer depending on the option selected
         # by the user in console
@@ -917,7 +917,7 @@ class Orchestrator:
         '''
         Target:
             - executes the vacuumer taking into account the value of its
-            variables.
+              variables.
         '''
         connecter = self.get_connecter()
         self.logger.debug(Messenger.BEGINNING_EXE_VACUUMER)

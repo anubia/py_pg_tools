@@ -23,7 +23,7 @@ class CustomRotatingFileHandler(logging.handlers.RotatingFileHandler):
         '''
         Target:
             - escape ANSI codes in file handlers, this way they will not be
-            seen in log files.
+              seen in log files.
         Parameters:
             - record: a line to be written in the log file.
         '''
@@ -194,7 +194,7 @@ class Logger:
         '''
         Target:
             - show and log an error message with colors and effcets, and stop
-            the execution of the program.
+              the execution of the program.
         Parameters:
             - message: the message to show and log.
         '''
@@ -236,7 +236,7 @@ class Logger:
         '''
         Target:
             - turn a string with the name of a background color into its ANSI
-            code.
+              code.
         Parameters:
             - bgcolor: the common name of a color.
         Return:

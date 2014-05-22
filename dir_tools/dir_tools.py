@@ -60,7 +60,7 @@ class Dir:
             - get the default directory where the backups must be stored.
         Return:
             - A string which gives the absolute path where the backups will be
-            stored.
+              stored.
         '''
         ## Get the script's directory
         #script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -77,13 +77,13 @@ class Dir:
         '''
         Target:
             - get the default directory where the configuration files should
-            be.
+              be.
         Parameters:
             - subpath: the last part of the default path which depends on the
-            type of configuration file.
+              type of configuration file.
         Return:
             - a string which gives the absolute path where a specific
-            configuration file should be.
+              configuration file should be.
         '''
         # Get the script's directory
         script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -100,7 +100,7 @@ class Dir:
         '''
         Target:
             - generate a list which contains every file in the specified
-            directory (and its subdirectories) sorted by modification date.
+              directory (and its subdirectories) sorted by modification date.
         Parameters:
             - path: the directory where the files are.
         Return:
@@ -122,12 +122,12 @@ class Dir:
         '''
         Target:
             - extract the databases' names from the files' names of the list
-            received and store them in a list.
+              received and store them in a list.
         Parameters:
             - bkps_list: a list with backup's files.
         Return:
             - a list with those databases' names extracted from the backup's
-            list.
+              list.
         '''
         bkped_dbs = []
 
@@ -162,9 +162,9 @@ class Dir:
         '''
         Target:
             - compare two lists with databases. This function will be used to
-            show which PostgreSQL databases do not have a backup in a specified
-            directory and which databases have a backup but are not stored in
-            PostgreSQL.
+              show which PostgreSQL databases do not have a backup in a specified
+              directory and which databases have a backup but are not stored in
+              PostgreSQL.
         Parameters:
             - pg_dbs: list of PostgreSQL databases.
             - bkped_dbs: list of databases which have a backup.
@@ -222,7 +222,7 @@ class Dir:
         '''
         Target:
             - remove every subdirectory if empty (even the whole directory in
-            case it turns empty).
+              case it turns empty).
         Parameters:
             - path: the absolute path of the directory.
         '''

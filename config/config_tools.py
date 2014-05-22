@@ -44,7 +44,7 @@ class LogCfgParser:
         '''
         Target:
             - get the logger variables from a configuration file and store them
-            in a dictionary.
+              in a dictionary.
         '''
         try:
             self.log_vars = {
@@ -97,7 +97,7 @@ class CfgParser:
         '''
         Target:
             - get the connecter variables from a configuration file and store
-            them in a dictionary.
+              them in a dictionary.
         '''
         try:
             self.conn_vars = {
@@ -114,7 +114,7 @@ class CfgParser:
         '''
         Target:
             - get the backer variables from a configuration file and store them
-            in a dictionary (database case).
+              in a dictionary (database case).
         '''
         try:
             self.bkp_vars = {
@@ -142,7 +142,7 @@ class CfgParser:
         '''
         Target:
             - get the backer variables from a configuration file and store them
-            in a dictionary (cluster case).
+              in a dictionary (cluster case).
         '''
         try:
             self.bkp_vars = {
@@ -162,7 +162,7 @@ class CfgParser:
         '''
         Target:
             - get the dropper variables from a configuration file and store
-            them in a dictionary.
+              them in a dictionary.
         '''
         try:
             self.bkp_vars = {
@@ -178,7 +178,7 @@ class CfgParser:
         '''
         Target:
             - get the informer variables from a configuration file and store
-            them in a dictionary.
+              them in a dictionary.
         '''
         try:
             self.bkp_vars = {
@@ -195,7 +195,7 @@ class CfgParser:
         '''
         Target:
             - get the replicator variables from a configuration file and store
-            them in a dictionary.
+              them in a dictionary.
         '''
         try:
             self.bkp_vars = {
@@ -212,7 +212,7 @@ class CfgParser:
         '''
         Target:
             - get the restorer variables from a configuration file and store
-            them in a dictionary (database case).
+              them in a dictionary (database case).
         '''
         try:
             self.bkp_vars = {
@@ -229,7 +229,7 @@ class CfgParser:
         '''
         Target:
             - get the restorer variables from a configuration file and store
-            them in a dictionary (cluster case).
+              them in a dictionary (cluster case).
         '''
         try:
             self.bkp_vars = {
@@ -245,7 +245,7 @@ class CfgParser:
         '''
         Target:
             - get the terminator variables from a configuration file and store
-            them in a dictionary.
+              them in a dictionary.
         '''
         try:
             self.kill_vars = {
@@ -263,7 +263,7 @@ class CfgParser:
         '''
         Target:
             - get the trimmer variables from a configuration file and store
-            them in a dictionary (database case).
+              them in a dictionary (database case).
         '''
         try:
             self.bkp_vars = {
@@ -289,7 +289,7 @@ class CfgParser:
         '''
         Target:
             - get the trimmer variables from a configuration file and store
-            them in a dictionary (cluster case).
+              them in a dictionary (cluster case).
         '''
         try:
             self.bkp_vars = {
@@ -309,7 +309,7 @@ class CfgParser:
         '''
         Target:
             - get the vacuumer variables from a configuration file and store
-            them in a dictionary.
+              them in a dictionary.
         '''
         try:
             self.bkp_vars = {

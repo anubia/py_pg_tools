@@ -12,7 +12,10 @@ from logger.logger import Logger
 
 
 class Connecter:
-
+    '''This class manages connections with database engines and operations
+    involving them.
+    So far, only PostgreSQL is supported.
+    '''
     conn = None  # The PostgreSQL connection object
     cursor = None  # The cursor of the PostgreSQL connection
     server = None  # The target host of the connection
@@ -74,10 +77,11 @@ class Connecter:
         '''
         Target:
             - get the name of the process id depending on the PostgreSQL
-            version which is being used. Before the version 9.2 this variable
-            was called "procpid", afterwards became "pid".
+              version which is being used. Before the version 9.2 this variable
+              was called "procpid", afterwards became "pid".
         Return:
             - a string which gives the name of the vaiable process id.
+        
         '''
         pg_version = self.conn.server_version  # Get PostgreSQL version
 
@@ -92,7 +96,8 @@ class Connecter:
             - check if a user connected to PostgreSQL has a superuser role.
         Return:
             - a boolean which indicates whether a user is a PostgreSQL
-            superuser or not.
+              superuser or not.
+        
         '''
         query_is_superuser = (
             'SELECT usesuper '
@@ -108,12 +113,13 @@ class Connecter:
         '''
         Target:
             - do different queries to PostgreSQL depending on the parameters
-            received, and store the results in the connection cursor.
+              received, and store the results in the connection cursor.
         Parameters:
             - ex_templates: flag which determinates whether or not get those
-            databases which are templates.
+              databases which are templates.
             - db_owner: the name of the user whose databases are going to be
-            obtained.
+              obtained.
+              
         '''
         query_get_dbs = (
             'SELECT d.datname, d.datallowconn, '
@@ -158,7 +164,7 @@ class Connecter:
             - enable connections to a specified PostgreSQL database.
         Parameters:
             - dbname: name of the database whose property "datallowconn" is
-            going to be changed to allow connections to itself.
+              going to be changed to allow connections to itself.
         '''
         query_db_allow_conn = (
             'UPDATE pg_database '
@@ -175,7 +181,7 @@ class Connecter:
             - disable connections to a specified PostgreSQL database.
         Parameters:
             - dbname: name of the database whose property "datallowconn" is
-            going to be changed to disallow connections to itself.
+              going to be changed to disallow connections to itself.
         '''
         query_db_disallow_conn = (
             'UPDATE pg_database '

@@ -24,8 +24,8 @@ class Configurator:
             - cfg_type: the type of config file which is going to be loaded.
             - path: the path of the config file to be loaded.
             - logger: the logger which will be show and log the messages. It
-            will be None if the config file to load is for the logger
-            configuration.
+              will be None if the config file to load is for the logger
+              configuration.
         '''
         self.cfg_type = cfg_type
         self.path = path

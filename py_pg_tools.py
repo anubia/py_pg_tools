@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
+'''
+.. module:: py_pg_tools
+   :platform: Unix, Windows
+   :synopsis: A group of scripts made to dump and vacuum PostgreSQL databases,
+              dump PostgreSQL clusters, and clean PostgreSQL databases/clusters
+              backups.
 
+.. moduleauthor:: Juan Formoso Vasco <jfv@anubia.es>
+
+'''
 import argparse  # To work with console parameters
 import sys  # To get the console subparser
 
@@ -9,10 +18,20 @@ from argparse import RawTextHelpFormatter  # To insert newlines in console help
 from const.const import Messenger
 from orchestrator import Orchestrator
 
+setup = {
+    'author': 'Juan Formoso Vasco <jfv@anubia.es>',
+    'copyright': 'Copyright 2014, Anubía, soluciones en la nube, SL',
+    'credits': ['Alejandro Santana <alejandrosantana@anubia.es>'],
+    'licens': 'AGPL-3',
+    'version': '0.1.1',
+    'maintainer': 'Juan Formoso Vasco',
+    'email': 'jfv@anubia.es',
+    'status': 'Testting',
+}
 
 # ******************************** MAIN PROGRAM *******************************
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # ***************************** MAIN PARSER *******************************
 
