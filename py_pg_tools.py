@@ -38,6 +38,12 @@ if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(
         description=Messenger.PROGRAM_DESCRIPTION,
         formatter_class=RawTextHelpFormatter)
+
+    # TODO: completar esto y mostrar información y versión del programa cuando
+    # se envíen estos argumentos
+    arg_parser.add_argument('-i', '--info', action='store_true', help='')
+    arg_parser.add_argument('-v', '--version', action='store_true', help='')
+
     sub_parsers = arg_parser.add_subparsers()
 
     # ******************************** BACKER *********************************
@@ -171,17 +177,48 @@ if __name__ == '__main__':
 
     informer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    informer.add_argument('-C', '--config',
-                          help='load a configuration file (.cfg) to get the '
-                          'informer conditions')
+    informer.add_argument('-dc', '--details-conns', nargs='*', type=int,
+                          help='specify a list of PIDs and it will give you '
+                          'some details about the PostgreSQL connections '
+                          'which have those PIDs. If no one is specified, '
+                          'it will show some details about every connection '
+                          'to PostgreSQL')
 
-    groupA = informer.add_mutually_exclusive_group()
-    groupA.add_argument('-d', '--db-name', nargs='+',
-                        help='gives the owner and the codification of the '
-                        'specified databases')
+    informer.add_argument('-dd', '--details-dbs', nargs='*',
+                          help='specify a list of PostgreSQL databases and it '
+                          'will give you some details about them. If no one '
+                          'is specified, it will show some details about '
+                          'every PostgreSQL database')
 
-    groupA.add_argument('-u', '--users', nargs='+',
-                        help='gives the role of the specified users')
+    informer.add_argument('-du', '--details-users', nargs='*',
+                          help='specify a list of PostgreSQL users and it '
+                          'will give you some details about them. If no one '
+                          'is specified, it will show some details about '
+                          'every PostgreSQL user')
+
+    informer.add_argument('-lc', '--list-conns', action='store_true',
+                          help='gives a list of the current PostgreSQL '
+                          'connection PIDs')
+
+    informer.add_argument('-ld', '--list-dbs', action='store_true',
+                          help='gives a list of the PostgreSQL databases')
+
+    informer.add_argument('-lu', '--list-users', action='store_true',
+                          help='gives a list of the PostgreSQL users')
+
+    informer.add_argument('-vpg', '--version-pg', action='store_true',
+                          help='gives the PostgreSQL version installed in the '
+                          'host')
+
+    informer.add_argument('-vnpg', '--version-num-pg', action='store_true',
+                          help='gives the PostgreSQL version installed in the '
+                          'host (numeric format)')
+
+    informer.add_argument('-ts', '--time-start', action='store_true',
+                          help='gives the moment when PostgreSQL was started')
+
+    informer.add_argument('-tu', '--time-up', action='store_true',
+                          help='gives how long PostgreSQL has been working')
 
     informer.add_argument('-Lc', '--config-logger',
                           help=Messenger.CONFIG_LOGGER_HELP)
@@ -474,9 +511,20 @@ if __name__ == '__main__':
     # ************************* INFORMER REQUIREMENTS *************************
 
     elif action == 'i':
-        if not (args.config or args.db_name or args.users):
-            informer.error('insufficient parameters to work - [-C/--config | '
-                           '-d/--db-name | -u/--users] must be specified')
+        if (args.details_conns is None and args.details_dbs is None
+            and args.details_users is None) \
+                and not (args.details_conns or args.details_dbs
+                         or args.details_users or args.list_conns
+                         or args.list_dbs or args.list_users
+                         or args.version_pg or args.version_num_pg
+                         or args.time_start or args.time_up):
+            informer.error('insufficient parameters to work - '
+                           '[-dc/--details-conns | -dd/--details-dbs | '
+                           '-du/--details-users | -lc/--list-conns | '
+                           '-ld/--list-dbs | -lu/--list-users | '
+                           '-vpg/--version-pg | -vnpg/--version-num-pg | '
+                           '-ts/--time-start | -tu/--time-up] must be '
+                           'specified')
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
             informer.error('insufficient connection parameters to work - '

@@ -174,6 +174,7 @@ class CfgParser:
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.DROPPER_CFG_DAMAGED)
 
+<<<<<<< HEAD
     def parse_informer(self):
         '''
         Target:
@@ -191,6 +192,8 @@ class CfgParser:
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.INFORMER_CFG_DAMAGED)
 
+=======
+>>>>>>> 7520ec2ef9c9199681126b24add98eff0b3ebc0a
     def parse_replicator(self):
         '''
         Target:
