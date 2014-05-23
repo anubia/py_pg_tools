@@ -5,31 +5,59 @@
 
 #connecter = Connecter('localhost', 'anubia', 5432)
 
-#query_get_dbs = (
+#query_get_dbs1 = (
     #'SELECT * '
-    #'FROM pg_user;'
+    #'FROM pg_database;'
+#)
+#query_get_dbs2 = (
+    #'SELECT * '
+    #'FOM pg_database;'
 #)
 
-#connecter.cursor.execute(query_get_dbs)
+#try:
+    #connecter.cursor.execute(query_get_dbs2)
+#except:
+    #print('ERROR')
+
+#try:
+    #connecter.cursor.execute(query_get_dbs1)
+#except:
+    #print('ERROR')
 
 #for record in connecter.cursor:
     #print(record)
 
-#s = -1
+import psycopg2  # To work with PostgreSQL
+import psycopg2.extras  # To get real field names from PostgreSQL
 
-#if isinstance(s, int):
-    #print('Lo es')
-#else:
-    #print('No lo es')
+conn = psycopg2.connect(host='localhost',
+                        database='postgres',
+                        user='anubia',
+                        port=5432)
 
-import re
-size = '20000TB'
-regex = r'(\d+)(MB|GB|TB|PT)$'
-regex = re.compile(regex)  # Validar la expresión regular
-if re.match(regex, size):
-    parts = regex.search(size).groups()
-    num = parts[0]
-    unit = parts[1]
-    print('El tamaño es de {} y la unidad de medida los {}'.format(num, unit))
-else:
-    print('No es un tamaño')
+cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+query_get_dbs1 = (
+    'SELECT * '
+    'FRO pg_database;'
+)
+query_get_dbs2 = (
+    'SELECT * '
+    'FROM pg_database;'
+)
+
+try:
+    cursor.execute(query_get_dbs1)
+except Exception as e:
+    conn.rollback()
+    print('ERROR')
+    print(str(e))
+
+try:
+    cursor.execute(query_get_dbs2)
+except Exception as e:
+    print('ERROR')
+    print(str(e))
+
+cursor.close()
+conn.close()

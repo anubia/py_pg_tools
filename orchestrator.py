@@ -465,9 +465,9 @@ class Orchestrator:
             # Overwrite the config variables with the console ones if necessary
             if self.args.all:
                 parser.kill_vars['kill_all'] = True
-            elif self.args.db_name:
-                parser.kill_vars['kill_user'] = self.args.db_name
             elif self.args.user:
+                parser.kill_vars['kill_user'] = self.args.db_name
+            elif self.args.db_name:
                 parser.kill_vars['kill_dbs'] = self.args.user
             else:
                 pass
@@ -484,7 +484,7 @@ class Orchestrator:
         else:
             # Create the terminator with the console variables
             terminator = Terminator(connecter, self.args.all,
-                                    self.args.db_name, self.args.user,
+                                    self.args.user, self.args.db_name,
                                     self.logger)
 
         return terminator
@@ -651,8 +651,8 @@ class Orchestrator:
         '''
         Target:
             - executes the backer depending on the type of backup to make, the
-              role of the user who is connected to PostgreSQL and the rest of the
-              conditions. It calls a terminator if necessary.
+              role of the user who is connected to PostgreSQL and the rest of
+              the conditions. It calls a terminator if necessary.
         '''
         connecter = self.get_connecter()
 
@@ -954,6 +954,7 @@ class Orchestrator:
         Target:
             - call the corresponding function to the action stored.
         '''
+
         if self.action == 'B':  # Call backer
             self.setup_backer()
 

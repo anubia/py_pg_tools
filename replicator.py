@@ -3,6 +3,7 @@
 
 
 from const.const import Messenger
+from const.const import Queries
 from logger.logger import Logger
 
 
@@ -28,8 +29,7 @@ class Replicator:
             self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
         # First check whether the name of the copy already exists in PostgreSQL
-        query_db_exists = 'SELECT 1 FROM pg_database WHERE datname=(%s);'
-        self.connecter.cursor.execute(query_db_exists, (new_dbname, ))
+        self.connecter.cursor.execute(Queries.PG_DB_EXISTS, (new_dbname, ))
         # Do not replicate if the name already exists
         result = self.connecter.cursor.fetchone()
         if result:
@@ -50,12 +50,9 @@ class Replicator:
         Target:
             - clone a specified database in PostgreSQL.
         '''
-        query_clone_db = (
-            'CREATE DATABASE %s WITH TEMPLATE %s OWNER %s;'
-        )
-
-        format_query_clone_db = query_clone_db % (
-            self.new_dbname, self.original_dbname, self.connecter.user)
+        formatted_query_clone_pg_db = Queries.CLONE_PG_DB.format(
+            dbname=self.new_dbname, original_dbname=self.original_dbname,
+            user=self.connecter.user)
 
         try:
             message = Messenger.BEGINNING_REPLICATOR.format(
@@ -63,7 +60,7 @@ class Replicator:
             self.logger.highlight('info', message, 'white')
 
             self.connecter.cursor.execute('commit')
-            self.connecter.cursor.execute(format_query_clone_db)
+            self.connecter.cursor.execute(formatted_query_clone_pg_db)
 
             self.logger.highlight('info', Messenger.REPLICATE_DB_DONE.format(
                 new_dbname=self.new_dbname,

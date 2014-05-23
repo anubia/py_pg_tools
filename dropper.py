@@ -4,6 +4,7 @@
 
 from casting.casting import Casting
 from const.const import Messenger
+from const.const import Queries
 from logger.logger import Logger
 
 
@@ -39,14 +40,11 @@ class Dropper:
             - dbname: the PostgreSQL database's name which is going to be
               removed.
         '''
-        query_drop_db = (
-            'DROP DATABASE %s;'
-        )
-        format_query_drop_db = query_drop_db % (dbname)
+        formatted_query_drop_db = Queries.DROP_PG_DB.format(dbname)
 
         try:
             self.connecter.cursor.execute('commit')
-            self.connecter.cursor.execute(format_query_drop_db)
+            self.connecter.cursor.execute(formatted_query_drop_db)
             self.logger.info(Messenger.DROP_DB_DONE.format(dbname=dbname))
         except Exception as e:
             self.logger.debug('Error en la función "drop_pg_db": '

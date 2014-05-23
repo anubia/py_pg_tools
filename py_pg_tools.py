@@ -26,7 +26,7 @@ setup = {
     'version': '0.1.1',
     'maintainer': 'Juan Formoso Vasco',
     'email': 'jfv@anubia.es',
-    'status': 'Testting',
+    'status': 'Testing',
 }
 
 # ******************************** MAIN PROGRAM *******************************
@@ -39,10 +39,11 @@ if __name__ == '__main__':
         description=Messenger.PROGRAM_DESCRIPTION,
         formatter_class=RawTextHelpFormatter)
 
-    # TODO: completar esto y mostrar información y versión del programa cuando
-    # se envíen estos argumentos
-    arg_parser.add_argument('-i', '--info', action='store_true', help='')
-    arg_parser.add_argument('-v', '--version', action='store_true', help='')
+    group = arg_parser.add_mutually_exclusive_group()
+    group.add_argument('-i', '--info', action='store_true',
+                       help=Messenger.PROGRAM_INFO_HELP)
+    group.add_argument('-v', '--version', action='store_true',
+                       help=Messenger.PROGRAM_VERSION_HELP)
 
     sub_parsers = arg_parser.add_subparsers()
 
@@ -55,59 +56,42 @@ if __name__ == '__main__':
 
     backer.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    backer.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP, type=int)
+    backer.add_argument('-cp', '--pg-port', type=int, help=Messenger.PORT_HELP)
 
     backer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    backer.add_argument('-C', '--config',
-                        help='load a configuration file (.cfg) to get the '
-                        'backer conditions')
+    backer.add_argument('-C', '--config', help=Messenger.B_CONFIG_HELP)
 
     groupA = backer.add_mutually_exclusive_group()
     groupA.add_argument('-d', '--db-name', nargs='+',
-                        help='specify the name/s of the PostgreSQL database/s '
-                        'to be dumped')
-    groupA.add_argument('-c', '--cluster',
-                        help='select dumping the PostgreSQL cluster',
-                        action='store_true')
+                        help=Messenger.B_DB_NAME_HELP)
+    groupA.add_argument('-c', '--cluster', action='store_true',
+                        help=Messenger.B_CLUSTER_HELP)
 
-    backer.add_argument('-p', '--bkp-path',
-                        help='specify the path where the backups are going '
-                        'to be stored')
+    backer.add_argument('-p', '--bkp-path', help=Messenger.B_BKP_PATH_HELP)
 
     backer.add_argument('-f', '--backup-format',
-                        help='select the backup\'s file format (dump, bz2, '
-                        'gz, zip)', choices=['dump', 'bz2', 'gz', 'zip'])
+                        help=Messenger.B_BACKUP_FORMAT_HELP,
+                        choices=['dump', 'bz2', 'gz', 'zip'])
 
-    backer.add_argument('-g', '--group',
-                        help='select a name to put in the each backup\'s name '
-                        'to agrupate them')
+    backer.add_argument('-g', '--group', help=Messenger.B_GROUP_HELP)
 
     groupB = backer.add_mutually_exclusive_group()
-    groupB.add_argument('-m', '--ex-templates',
-                        help='specify whether the databases which are '
-                        'templates have to be dumped', action='store_true')
-    groupB.add_argument('-M', '--no-ex-templates',
-                        help='specify whether the databases which are '
-                        'templates have not to be dumped', action='store_true')
+    groupB.add_argument('-m', '--ex-templates', action='store_true',
+                        help=Messenger.B_EX_TEMPLATES_HELP)
+    groupB.add_argument('-M', '--no-ex-templates', action='store_true',
+                        help=Messenger.B_NO_EX_TEMPLATES_HELP)
 
     groupC = backer.add_mutually_exclusive_group()
-    groupC.add_argument('-v', '--vacuum',
-                        help='vacuum those databases which are going to be '
-                        'dumped before the process', action='store_true')
-    groupC.add_argument('-V', '--no-vacuum',
-                        help='not to vacuum those databases which are going '
-                        'to be dumped before the process', action='store_true')
+    groupC.add_argument('-v', '--vacuum', action='store_true',
+                        help=Messenger.B_VACUUM_HELP)
+    groupC.add_argument('-V', '--no-vacuum', action='store_true',
+                        help=Messenger.B_NO_VACUUM_HELP)
 
-    backer.add_argument('-o', '--db-owner',
-                        help='only if the user who is running the program is '
-                        'a PostgreSQL superuser, this option allows him to '
-                        'play other PostgreSQL role writting its username')
+    backer.add_argument('-o', '--db-owner', help=Messenger.B_DB_OWNER_HELP)
 
-    backer.add_argument('-t', '--terminate',
-                        help='terminate every connection (except yours) '
-                        'to each database which is going to be dumped',
-                        action='store_true')
+    backer.add_argument('-t', '--terminate', action='store_true',
+                        help=Messenger.B_TERMINATE_HELP)
 
     backer.add_argument('-Lc', '--config-logger',
                         help=Messenger.CONFIG_LOGGER_HELP)
@@ -120,8 +104,8 @@ if __name__ == '__main__':
                         choices=['debug', 'info', 'warning', 'error',
                                  'critical'])
 
-    backer.add_argument('-Lm', '--logger-mute',
-                        help=Messenger.LOGGER_MUTE_HELP, action='store_true')
+    backer.add_argument('-Lm', '--logger-mute', action='store_true',
+                        help=Messenger.LOGGER_MUTE_HELP)
 
     # ******************************** DROPPER ********************************
 
@@ -132,22 +116,18 @@ if __name__ == '__main__':
 
     dropper.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    dropper.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                         type=int)
+    dropper.add_argument('-cp', '--pg-port', type=int,
+                         help=Messenger.PORT_HELP)
 
     dropper.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    dropper.add_argument('-C', '--config',
-                         help='load a configuration file (.cfg) to get the '
-                         'dropper conditions')
+    dropper.add_argument('-C', '--config', help=Messenger.D_CONFIG_HELP)
 
     dropper.add_argument('-d', '--db-name', nargs='+',
-                         help='specify the PostgreSQL databases to be deleted')
+                         help=Messenger.D_DB_NAME_HELP)
 
-    dropper.add_argument('-t', '--terminate',
-                         help='terminate every connection (except yours) '
-                         'to each database which is going to be dropped',
-                         action='store_true')
+    dropper.add_argument('-t', '--terminate', action='store_true',
+                         help=Messenger.D_TERMINATE_HELP)
 
     dropper.add_argument('-Lc', '--config-logger',
                          help=Messenger.CONFIG_LOGGER_HELP)
@@ -160,8 +140,8 @@ if __name__ == '__main__':
                          choices=['debug', 'info', 'warning', 'error',
                                   'critical'])
 
-    dropper.add_argument('-Lm', '--logger-mute',
-                         help=Messenger.LOGGER_MUTE_HELP, action='store_true')
+    dropper.add_argument('-Lm', '--logger-mute', action='store_true',
+                         help=Messenger.LOGGER_MUTE_HELP)
 
     # ******************************** INFORMER *******************************
 
@@ -172,53 +152,40 @@ if __name__ == '__main__':
 
     informer.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    informer.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                          type=int)
+    informer.add_argument('-cp', '--pg-port', type=int,
+                          help=Messenger.PORT_HELP)
 
     informer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
     informer.add_argument('-dc', '--details-conns', nargs='*', type=int,
-                          help='specify a list of PIDs and it will give you '
-                          'some details about the PostgreSQL connections '
-                          'which have those PIDs. If no one is specified, '
-                          'it will show some details about every connection '
-                          'to PostgreSQL')
+                          help=Messenger.I_DETAILS_CONNS_HELP)
 
     informer.add_argument('-dd', '--details-dbs', nargs='*',
-                          help='specify a list of PostgreSQL databases and it '
-                          'will give you some details about them. If no one '
-                          'is specified, it will show some details about '
-                          'every PostgreSQL database')
+                          help=Messenger.I_DETAILS_DBS_HELP)
 
     informer.add_argument('-du', '--details-users', nargs='*',
-                          help='specify a list of PostgreSQL users and it '
-                          'will give you some details about them. If no one '
-                          'is specified, it will show some details about '
-                          'every PostgreSQL user')
+                          help=Messenger.I_DETAILS_USERS_HELP)
 
     informer.add_argument('-lc', '--list-conns', action='store_true',
-                          help='gives a list of the current PostgreSQL '
-                          'connection PIDs')
+                          help=Messenger.I_LIST_CONNS_HELP)
 
     informer.add_argument('-ld', '--list-dbs', action='store_true',
-                          help='gives a list of the PostgreSQL databases')
+                          help=Messenger.I_LIST_DBS_HELP)
 
     informer.add_argument('-lu', '--list-users', action='store_true',
-                          help='gives a list of the PostgreSQL users')
+                          help=Messenger.I_LIST_USERS_HELP)
 
     informer.add_argument('-vpg', '--version-pg', action='store_true',
-                          help='gives the PostgreSQL version installed in the '
-                          'host')
+                          help=Messenger.I_VERSION_PG_HELP)
 
     informer.add_argument('-vnpg', '--version-num-pg', action='store_true',
-                          help='gives the PostgreSQL version installed in the '
-                          'host (numeric format)')
+                          help=Messenger.I_VERSION_NUM_PG_HELP)
 
     informer.add_argument('-ts', '--time-start', action='store_true',
-                          help='gives the moment when PostgreSQL was started')
+                          help=Messenger.I_TIME_START_HELP)
 
     informer.add_argument('-tu', '--time-up', action='store_true',
-                          help='gives how long PostgreSQL has been working')
+                          help=Messenger.I_TIME_UP_HELP)
 
     informer.add_argument('-Lc', '--config-logger',
                           help=Messenger.CONFIG_LOGGER_HELP)
@@ -231,8 +198,8 @@ if __name__ == '__main__':
                           choices=['debug', 'info', 'warning', 'error',
                                    'critical'])
 
-    informer.add_argument('-Lm', '--logger-mute',
-                          help=Messenger.LOGGER_MUTE_HELP, action='store_true')
+    informer.add_argument('-Lm', '--logger-mute', action='store_true',
+                          help=Messenger.LOGGER_MUTE_HELP)
 
     # ****************************** REPLICATOR *******************************
 
@@ -243,24 +210,18 @@ if __name__ == '__main__':
 
     replicator.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    replicator.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                            type=int)
+    replicator.add_argument('-cp', '--pg-port', type=int,
+                            help=Messenger.PORT_HELP)
 
     replicator.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    replicator.add_argument('-C', '--config',
-                            help='load a configuration file (.cfg) to get the '
-                            'replicator conditions')
+    replicator.add_argument('-C', '--config', help=Messenger.R_CONFIG_HELP)
 
     replicator.add_argument('-d', '--db-name', nargs=2,
-                            help='specifies the new name of the database '
-                            'generated and the name of the database which is '
-                            'being cloned, respectively')
+                            help=Messenger.R_DB_NAME_HELP)
 
-    replicator.add_argument('-t', '--terminate',
-                            help='terminate every connection (except yours) '
-                            'to the database which is going to be replicated',
-                            action='store_true')
+    replicator.add_argument('-t', '--terminate', action='store_true',
+                            help=Messenger.R_TERMINATE_HELP)
 
     replicator.add_argument('-Lc', '--config-logger',
                             help=Messenger.CONFIG_LOGGER_HELP)
@@ -273,9 +234,8 @@ if __name__ == '__main__':
                             choices=['debug', 'info', 'warning', 'error',
                                      'critical'])
 
-    replicator.add_argument('-Lm', '--logger-mute',
-                            help=Messenger.LOGGER_MUTE_HELP,
-                            action='store_true')
+    replicator.add_argument('-Lm', '--logger-mute', action='store_true',
+                            help=Messenger.LOGGER_MUTE_HELP)
 
     # ******************************* RESTORER ********************************
 
@@ -286,29 +246,21 @@ if __name__ == '__main__':
 
     restorer.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    restorer.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                          type=int)
+    restorer.add_argument('-cp', '--pg-port', type=int,
+                          help=Messenger.PORT_HELP)
 
     restorer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    restorer.add_argument('-C', '--config',
-                          help='load a configuration file (.cfg) to get the '
-                          'restorer conditions')
+    restorer.add_argument('-C', '--config', help=Messenger.RS_CONFIG_HELP)
 
     groupA = restorer.add_mutually_exclusive_group()
     groupA.add_argument('-d', '--db-backup', nargs=2,
-                        help='specifies the path of the backup\'s file '
-                        '(database) which is going to be loaded and the name '
-                        'of the PostgreSQL database which is going to be '
-                        'generated, respectively')
+                        help=Messenger.RS_DB_BACKUP_HELP)
     groupA.add_argument('-p', '--cluster-backup',
-                        help='specifies the path of the backup\'s file '
-                        '(cluster) which is going to be loaded')
+                        help=Messenger.RS_CLUSTER_BACKUP_HELP)
 
-    restorer.add_argument('-c', '--cluster',
-                          help='specifies whether the specified path is a '
-                          'database\'s backup or a cluster\'s backup',
-                          action='store_true')
+    restorer.add_argument('-c', '--cluster', action='store_true',
+                          help=Messenger.RS_CLUSTER_HELP)
 
     restorer.add_argument('-Lc', '--config-logger',
                           help=Messenger.CONFIG_LOGGER_HELP)
@@ -321,8 +273,8 @@ if __name__ == '__main__':
                           choices=['debug', 'info', 'warning', 'error',
                                    'critical'])
 
-    restorer.add_argument('-Lm', '--logger-mute',
-                          help=Messenger.LOGGER_MUTE_HELP, action='store_true')
+    restorer.add_argument('-Lm', '--logger-mute', action='store_true',
+                          help=Messenger.LOGGER_MUTE_HELP)
 
     # ****************************** TERMINATOR *******************************
 
@@ -333,26 +285,19 @@ if __name__ == '__main__':
 
     terminator.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    terminator.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                            type=int)
+    terminator.add_argument('-cp', '--pg-port', type=int,
+                            help=Messenger.PORT_HELP)
 
     terminator.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    terminator.add_argument('-C', '--config',
-                            help='load a configuration file (.cfg) to get the '
-                                 'terminator conditions')
+    terminator.add_argument('-C', '--config', help=Messenger.T_CONFIG_HELP)
 
     groupA = terminator.add_mutually_exclusive_group()
-    groupA.add_argument('-a', '--all',
-                        help='terminates every connection (except yours) '
-                             'to the host which you are connected to',
-                             action='store_true')
+    groupA.add_argument('-a', '--all', action='store_true',
+                        help=Messenger.T_ALL_HELP)
     groupA.add_argument('-d', '--db-name', nargs='+',
-                        help='terminates every connection (except yours) '
-                             'to the specified PostgreSQL database')
-    groupA.add_argument('-u', '--user',
-                        help='terminates every connection of the specified '
-                             'user (except if you are the specified user)')
+                        help=Messenger.T_DB_NAME_HELP)
+    groupA.add_argument('-u', '--user', help=Messenger.T_USER_HELP)
 
     terminator.add_argument('-Lc', '--config-logger',
                             help=Messenger.CONFIG_LOGGER_HELP)
@@ -365,9 +310,8 @@ if __name__ == '__main__':
                             choices=['debug', 'info', 'warning', 'error',
                                      'critical'])
 
-    terminator.add_argument('-Lm', '--logger-mute',
-                            help=Messenger.LOGGER_MUTE_HELP,
-                            action='store_true')
+    terminator.add_argument('-Lm', '--logger-mute', action='store_true',
+                            help=Messenger.LOGGER_MUTE_HELP)
 
     # ******************************** TRIMMER ********************************
 
@@ -378,44 +322,31 @@ if __name__ == '__main__':
 
     trimmer.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    trimmer.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                         type=int)
+    trimmer.add_argument('-cp', '--pg-port', type=int,
+                         help=Messenger.PORT_HELP)
 
     trimmer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    trimmer.add_argument('-C', '--config',
-                         help='load a configuration file (.cfg) to get the '
-                              'trimmer conditions')
+    trimmer.add_argument('-C', '--config', help=Messenger.TR_CONFIG_HELP)
 
     groupA = trimmer.add_mutually_exclusive_group()
     groupA.add_argument('-d', '--db-name', nargs='+',
-                        help='trim the backups of a specified group of '
-                        'PostgreSQL databases')
-    groupA.add_argument('-c', '--cluster',
-                        help='trim the backups of the PostgreSQL cluster',
-                        action='store_true')
+                        help=Messenger.TR_DB_NAME_HELP)
+    groupA.add_argument('-c', '--cluster', action='store_true',
+                        help=Messenger.TR_CLUSTER_HELP)
 
     trimmer.add_argument('-f', '--bkp-folder',
-                         help='select the path of the folder to be trimmed. '
-                         'The folder\'s name must be the group\'s name')
+                         help=Messenger.TR_BKP_FOLDER_HELP)
 
-    trimmer.add_argument('-p', '--prefix',
-                         help='specify the prefix of the backups which are '
-                         'going to be trimmed')
+    trimmer.add_argument('-p', '--prefix', help=Messenger.TR_PREFIX_HELP)
 
-    trimmer.add_argument('-n', '--n-backups',
-                         help='specify the minimum number of backups of each '
-                         'database to keep stored, regardless of the rest of '
-                         'conditions', type=int)
+    trimmer.add_argument('-n', '--n-backups', type=int,
+                         help=Messenger.TR_N_BACKUPS_HELP)
 
-    trimmer.add_argument('-e', '--expiry-days',
-                         help='specify the number of days which have to be '
-                         'elapsed to consider a backup expired', type=int)
+    trimmer.add_argument('-e', '--expiry-days', type=int,
+                         help=Messenger.TR_EXPIRY_DAYS_HELP)
 
-    trimmer.add_argument('-s', '--max-size',
-                         help='when the size of a group of a database\'s '
-                         'backups exceeds this maximum size, a message will'
-                         'be shown to let the user know it')
+    trimmer.add_argument('-s', '--max-size', help=Messenger.TR_MAX_SIZE_HELP)
 
     trimmer.add_argument('-Lc', '--config-logger',
                          help=Messenger.CONFIG_LOGGER_HELP)
@@ -428,8 +359,8 @@ if __name__ == '__main__':
                          choices=['debug', 'info', 'warning', 'error',
                                   'critical'])
 
-    trimmer.add_argument('-Lm', '--logger-mute',
-                         help=Messenger.LOGGER_MUTE_HELP, action='store_true')
+    trimmer.add_argument('-Lm', '--logger-mute', action='store_true',
+                         help=Messenger.LOGGER_MUTE_HELP)
 
     # ******************************* VACUUMER ********************************
 
@@ -440,29 +371,20 @@ if __name__ == '__main__':
 
     vacuumer.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
 
-    vacuumer.add_argument('-cp', '--pg-port', help=Messenger.PORT_HELP,
-                          type=int)
+    vacuumer.add_argument('-cp', '--pg-port', type=int,
+                          help=Messenger.PORT_HELP)
 
     vacuumer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
 
-    vacuumer.add_argument('-C', '--config',
-                          help='load a configuration file (.cfg) to get the '
-                               'vacuum conditions')
+    vacuumer.add_argument('-C', '--config', help=Messenger.V_CONFIG_HELP)
 
     vacuumer.add_argument('-d', '--db-name', nargs='+',
-                          help='specify the name/s of the PostgreSQL '
-                          'database/s to be vacuumed')
+                          help=Messenger.V_DB_NAME_HELP)
 
-    vacuumer.add_argument('-o', '--db-owner',
-                          help='only if the user who is running the program '
-                          'is a PostgreSQL superuser, this option allows him '
-                          'to play other PostgreSQL role writting its '
-                          'username')
+    vacuumer.add_argument('-o', '--db-owner', help=Messenger.V_DB_OWNER_HELP)
 
-    vacuumer.add_argument('-t', '--terminate',
-                          help='terminate every connection (except yours) '
-                               'to each database which is going to be '
-                               'vacuumed', action='store_true')
+    vacuumer.add_argument('-t', '--terminate',  action='store_true',
+                          help=Messenger.V_TERMINATE_HELP)
 
     vacuumer.add_argument('-Lc', '--config-logger',
                           help=Messenger.CONFIG_LOGGER_HELP)
@@ -475,8 +397,8 @@ if __name__ == '__main__':
                           choices=['debug', 'info', 'warning', 'error',
                                    'critical'])
 
-    vacuumer.add_argument('-Lm', '--logger-mute',
-                          help=Messenger.LOGGER_MUTE_HELP, action='store_true')
+    vacuumer.add_argument('-Lm', '--logger-mute', action='store_true',
+                          help=Messenger.LOGGER_MUTE_HELP)
 
     # *************************** PARSING SYS.ARGV ****************************
 
@@ -484,29 +406,31 @@ if __name__ == '__main__':
 
     action = sys.argv[1]
 
+    # ********************* INFO & VERSION REQUIREMENTS ***********************
+
+    if ('-i' in sys.argv or '--info' in sys.argv) and len(sys.argv) > 2:
+        arg_parser.error(Messenger.PROGRAM_INFO_ARGS_ERROR)
+
+    elif ('-v' in sys.argv or '--version' in sys.argv) and len(sys.argv) > 2:
+        arg_parser.error(Messenger.PROGRAM_VERSION_ARGS_ERROR)
+
     # ************************** BACKER REQUIREMENTS **************************
 
     if action == 'B':
         if not (args.config or args.db_name or args.cluster):
-            backer.error('insufficient parameters to work - [-C/--config | '
-                         '-d/--db-name | -c/--cluster] must be specified')
+            backer.error(Messenger.BACKER_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            backer.error('insufficient connection parameters to work - '
-                         '[-cC/--config-connection | (-ch/--host & '
-                         '-cp/--port & -cu/--user)] must be specified')
+            backer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************** DROPPER REQUIREMENTS *************************
 
     elif action == 'd':
         if not (args.config or args.db_name):
-            dropper.error('insufficient parameters to work - [-C/--config | '
-                          '-d/--db-name] must be specified')
+            dropper.error(Messenger.DROPPER_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            dropper.dropper('insufficient connection parameters to work - '
-                            '[-cC/--config-connection | (-ch/--host & '
-                            '-cp/--port & -cu/--user)] must be specified')
+            dropper.dropper(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************* INFORMER REQUIREMENTS *************************
 
@@ -518,93 +442,72 @@ if __name__ == '__main__':
                          or args.list_dbs or args.list_users
                          or args.version_pg or args.version_num_pg
                          or args.time_start or args.time_up):
-            informer.error('insufficient parameters to work - '
-                           '[-dc/--details-conns | -dd/--details-dbs | '
-                           '-du/--details-users | -lc/--list-conns | '
-                           '-ld/--list-dbs | -lu/--list-users | '
-                           '-vpg/--version-pg | -vnpg/--version-num-pg | '
-                           '-ts/--time-start | -tu/--time-up] must be '
-                           'specified')
+            informer.error(Messenger.INFORMER_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            informer.error('insufficient connection parameters to work - '
-                           '[-cC/--config-connection | (-ch/--host & '
-                           '-cp/--port & -cu/--user)] must be specified')
+            informer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ****************************** REPLICATOR *******************************
 
     elif action == 'r':
         if not (args.config or args.db_name):
-            replicator.error('insufficient parameters to work - '
-                             '[-C/--config | -d/--db-name] must be specified')
+            replicator.error(Messenger.REPLICATOR_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            replicator.error('insufficient connection parameters to work - '
-                             '[-cC/--config-connection | (-ch/--host & '
-                             '-cp/--port & -cu/--user)] must be specified')
+            replicator.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ******************************* RESTORER ********************************
 
     elif action == 'R':
         if not (args.config or args.db_backup or
                 (args.cluster and args.cluster_backup)):
-            restorer.error('insufficient parameters to work - [-C/--config | '
-                           '-d/--db-backup | (-c/--cluster & '
-                           '-p/--cluster-backup)] must be specified')
-
+            restorer.error(Messenger.RESTORER_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            restorer.error('insufficient connection parameters to work - '
-                           '[-cC/--config-connection | (-ch/--host & '
-                           '-cp/--port & -cu/--user)] must be specified')
+            restorer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************ TERMINATOR REQUIREMENTS ************************
 
     elif action == 't':
         if not (args.config or args.all or args.db_name or args.user):
-            terminator.error('insufficient parameters to work - [-C/--config '
-                             '| -a/--all | -d/--db-name | -u/--user] must be '
-                             'specified')
+            terminator.error(Messenger.TERMINATOR_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            terminator.error('insufficient connection parameters to work - '
-                             '[-cC/--config-connection | (-ch/--host & '
-                             '-cp/--port & -cu/--user)] must be specified')
+            terminator.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************** TRIMMER REQUIREMENTS *************************
 
     elif action == 'T':
         if not (args.config or
                 ((args.db_name or args.cluster) and args.bkp_folder)):
-            trimmer.error('insufficient parameters to work - [-C/--config | '
-                          '(-f/--bkp-folder & (-d/--db-name | -c/--cluster))] '
-                          'must be specified')
+            trimmer.error(Messenger.TRIMMER_ARGS_ERROR)
         if not args.cluster and not \
             (args.config_connection or
              (args.pg_host and args.pg_port and args.pg_user)):
-            trimmer.error('insufficient connection parameters to work - '
-                          '[-cC/--config-connection | (-ch/--host & '
-                          '-cp/--port & -cu/--user)] must be specified')
+            trimmer.error(Messenger.CONNECTION_ARGS_ERROR)
         if args.cluster and (args.config_connection or args.pg_host
                              or args.pg_port or args.pg_user):
-            trimmer.error('connection parameters no needed to work with '
-                          'clusters\' trimmer')
+            trimmer.error(Messenger.TRIMMER_CONNECTION_ARGS_ERROR)
 
     # ************************* VACUUMER REQUIREMENTS *************************
 
     elif action == 'v':
         if not (args.config or args.db_name):
-            vacuumer.error('insufficient parameters to work - [-C/--config '
-                           '| -d/--db-name] must be specified')
+            vacuumer.error(Messenger.VACUUMER_ARGS_ERROR)
         if not (args.config_connection or
                 (args.pg_host and args.pg_port and args.pg_user)):
-            vacuumer.error('insufficient connection parameters to work - '
-                           '[-cC/--config-connection | (-ch/--host & '
-                           '-cp/--port & -cu/--user)] must be specified')
+            vacuumer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     else:
         pass
 
-    # Load a specific module depending on the gotten console parameters
-    orchestrator = Orchestrator(action, args)
-    orchestrator.detect_module()
+    if args.version:
+        print(Messenger.PROGRAM_VERSION)
+
+    elif args.info:
+        print(Messenger.PROGRAM_INFO)
+
+    else:
+        # Load a specific module depending on the gotten console parameters
+        orchestrator = Orchestrator(action, args)
+        orchestrator.detect_module()

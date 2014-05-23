@@ -8,6 +8,7 @@ import psycopg2.extras  # To get real field names from PostgreSQL
 from casting.casting import Casting
 from checker.checker import Checker
 from const.const import Messenger
+from const.const import Queries
 from logger.logger import Logger
 
 
@@ -89,14 +90,16 @@ class Connecter:
         Return:
             - a string which gives the PostgreSQL version and more details.
         '''
-        query_get_pretty_pg_version = 'select version();'
         try:
-            self.cursor.execute(query_get_pretty_pg_version)
+            self.cursor.execute(Queries.GET_PG_PRETTY_VERSION)
             pretty_pg_version = self.cursor.fetchone()
 
             return pretty_pg_version[0]
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pretty_pg_version": '
                               '{}.'.format(str(e)))
             self.logger.highlight('warning', Messenger.GET_PG_VERSION_FAIL,
@@ -111,7 +114,6 @@ class Connecter:
               was called "procpid", afterwards became "pid".
         Return:
             - a string which gives the name of the vaiable process id.
-        
         '''
         pg_version = self.get_pg_version()  # Get PostgreSQL version
 
@@ -128,12 +130,7 @@ class Connecter:
             - a boolean which indicates whether a user is a PostgreSQL
               superuser or not.
         '''
-        query_is_superuser = (
-            'SELECT usesuper '
-            'FROM pg_user '
-            'WHERE usename = CURRENT_USER;'
-        )
-        self.cursor.execute(query_is_superuser)
+        self.cursor.execute(Queries.IS_PG_SUPERUSER)
         row = self.cursor.fetchone()
 
         return row['usesuper']
@@ -145,15 +142,16 @@ class Connecter:
         Return:
             - a date which indicates the time when PostgreSQL was started.
         '''
-        query_get_pg_time_start = 'SELECT pg_postmaster_start_time();'
-
         try:
-            self.cursor.execute(query_get_pg_time_start)
+            self.cursor.execute(Queries.GET_PG_TIME_START)
             row = self.cursor.fetchone()
 
             return row[0]
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_time_start": '
                               '{}.'.format(str(e)))
             self.logger.highlight('warning', Messenger.GET_PG_TIME_START_FAIL,
@@ -167,15 +165,16 @@ class Connecter:
         Return:
             - a date which indicates how long PostgreSQL has been working.
         '''
-        query_get_pg_time_up = 'SELECT now() - pg_postmaster_start_time();'
-
         try:
-            self.cursor.execute(query_get_pg_time_up)
+            self.cursor.execute(Queries.GET_PG_TIME_UP)
             row = self.cursor.fetchone()
 
             return row[0]
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_time_up": '
                               '{}.'.format(str(e)))
             self.logger.highlight('warning', Messenger.GET_PG_TIME_UP_FAIL,
@@ -192,44 +191,19 @@ class Connecter:
               databases which are templates.
             - db_owner: the name of the user whose databases are going to be
               obtained.
-              
         '''
-        query_get_dbs = (
-            'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-            'FROM pg_catalog.pg_database d;'
-        )
-        query_get_ex_template_dbs = (
-            'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-            'FROM pg_catalog.pg_database d '
-            'WHERE not datistemplate;'
-        )
-        query_get_owner_dbs = (
-            'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-            'FROM pg_catalog.pg_database d '
-            'WHERE pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
-        )
-        query_get_ex_template_owner_dbs = (
-            'SELECT d.datname, d.datallowconn, '
-            'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-            'FROM pg_catalog.pg_database d '
-            'WHERE not datistemplate '
-            'AND pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
-        )
-
         # Get all databases (no templates) of a specific owner
         if db_owner and ex_templates:
-            self.cursor.execute(query_get_ex_template_owner_dbs, (db_owner, ))
+            self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS_BY_OWNER,
+                                (db_owner, ))
         # Get all databases (templates too) of a specific owner
         elif db_owner and ex_templates is False:
-            self.cursor.execute(query_get_owner_dbs, (db_owner, ))
+            self.cursor.execute(Queries.GET_PG_DBS_BY_OWNER, (db_owner, ))
         # Get all databases (no templates)
         elif not db_owner and ex_templates is False:
-            self.cursor.execute(query_get_dbs)
+            self.cursor.execute(Queries.GET_PG_DBS)
         else:  # Get all databases (templates too)
-            self.cursor.execute(query_get_ex_template_dbs)
+            self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS)
 
     def get_pg_db_data(self, dbname):
         '''
@@ -239,21 +213,15 @@ class Connecter:
             - dbname: name of the database whose information is going to be
               shown.
         '''
-        query_get_db_data = (
-            'SELECT datname, pg_get_userbyid(datdba) as owner, '
-            'pg_encoding_to_char(encoding) as encoding, datcollate, datctype, '
-            'datistemplate, datallowconn, datconnlimit, datlastsysoid, '
-            'datfrozenxid, dattablespace, datacl, '
-            'pg_size_pretty(pg_database_size(datname)) as size '
-            'FROM pg_database '
-            'WHERE datname = (%s);'
-        )
 
         try:
-            self.cursor.execute(query_get_db_data, (dbname, ))
+            self.cursor.execute(Queries.GET_PG_DB_DATA, (dbname, ))
             db = self.cursor.fetchone()
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_db_data": '
                               '{}.'.format(str(e)))
             message = Messenger.GET_PG_DB_DATA.format(dbname=dbname)
@@ -270,30 +238,19 @@ class Connecter:
             - username: name of the user whose information is going to be
               shown.
         '''
-        query_get_user_data_91 = (
-            'SELECT usename, usesysid, usecreatedb, usesuper, usecatupd, '
-            'passwd, valuntil, useconfig '
-            'FROM pg_user '
-            'WHERE usename = (%s);'
-        )
-
-        query_get_user_data_92 = (
-            'SELECT usename, usesysid, usecreatedb, usesuper, usecatupd, '
-            'userepl, passwd, valuntil, useconfig '
-            'FROM pg_user '
-            'WHERE usename = (%s);'
-        )
-
         try:
             pg_version = self.get_pg_version()  # Get PostgreSQL version
 
             if pg_version < self.PG_PID_VERSION_THRESHOLD:
-                self.cursor.execute(query_get_user_data_91, (username, ))
+                self.cursor.execute(Queries.GET_PG91_USER_DATA, (username, ))
             else:
-                self.cursor.execute(query_get_user_data_92, (username, ))
+                self.cursor.execute(Queries.GET_PG92_USER_DATA, (username, ))
             user = self.cursor.fetchone()
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_user_data": '
                               '{}.'.format(str(e)))
             message = Messenger.GET_PG_USER_DATA.format(username=username)
@@ -310,31 +267,19 @@ class Connecter:
             - connpid: PID of the backend whose information is going to be
               shown.
         '''
-        query_get_conn_data_91 = (
-            'SELECT datid, datname, procpid, usesysid, usename, '
-            'application_name, client_addr, client_hostname, client_port, '
-            'backend_start, xact_start, query_start, waiting '
-            'FROM pg_stat_activity '
-            'WHERE procpid = (%s);'
-        )
-        query_get_conn_data_92 = (
-            'SELECT datid, datname, pid, usesysid, usename, application_name, '
-            'client_addr, client_hostname, client_port, backend_start, '
-            'xact_start, query_start, state_change, waiting, state, query '
-            'FROM pg_stat_activity '
-            'WHERE pid = (%s);'
-        )
-
         try:
             pg_version = self.get_pg_version()  # Get PostgreSQL version
 
             if pg_version < self.PG_PID_VERSION_THRESHOLD:
-                self.cursor.execute(query_get_conn_data_91, (connpid, ))
+                self.cursor.execute(Queries.GET_PG91_CONN_DATA, (connpid, ))
             else:
-                self.cursor.execute(query_get_conn_data_92, (connpid, ))
+                self.cursor.execute(Queries.GET_PG92_CONN_DATA, (connpid, ))
             conn = self.cursor.fetchone()
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_conn_data": '
                               '{}.'.format(str(e)))
             message = Messenger.GET_PG_CONN_DATA.format(connpid=connpid)
@@ -352,21 +297,11 @@ class Connecter:
             - ex_templates: flag which determinates whether or not get those
               databases which are templates.
         '''
-        query_get_dbnames = (
-            'SELECT datname '
-            'FROM pg_database;'
-        )
-        query_get_ex_template_dbnames = (
-            'SELECT datname '
-            'FROM pg_database '
-            'WHERE not datistemplate;'
-        )
-
         try:
             if ex_templates:
-                self.cursor.execute(query_get_ex_template_dbnames)
+                self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBNAMES)
             else:
-                self.cursor.execute(query_get_dbnames)
+                self.cursor.execute(Queries.GET_PG_DBNAMES)
             result = self.cursor.fetchall()
 
             dbnames = []
@@ -374,6 +309,9 @@ class Connecter:
                 dbnames.append(record['datname'])
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_dbnames": '
                               '{}.'.format(str(e)))
             self.logger.highlight('warning', Messenger.GET_PG_DBNAMES_DATA,
@@ -387,15 +325,8 @@ class Connecter:
         Target:
             - get PostgreSQL users' names.
         '''
-        query_get_usernames = (
-            'SELECT usename '
-            'FROM pg_user;'
-        )
-
         try:
-            # TODO: ver por qué si peta get_pg_db_data, peta esto, y lo mismo
-            # con varias funciones de este informer
-            self.cursor.execute(query_get_usernames)
+            self.cursor.execute(Queries.GET_PG_USERNAMES)
             result = self.cursor.fetchall()
 
             usernames = []
@@ -403,6 +334,9 @@ class Connecter:
                 usernames.append(record['usename'])
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_usernames": '
                               '{}.'.format(str(e)))
             self.logger.highlight('warning', Messenger.GET_PG_USERNAMES_DATA,
@@ -417,13 +351,11 @@ class Connecter:
             - get PostgreSQL backends' PIDs.
         '''
         pid = self.get_pid_str()  # Get PID variable's name
-        query_get_pids = (
-            'SELECT {pid} as pid '
-            'FROM pg_stat_activity;'.format(pid=pid)
-        )
+        formatted_query_get_pg_connpids = Queries.GET_PG_CONNPIDS.format(
+            pid=pid)
 
         try:
-            self.cursor.execute(query_get_pids)
+            self.cursor.execute(formatted_query_get_pg_connpids)
             result = self.cursor.fetchall()
 
             pids = []
@@ -431,6 +363,9 @@ class Connecter:
                 pids.append(record['pid'])
 
         except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_connpids": '
                               '{}.'.format(str(e)))
             self.logger.highlight('warning', Messenger.GET_PG_CONNPIDS_DATA,
@@ -447,13 +382,7 @@ class Connecter:
             - dbname: name of the database whose property "datallowconn" is
               going to be changed to allow connections to itself.
         '''
-        query_db_allow_conn = (
-            'UPDATE pg_database '
-            'SET datallowconn = TRUE '
-            'WHERE datname = (%s);'
-        )
-
-        self.cursor.execute(query_db_allow_conn, (dbname, ))
+        self.cursor.execute(Queries.ALLOW_CONN_TO_PG_DB, (dbname, ))
         self.conn.commit()  # Make changes permanent
 
     def disallow_db_conn(self, dbname):
@@ -464,11 +393,5 @@ class Connecter:
             - dbname: name of the database whose property "datallowconn" is
               going to be changed to disallow connections to itself.
         '''
-        query_db_disallow_conn = (
-            'UPDATE pg_database '
-            'SET datallowconn = FALSE '
-            'WHERE datname = (%s);'
-        )
-
-        self.cursor.execute(query_db_disallow_conn, (dbname, ))
+        self.cursor.execute(Queries.DISALLOW_CONN_TO_PG_DB, (dbname, ))
         self.conn.commit()  # Make changes permanent

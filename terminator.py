@@ -3,6 +3,7 @@
 
 from logger.logger import Logger
 from const.const import Messenger
+from const.const import Queries
 from casting.casting import Casting
 from checker.checker import Checker
 
@@ -16,28 +17,11 @@ class Terminator:
     connecter = None
     logger = None  # Logger to show and log some messages
 
-    # Terminate process by an target user
-    query_terminate_backend_user = (
-        "SELECT pg_terminate_backend({pg_pid}) "
-        "FROM pg_stat_activity "
-        "WHERE usename = '{target_user}';"
-    )
-    # This will kill existing connections except for yours to target database
-    query_terminate_backend_db = (
-        "SELECT pg_terminate_backend({pg_pid}) "
-        "FROM pg_stat_activity "
-        "WHERE datname = '{target_db}' "
-        "AND {pg_pid} <> pg_backend_pid();"
-    )
-    # This will kill existing connections except for yours to any database
-    query_terminate_backend_all = (
-        "SELECT pg_terminate_backend({pg_pid}) "
-        "FROM pg_stat_activity "
-        "WHERE {pg_pid} <> pg_backend_pid();"
-    )
-
     def __init__(self, connecter, target_all=False, target_user='',
                  target_dbs=[], logger=None):
+
+        # TODO: comprobar por qué no es posible terminar las conexiones a
+        # ciertas bases de datos y de ciertos usuarios
 
         if logger:
             self.logger = logger
@@ -60,7 +44,9 @@ class Terminator:
 
         self.target_user = target_user
 
-        if isinstance(target_dbs, list):
+        if target_dbs is None:
+            self.target_dbs = []
+        elif isinstance(target_dbs, list):
             self.target_dbs = target_dbs
         else:
             self.target_dbs = Casting.str_to_list(target_dbs)
@@ -74,12 +60,13 @@ class Terminator:
         message = Messenger.BEGINNING_TERMINATE_USER_CONN.format(
             target_user=self.target_user)
         self.logger.highlight('info', message, 'white')
-        sql = self.query_terminate_backend_user
 
         try:
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
-            sql = sql.format(pg_pid=pg_pid, target_user=self.target_user)
-            self.connecter.cursor.execute(sql)
+
+            formatted_sql = Queries.TERMINATE_BACKEND_PG_USER.format(
+                pg_pid=pg_pid, target_user=self.target_user)
+            self.connecter.cursor.execute(formatted_sql)
 
             message = Messenger.TERMINATE_USER_CONN_DONE.format(
                 target_user=self.target_user)
@@ -98,15 +85,17 @@ class Terminator:
             - terminate every connection to a PostgreSQL database (except the
               current one, if it is connected to the target database).
         '''
-        sql = self.query_terminate_backend_db
-
         try:
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
+
             if isinstance(target_db, dict):
-                sql = sql.format(pg_pid=pg_pid, target_db=target_db['name'])
+                formatted_sql = Queries.TERMINATE_BACKEND_PG_DB.format(
+                    pg_pid=pg_pid, target_db=target_db['name'])
             else:
-                sql = sql.format(pg_pid=pg_pid, target_db=target_db)
-            self.connecter.cursor.execute(sql)
+                formatted_sql = Queries.TERMINATE_BACKEND_PG_DB.format(
+                    pg_pid=pg_pid, target_db=target_db)
+
+            self.connecter.cursor.execute(formatted_sql)
 
             if isinstance(target_db, dict):
                 message = Messenger.TERMINATE_DB_CONN_DONE.format(
@@ -148,15 +137,16 @@ class Terminator:
         Target:
             - remove every connection to PostgreSQL (except the current one).
         '''
-        sql = self.query_terminate_backend_all
-
         try:
             message = Messenger.BEGINNING_TERMINATE_ALL_CONN
             self.logger.highlight('info', message, 'white')
 
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
-            sql = sql.format(pg_pid=pg_pid)
-            self.connecter.cursor.execute(sql)
+
+            formatted_sql = Queries.TERMINATE_BACKEND_PG_ALL.format(
+                pg_pid=pg_pid)
+
+            self.connecter.cursor.execute(formatted_sql)
 
             self.logger.highlight('info', Messenger.TERMINATE_ALL_CONN_DONE,
                                   'green')

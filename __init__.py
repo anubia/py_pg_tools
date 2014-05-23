@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('.'))
 
 __all__ = ['casting', 'backer', 'checker', 'config',  'configurator',
            'connecter', 'const', 'date_tools', 'db_selector', 'dir_tools',
-           'dropper', 'informer', 'logger', 'mailer', 'orchestrator', 'proof',
+           'dropper', 'informer', 'logger', 'mailer', 'orchestrator',
            'py_pg_tools', 'replicator', 'restorer', 'terminator', 'trimmer',
            'vacuumer']
 
@@ -27,7 +27,6 @@ from . import informer
 from . import logger
 from . import mailer
 from . import orchestrator
-from . import proof
 from . import py_pg_tools
 from . import replicator
 from . import restorer

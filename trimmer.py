@@ -169,6 +169,7 @@ class Trimmer:
 
             # Obsolete backup
             if x_days_ago and file_info.st_ctime < x_days_ago:
+
                 self.logger.info(Messenger.DELETING_OBSOLETE_BACKUP % f)
                 os.unlink(f)  # Remove backup's file
                 unlinked = True
@@ -181,31 +182,33 @@ class Trimmer:
         # Get total size of the backups in the selected unit of measure
         tsize_unit = ceil(tsize / equivalence)
 
-        ## DESCOMENTAR ESTA SECCIÓN PARA PROCEDER CON LA ELIMINACIÓN DE COPIAS
-        ## SI EL TAMAÑO DEL TOTAL DE ÉSTAS SUPERA EL TAMAÑO MÁXIMO ESPECIFICADO
+        ## UNCOMMENT NEXT SECTION TO PROCEDURE WITH THE BACKUP'S DELETION IF
+        ## THEIR TOTAL SIZE EXCEEDS THE SPECIFIED MAXIMUM SIZE
+
         #db_bkps_list = db_bkps_lt[:]
 
         #for f in db_bkps_list:
-            ## Si hay menos copias de las deseadas...
+            ## If there are less backups than the minimum required...
             #if num_bkps <= self.min_n_bkps:
                 #break
             #if tsize <= self.max_size:
                 #break
             #else:
-                ## Almacenar información del archivo
                 #file_info = os.stat(f)
-                #logger.info('Tamaño de copias de seguridad en disco mayor que'
-                            #' {} {}: eliminando el archivo {}...' %
-                            #(max_size['size'], max_size['unit'], f))
-                #os.unlink(f)  # Eliminar copia de seguridad
+                #self.logger.info('Tamaño de copias de seguridad en disco '
+                                 #'mayor que {} {}: eliminando el archivo '
+                                 #'{}...' %
+                                 #(max_size['size'], max_size['unit'], f))
+                #os.unlink(f)  # Remove backup's file
                 #unlinked = True
-                ## Reducir la variable que indica el número de copias de esta
-                ## BD almacenadas en el directorio
+                ## Update the number of backups of the database
                 #num_bkps -= 1
+                ## Update the list of database's backups
                 ## db_bkps_lt.remove(f)
-                #tsize -= file_info.st_size  # Actualizar el tamaño total
+                #tsize -= file_info.st_size  # Update total size after deletion
 
         if not unlinked:
+
             message = Messenger.NO_DB_BACKUP_DELETED.format(dbname=dbname)
             self.logger.highlight('warning', message, 'yellow')
 
@@ -223,8 +226,8 @@ class Trimmer:
         '''
         Target:
             - remove (if necessary) some backups of a group of databases,
-              taking into account some parameters in the following order: minimum
-              number of backups to keep > obsolete backups.
+              taking into account some parameters in the following order:
+              minimum number of backups to keep > obsolete backups.
         Parameters:
             - bkps_list: list of backups found in the specified directory.
             - dbs_to_clean: name of the database whose backups are going to be
@@ -351,64 +354,69 @@ class TrimmerCluster:
 
         self.max_size = max_size['size'] * equivalence
 
-        # Almacenar número actual de copias que tiene una base de datos
+        # Store the total number of backups of the cluster
         num_bkps = len(ht_bkps_list)
-        # Realizar una copia de la lista de copias de seguridad para poderla
-        # manipular sin problemas en mitad de un bucle
+        # Clone the list to avoid conflict errors when removing
         ht_bkps_lt = ht_bkps_list[:]
 
         unlinked = False
 
         self.logger.highlight('info', Messenger.BEGINNING_CL_TRIMMER, 'white')
 
-        for f in ht_bkps_list:  # Para cada copia de seguridad del clúster...
-            # Si hay menos copias de las deseadas...
+        for f in ht_bkps_list:
+
+            # Break if number of backups do not exceed the minimum
             if num_bkps <= self.min_n_bkps:
                 break
-            # Almacenar información del archivo
-            file_info = os.stat(f)
-            # Si está obsoleta...
-            if x_days_ago and file_info.st_ctime < x_days_ago:
-                self.logger.info(Messenger.DELETING_OBSOLETE_BACKUP % f)
-                os.unlink(f)  # Eliminar copia de seguridad
-                unlinked = True
-                # Reducir la variable que indica el número de copias de este
-                # clúster almacenadas en el directorio
-                num_bkps -= 1
-                ht_bkps_lt.remove(f)  # Actualizar lista de copias de seguridad
 
+            file_info = os.stat(f)
+
+            # Obsolete backup
+            if x_days_ago and file_info.st_ctime < x_days_ago:
+
+                self.logger.info(Messenger.DELETING_OBSOLETE_BACKUP % f)
+                os.unlink(f)  # Remove backup's file
+                unlinked = True
+                # Update the number of backups of the database
+                num_bkps -= 1
+                ht_bkps_lt.remove(f)  # Update the list of cluster's backups
+
+        # Get total size of the backups in Bytes
         tsize = Dir.get_files_tsize(ht_bkps_lt)
+        # Get total size of the backups in the selected unit of measure
         tsize_unit = ceil(tsize / equivalence)
 
-        ## DESCOMENTAR ESTA SECCIÓN PARA PROCEDER CON LA ELIMINACIÓN DE COPIAS
-        ## SI EL TAMAÑO DEL TOTAL DE ÉSTAS SUPERA EL TAMAÑO MÁXIMO ESPECIFICADO
+        ## UNCOMMENT NEXT SECTION TO PROCEDURE WITH THE BACKUP'S DELETION IF
+        ## THEIR TOTAL SIZE EXCEEDS THE SPECIFIED MAXIMUM SIZE
+
         #ht_bkps_list = ht_bkps_lt[:]
 
         #for f in ht_bkps_list:
-            ## Si hay menos copias de las deseadas...
+            ## If there are less backups than the minimum required...
             #if num_bkps <= self.min_n_bkps:
                 #break
             #if tsize <= self.max_size:
                 #break
             #else:
-                ## Almacenar información del archivo
                 #file_info = os.stat(f)
-                #logger.info('Tamaño de copias de seguridad en disco mayor que'
-                            #' {} {}: eliminando el archivo {}...' %
-                            #(max_size['size'], max_size['unit'], f))
-                #os.unlink(f)  # Eliminar copia de seguridad
+                #self.logger.info('Tamaño de copias de seguridad en disco '
+                                 #'mayor que {} {}: eliminando el archivo '
+                                 #'{}...' %
+                                 #(max_size['size'], max_size['unit'], f))
+                #os.unlink(f)  # Remove backup's file
                 #unlinked = True
-                ## Reducir la variable que indica el número de copias de esta
-                ## BD almacenadas en el directorio
+                ## Update the number of backups of the cluster
                 #num_bkps -= 1
-                ## ht_bkps_lt.remove(f)
-                #tsize -= file_info.st_size  # Actualizar el tamaño total
+                ## ht_bkps_lt.remove(f)  # Update the list of cluster's backups
+                #tsize -= file_info.st_size  # Update total size after deletion
 
         if not unlinked:
+
             message = Messenger.NO_CL_BACKUP_DELETED
             self.logger.highlight('warning', message, 'yellow')
 
-        if tsize > self.max_size:
+        if tsize > self.max_size:  # Total size exceeds the maximum
+
             message = Messenger.CL_BKPS_SIZE_EXCEEDED.format(
                 tsize_unit=tsize_unit, size=max_size['size'],
                 unit=max_size['unit'])
@@ -417,38 +425,47 @@ class TrimmerCluster:
         self.logger.highlight('info', Messenger.CL_TRIMMER_DONE, 'green')
 
     def trim_clusters(self, bkps_list):
-
-        # Declarar la expresión regular que detecta si el nombre del archivo
-        # de backup se corresponde con una copia generada por el programa
-        # dump.py
+        '''
+        Target:
+            - remove (if necessary) some backups of a cluster, taking into
+              account some parameters in the following order: minimum number of
+              backups to keep > obsolete backups.
+        Parameters:
+            - bkps_list: list of backups found in the specified directory.
+        '''
+        # If not prefix specified, trim all the backups (not only the ones
+        # without prefix)
         if self.prefix:
             regex = r'(' + self.prefix + ')ht_(.+_cluster)_' \
                     '(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
         else:
             regex = r'(.*)?ht_(.+_cluster)_(\d{8}_\d{6}_.+)\.' \
                     '(?:dump|bz2|gz|zip)$'
-        regex = re.compile(regex)  # Validar la expresión regular
+        regex = re.compile(regex)
 
         ht_bkps_list = []
 
-        for file in bkps_list:  # Para cada archivo del directorio...
+        for file in bkps_list:
 
+            # Extract file's name from the absolute path
             filename = os.path.basename(file)
-            # Si es un backup (su nombre sigue el patrón de dump.py)...
+
+            # If file matches regex (it means that file is a backup)
             if re.match(regex, filename):
 
-                # Si es un backup de una BD de la que se desea realizar una
-                # limpieza de backups...
+                # Append backup to the group of cluster's backups
                 ht_bkps_list.append(file)
-                # Si el archivo es un backup pero no se desea eliminar...
 
-            else:  # Si el archivo no es un backup...
+            else:
                 continue
 
         if ht_bkps_list:
-            # Eliminar (si procede) las copias de seguridad de esta BD
+
+            # Remove (if necessary) some backups of the cluster
             self.trim_cluster(ht_bkps_list)
+            # Remove directories which could be empty after the trim
             Dir.remove_empty_dirs(self.bkp_path)
+
         else:
             self.logger.highlight('warning', Messenger.NO_BACKUP_IN_DIR,
                                   'yellow', effect='bold')

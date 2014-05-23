@@ -18,33 +18,198 @@ class Messenger:
                           '- Vacuum a specified database\n' \
                           'See more information below and in the help of ' \
                           'each command'
+    PROGRAM_VERSION = 'Version: v.0.1'
+    PROGRAM_INFO = PROGRAM_VERSION + '\n' \
+                                     'Repository: https://gitlab.com/' \
+                                     'anubia/py_pg_tools.git\n' \
+                                     'Author: Juan Formoso Vasco ' \
+                                     '<jfv@anubia.es>\n' \
+                                     'Year: 2014'
+    PROGRAM_VERSION_HELP = 'Gives the program\'s version'
+    PROGRAM_INFO_HELP = 'Gives some information about the program, (the ' \
+                        'version, the repository where you can download ' \
+                        'it, the author and the year when it was created)'
+
     BACKER_HELP = 'BACKER: makes a backup of a PostgreSQL cluster or a ' \
                   'specified group of databases'
+    B_CONFIG_HELP = 'load a configuration file (.cfg) to get the backer ' \
+                    'conditions'
+    B_DB_NAME_HELP = 'specify the name/s of the PostgreSQL database/s ' \
+                     'to be dumped'
+    B_CLUSTER_HELP = 'select dumping the PostgreSQL cluster'
+    B_BKP_PATH_HELP = 'specify the path where the backups are going to be ' \
+                      'stored'
+    B_BACKUP_FORMAT_HELP = 'select the backup\'s file format (dump, bz2, ' \
+                           'gz, zip)'
+    B_GROUP_HELP = 'select a name to put in the each backup\'s name to ' \
+                   'agrupate them'
+    B_EX_TEMPLATES_HELP = 'specify whether the databases which are ' \
+                          'templates have to be dumped'
+    B_NO_EX_TEMPLATES_HELP = 'specify whether the databases which are ' \
+                             'templates do not have to be dumped'
+    B_VACUUM_HELP = 'vacuum those databases which are going to be dumped ' \
+                    'dumped before the process'
+    B_NO_VACUUM_HELP = 'do not vacuum those databases which are going to be ' \
+                       'dumped before the process'
+    B_DB_OWNER_HELP = 'only if the user who is running the program is a ' \
+                      'PostgreSQL superuser, this option allows him to ' \
+                      'play other PostgreSQL role writting its username'
+    B_TERMINATE_HELP = 'terminate every connection (except yours) to each ' \
+                       'database which is going to be dumped'
+
     DROPPER_HELP = 'DROPPER: deletes the specified PostgreSQL databases'
+    D_CONFIG_HELP = 'load a configuration file (.cfg) to get the dropper ' \
+                    'conditions'
+    D_DB_NAME_HELP = 'specify the PostgreSQL databases to be deleted'
+    D_TERMINATE_HELP = 'terminate every connection (except yours) to each ' \
+                       'database which is going to be dropped'
+
     INFORMER_HELP = 'INFORMER: gives some information about PostgreSQL'
+    I_CONFIG_HELP = 'load a configuration file (.cfg) to get the dropper ' \
+                    'conditions'
+    I_DETAILS_CONNS_HELP = 'specify a list of PIDs and it will give you ' \
+                           'some details about the PostgreSQL connections ' \
+                           'which have those PIDs. If no one is specified, ' \
+                           'it will show some details about every ' \
+                           'connection to PostgreSQL'
+    I_DETAILS_DBS_HELP = 'specify a list of PostgreSQL databases and it ' \
+                         'will give you some details about them. If no one ' \
+                         'is specified, it will show some details about ' \
+                         'every PostgreSQL database'
+    I_DETAILS_USERS_HELP = 'specify a list of PostgreSQL users and it will ' \
+                           'give you some details about them. If no one is ' \
+                           'specified, it will show some details about ' \
+                           'every PostgreSQL user'
+    I_LIST_CONNS_HELP = 'gives a list of the current PostgreSQL connection ' \
+                        'PIDs'
+    I_LIST_DBS_HELP = 'gives a list of the PostgreSQL databases'
+    I_LIST_USERS_HELP = 'gives a list of the PostgreSQL users'
+    I_VERSION_PG_HELP = 'gives the PostgreSQL version installed in the host'
+    I_VERSION_NUM_PG_HELP = 'gives the PostgreSQL version installed in the ' \
+                            'host (numeric format)'
+    I_TIME_START_HELP = 'gives the moment when PostgreSQL was started'
+    I_TIME_UP_HELP = 'gives how long PostgreSQL has been working'
+
     REPLICATOR_HELP = 'REPLICATOR: clones the specified PostgreSQL database'
+    R_CONFIG_HELP = 'load a configuration file (.cfg) to get the replicator ' \
+                    'conditions'
+    R_DB_NAME_HELP = 'specifies the new name of the database generated and ' \
+                     'the name of the database which is being cloned, ' \
+                     'respectively'
+    R_TERMINATE_HELP = 'terminate every connection (except yours) to the ' \
+                       'database which is going to be replicated'
+
     RESTORER_HELP = 'RESTORER: restores a database\'s backup file in ' \
                     'PostgreSQL'
+    RS_CONFIG_HELP = 'load a configuration file (.cfg) to get the restorer ' \
+                     'conditions'
+    RS_DB_BACKUP_HELP = 'specifies the path of the backup\'s file ' \
+                        '(database) which is going to be loaded and the ' \
+                        'name of the PostgreSQL database which is going to ' \
+                        'be generated, respectively'
+    RS_CLUSTER_BACKUP_HELP = 'specifies the path of the backup\'s file ' \
+                             '(cluster) which is going to be loaded'
+    RS_CLUSTER_HELP = 'specifies whether the specified path is a ' \
+                      'database\'s backup or a cluster\'s backup'
+
     TERMINATOR_HELP = 'TERMINATOR: terminates the specified connections to ' \
                       'PostgreSQL'
+    T_CONFIG_HELP = 'load a configuration file (.cfg) to get the terminator ' \
+                    'conditions'
+    T_ALL_HELP = 'terminates every connection (except yours) to the host ' \
+                 'which you are connected to'
+    T_DB_NAME_HELP = 'terminates every connection (except yours) to the ' \
+                     'specified PostgreSQL database'
+    T_USER_HELP = 'terminates every connection of the specified user ' \
+                  '(except if you are the specified user)'
+
     TRIMMER_HELP = 'TRIMMER: deletes (if necessary) a group of PostgreSQL ' \
                    'backups (cluster or databases) according to some ' \
                    'specified conditions'
+    TR_CONFIG_HELP = 'load a configuration file (.cfg) to get the trimmer ' \
+                     'conditions'
+    TR_DB_NAME_HELP = 'trim the backups of a specified group of PostgreSQL ' \
+                      'databases'
+    TR_CLUSTER_HELP = 'trim the backups of the PostgreSQL cluster'
+    TR_BKP_FOLDER_HELP = 'select the path of the folder to be trimmed. The ' \
+                         'folder\'s name must be the group\'s name'
+    TR_PREFIX_HELP = 'specify the prefix of the backups which are going to ' \
+                     'be trimmed'
+    TR_N_BACKUPS_HELP = 'specify the minimum number of backups of each ' \
+                        'database to keep stored, regardless of the rest of ' \
+                        'conditions'
+    TR_EXPIRY_DAYS_HELP = 'specify the number of days which have to be ' \
+                          'elapsed to consider a backup expired'
+    TR_MAX_SIZE_HELP = 'when the size of a group of a database\'s backups ' \
+                       'exceeds this maximum size, a message will be shown ' \
+                       'to let the user know it'
+
     VACUUMER_HELP = 'VACUUMER: makes a vacuum of a specified group of ' \
                     'PostgreSQL databases'
+    V_CONFIG_HELP = 'load a configuration file (.cfg) to get the vacuum ' \
+                    'conditions'
+    V_DB_NAME_HELP = 'specify the name/s of the PostgreSQL database/s to be ' \
+                     'vacuumed'
+    V_DB_OWNER_HELP = 'only if the user who is running the program is a ' \
+                      'PostgreSQL superuser, this option allows him to play ' \
+                      'other PostgreSQL role writting its username'
+    V_TERMINATE_HELP = 'terminate every connection (except yours) to each ' \
+                       'database which is going to be vacuumed'
+
     CONFIG_CONNECTION_HELP = 'load a configuration file (.cfg) to get the ' \
                              'PostgreSQL connection parameters'
+
     HOST_HELP = 'indicates the host you are going to connect to'
+
     PORT_HELP = 'indicates the port you are going to connect to'
+
     USER_HELP = 'indicates the PostgreSQL username with whom you are going ' \
                 'to connect'
+
     CONFIG_LOGGER_HELP = 'load a configuration file (.cfg) to get the ' \
                          'logger parameters'
+
     LOGGER_LOGFILE_HELP = 'indicates the path of the file in which the ' \
                           'logger is going to store the log info'
+
     LOGGER_LEVEL_HELP = 'indicates the logger\'s verbosity level (debug, ' \
                         'info, warning, error, critical)'
+
     LOGGER_MUTE_HELP = 'indicates not to store anything'
+
+    PROGRAM_INFO_ARGS_ERROR = 'cannot specify more parameters when using ' \
+                              '[-i/--info]'
+    PROGRAM_VERSION_ARGS_ERROR = 'cannot specify more parameters when using ' \
+                                 '[-v/--version]'
+    BACKER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
+                        '-d/--db-name | -c/--cluster] must be specified'
+    DROPPER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
+                         '-d/--db-name] must be specified'
+    INFORMER_ARGS_ERROR = 'insufficient parameters to work - ' \
+                          '[-dc/--details-conns | -dd/--details-dbs | ' \
+                          '-du/--details-users | -lc/--list-conns | ' \
+                          '-ld/--list-dbs | -lu/--list-users | ' \
+                          '-vpg/--version-pg | -vnpg/--version-num-pg | ' \
+                          '-ts/--time-start | -tu/--time-up] must be ' \
+                          'specified'
+    REPLICATOR_ARGS_ERROR = 'insufficient parameters to work - ' \
+                            '[-C/--config | -d/--db-name] must be specified'
+    RESTORER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
+                          '-d/--db-backup | (-c/--cluster & ' \
+                          '-p/--cluster-backup)] must be specified'
+    TERMINATOR_ARGS_ERROR = 'insufficient parameters to work - [-C/--config ' \
+                            '| -a/--all | -d/--db-name | -u/--user] must be ' \
+                            'specified'
+    TRIMMER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
+                         '(-f/--bkp-folder & (-d/--db-name | ' \
+                         '-c/--cluster))] must be specified'
+    TRIMMER_CONNECTION_ARGS_ERROR = 'connection parameters no needed to ' \
+                                    'work with clusters\' trimmer'
+    VACUUMER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config ' \
+                          '| -d/--db-name] must be specified'
+    CONNECTION_ARGS_ERROR = 'insufficient connection parameters to work - ' \
+                            '[-cC/--config-connection | (-ch/--host & ' \
+                            '-cp/--port & -cu/--user)] must be specified'
 
     BEGINNING_EXE_DB_BACKER = 'INICIANDO EJECUCIÓN DE BACKER (BASES DE DATOS)'
     BEGINNING_EXE_CL_BACKER = 'INICIANDO EJECUCIÓN DE BACKER (CLÚSTER)'
@@ -433,6 +598,141 @@ class Default:
     VACUUM = True
     VALID_BOOLS = ['True', 'true', 'False', 'false']
     VALID_EXP_DAYS = [-1, int]
+
+    def __init__(self):
+        pass
+
+
+class Queries:
+
+    ALLOW_CONN_TO_PG_DB = (
+        'UPDATE pg_database '
+        'SET datallowconn = TRUE '
+        'WHERE datname = (%s);'
+    )
+    CLONE_PG_DB = (
+        'CREATE DATABASE {dbname} '
+        'WITH TEMPLATE {original_dbname} OWNER {user};'
+    )
+    DISALLOW_CONN_TO_PG_DB = (
+        'UPDATE pg_database '
+        'SET datallowconn = FALSE '
+        'WHERE datname = (%s);'
+    )
+    DROP_PG_DB = (
+        'DROP DATABASE {dbname};'
+    )
+    GET_PG_CONNPIDS = (
+        'SELECT {pid} as pid '
+        'FROM pg_stat_activity;'
+    )
+    GET_PG_DBNAMES = (
+        'SELECT datname '
+        'FROM pg_database;'
+    )
+    GET_PG_DBS = (
+        'SELECT d.datname, d.datallowconn, '
+        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
+        'FROM pg_catalog.pg_database d;'
+    )
+    GET_PG_DBS_BY_OWNER = (
+        'SELECT d.datname, d.datallowconn, '
+        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
+        'FROM pg_catalog.pg_database d '
+        'WHERE pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
+    )
+    GET_PG_NO_TEMPLATE_DBNAMES = (
+        'SELECT datname '
+        'FROM pg_database '
+        'WHERE not datistemplate;'
+    )
+    GET_PG_NO_TEMPLATE_DBS = (
+        'SELECT d.datname, d.datallowconn, '
+        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
+        'FROM pg_catalog.pg_database d '
+        'WHERE not datistemplate;'
+    )
+    GET_PG_NO_TEMPLATE_DBS_BY_OWNER = (
+        'SELECT d.datname, d.datallowconn, '
+        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
+        'FROM pg_catalog.pg_database d '
+        'WHERE not datistemplate '
+        'AND pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
+    )
+    GET_PG_DB_DATA = (
+        'SELECT datname, pg_get_userbyid(datdba) as owner, '
+        'pg_encoding_to_char(encoding) as encoding, datcollate, datctype, '
+        'datistemplate, datallowconn, datconnlimit, datlastsysoid, '
+        'datfrozenxid, dattablespace, datacl, '
+        'pg_size_pretty(pg_database_size(datname)) as size '
+        'FROM pg_database '
+        'WHERE datname = (%s);'
+    )
+    GET_PG_PRETTY_VERSION = (
+        'select version();'
+    )
+    GET_PG_TIME_START = (
+        'SELECT pg_postmaster_start_time();'
+    )
+    GET_PG_TIME_UP = (
+        'SELECT now() - pg_postmaster_start_time();'
+    )
+    GET_PG_USERNAMES = (
+        'SELECT usename '
+        'FROM pg_user;'
+    )
+    GET_PG91_CONN_DATA = (
+        'SELECT datid, datname, procpid, usesysid, usename, '
+        'application_name, client_addr, client_hostname, client_port, '
+        'backend_start, xact_start, query_start, waiting '
+        'FROM pg_stat_activity '
+        'WHERE procpid = (%s);'
+    )
+    GET_PG92_CONN_DATA = (
+        'SELECT datid, datname, pid, usesysid, usename, application_name, '
+        'client_addr, client_hostname, client_port, backend_start, '
+        'xact_start, query_start, state_change, waiting, state, query '
+        'FROM pg_stat_activity '
+        'WHERE pid = (%s);'
+    )
+    GET_PG91_USER_DATA = (
+        'SELECT usename, usesysid, usecreatedb, usesuper, usecatupd, '
+        'passwd, valuntil, useconfig '
+        'FROM pg_user '
+        'WHERE usename = (%s);'
+    )
+    GET_PG92_USER_DATA = (
+        'SELECT usename, usesysid, usecreatedb, usesuper, usecatupd, '
+        'userepl, passwd, valuntil, useconfig '
+        'FROM pg_user '
+        'WHERE usename = (%s);'
+    )
+    IS_PG_SUPERUSER = (
+        'SELECT usesuper '
+        'FROM pg_user '
+        'WHERE usename = CURRENT_USER;'
+    )
+    PG_DB_EXISTS = (
+        'SELECT 1 '
+        'FROM pg_database '
+        'WHERE datname=(%s);'
+    )
+    TERMINATE_BACKEND_PG_ALL = (
+        'SELECT pg_terminate_backend({pg_pid}) '
+        'FROM pg_stat_activity '
+        'WHERE {pg_pid} <> pg_backend_pid();'
+    )
+    TERMINATE_BACKEND_PG_DB = (
+        'SELECT pg_terminate_backend({pg_pid}) '
+        'FROM pg_stat_activity '
+        'WHERE datname = "{target_db}" '
+        'AND {pg_pid} <> pg_backend_pid();'
+    )
+    TERMINATE_BACKEND_PG_USER = (
+        'SELECT pg_terminate_backend({pg_pid}) '
+        'FROM pg_stat_activity '
+        'WHERE usename = "{target_user}";'
+    )
 
     def __init__(self):
         pass
