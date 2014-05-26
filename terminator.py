@@ -64,9 +64,29 @@ class Terminator:
         try:
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
 
-            formatted_sql = Queries.TERMINATE_BACKEND_PG_USER.format(
-                pg_pid=pg_pid, target_user=self.target_user)
-            self.connecter.cursor.execute(formatted_sql)
+            sql = Queries.GET_CURRENT_PG_USER
+            self.connecter.cursor.execute(sql)
+            current_pg_user = self.connecter.cursor.fetchone()[0]
+
+            if self.target_user == current_pg_user:
+                message = Messenger.TARGET_USER_IS_CURRENT_USER.format(
+                    target_user=self.target_user)
+                self.logger.highlight('warning', message, 'yellow')
+
+            else:
+                formatted_sql = Queries.BACKEND_PG_USER_EXISTS.format(
+                    pg_pid=pg_pid, target_user=self.target_user)
+                self.connecter.cursor.execute(formatted_sql)
+                result = self.connecter.cursor.fetchone()
+
+                if result:
+                    formatted_sql = Queries.TERMINATE_BACKEND_PG_USER.format(
+                        pg_pid=pg_pid, target_user=self.target_user)
+                    self.connecter.cursor.execute(formatted_sql)
+                else:
+                    message = Messenger.NO_USER_CONNS.format(
+                        target_user=self.target_user)
+                    self.logger.info(message)
 
             message = Messenger.TERMINATE_USER_CONN_DONE.format(
                 target_user=self.target_user)
@@ -86,35 +106,38 @@ class Terminator:
               current one, if it is connected to the target database).
         '''
         try:
+            if isinstance(target_db, dict):
+                target_db = target_db['name']
+
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
 
-            if isinstance(target_db, dict):
-                formatted_sql = Queries.TERMINATE_BACKEND_PG_DB.format(
-                    pg_pid=pg_pid, target_db=target_db['name'])
-            else:
+            formatted_sql = Queries.BACKEND_PG_DB_EXISTS.format(
+                pg_pid=pg_pid, target_db=target_db)
+
+            self.connecter.cursor.execute(formatted_sql)
+            result = self.connecter.cursor.fetchone()
+
+            if result:
+
                 formatted_sql = Queries.TERMINATE_BACKEND_PG_DB.format(
                     pg_pid=pg_pid, target_db=target_db)
 
-            self.connecter.cursor.execute(formatted_sql)
+                self.connecter.cursor.execute(formatted_sql)
 
-            if isinstance(target_db, dict):
-                message = Messenger.TERMINATE_DB_CONN_DONE.format(
-                    target_dbname=target_db['name'])
-            else:
                 message = Messenger.TERMINATE_DB_CONN_DONE.format(
                     target_dbname=target_db)
-            self.logger.info(message)
+                self.logger.info(message)
+
+            else:
+                message = Messenger.NO_DB_CONNS.format(target_db=target_db)
+                self.logger.info(message)
 
         except Exception as e:
             self.logger.debug('Error en la función "terminate_backend_db": '
                               '{}.'.format(str(e)))
-            if isinstance(target_db, dict):
-                message = Messenger.TERMINATE_DB_CONN_FAIL.format(
-                    target_dbname=target_db['name'])
-            else:
-                message = Messenger.TERMINATE_DB_CONN_FAIL.format(
-                    target_dbname=target_db)
-            self.logger.highlight('warning', message, 'yellow', effect='bold')
+            message = Messenger.TERMINATE_DB_CONN_FAIL.format(
+                target_dbname=target_db)
+            self.logger.highlight('warning', message, 'yellow')
 
     def terminate_backend_dbs(self):
         '''
@@ -143,10 +166,17 @@ class Terminator:
 
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
 
-            formatted_sql = Queries.TERMINATE_BACKEND_PG_ALL.format(
-                pg_pid=pg_pid)
+            formatted_sql = Queries.BACKEND_PG_ALL_EXISTS.format(pg_pid=pg_pid)
 
             self.connecter.cursor.execute(formatted_sql)
+            result = self.connecter.cursor.fetchone()
+
+            if result:
+                formatted_sql = Queries.TERMINATE_BACKEND_PG_ALL.format(
+                    pg_pid=pg_pid)
+                self.connecter.cursor.execute(formatted_sql)
+            else:
+                self.logger.info(Messenger.NO_CONNS)
 
             self.logger.highlight('info', Messenger.TERMINATE_ALL_CONN_DONE,
                                   'green')

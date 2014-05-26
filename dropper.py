@@ -40,7 +40,7 @@ class Dropper:
             - dbname: the PostgreSQL database's name which is going to be
               removed.
         '''
-        formatted_query_drop_db = Queries.DROP_PG_DB.format(dbname)
+        formatted_query_drop_db = Queries.DROP_PG_DB.format(dbname=dbname)
 
         try:
             self.connecter.cursor.execute('commit')

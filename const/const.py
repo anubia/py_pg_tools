@@ -295,7 +295,7 @@ class Messenger:
     DB_VACUUMER_FAIL = 'La limpieza de la base de datos "{dbname}" no se ' \
                        'pudo completar.'
     TERMINATE_USER_CONN_DONE = 'Conexiones del usuario "{target_user}" a ' \
-                               'PostgreSQL terminadas con éxito.'
+                               'PostgreSQL terminadas.'
     TERMINATE_DB_CONN_DONE = 'Conexiones a la bases de datos ' \
                              '"{target_dbname}" terminadas.'
     TERMINATE_DBS_CONN_DONE = 'Conexiones a las bases de datos de ' \
@@ -325,6 +325,16 @@ class Messenger:
                                    'especificadas...'
     BEGINNING_TERMINATE_ALL_CONN = 'Terminando todas las conexiones a ' \
                                    'PostgreSQL...'
+
+    NO_CONNS = 'Actualmente no hay ninguna conexión a PostgreSQL (a ' \
+               'excepción de la suya).'
+    NO_DB_CONNS = 'Actualmente no hay ninguna conexión a la base de datos ' \
+                  '"{target_db}".'
+    NO_USER_CONNS = 'Actualmente no hay ninguna conexión a PostgreSQL del ' \
+                    'usuario "{target_user}".'
+    TARGET_USER_IS_CURRENT_USER = 'Actualmente está conectado a PostgreSQL ' \
+                                  'a través del usuario "{target_user}". No ' \
+                                  'es posible terminar su propia conexión.'
 
     SHOWING_DBS_DATA = 'Información de las bases de datos de PostgreSQL'
     SHOWING_DBS_NAME = 'Bases de datos de PostgreSQL'
@@ -610,6 +620,23 @@ class Queries:
         'SET datallowconn = TRUE '
         'WHERE datname = (%s);'
     )
+    BACKEND_PG_ALL_EXISTS = (
+        "SELECT 1 "
+        "FROM pg_stat_activity "
+        "WHERE {pg_pid} <> pg_backend_pid();"
+    )
+    BACKEND_PG_DB_EXISTS = (
+        "SELECT 1 "
+        "FROM pg_stat_activity "
+        "WHERE datname = '{target_db}' "
+        "AND {pg_pid} <> pg_backend_pid();"
+    )
+    BACKEND_PG_USER_EXISTS = (
+        "SELECT 1 "
+        "FROM pg_stat_activity "
+        "WHERE usename = '{target_user}' "
+        "AND usename <> CURRENT_USER;"
+    )
     CLONE_PG_DB = (
         'CREATE DATABASE {dbname} '
         'WITH TEMPLATE {original_dbname} OWNER {user};'
@@ -621,6 +648,9 @@ class Queries:
     )
     DROP_PG_DB = (
         'DROP DATABASE {dbname};'
+    )
+    GET_CURRENT_PG_USER = (
+        "SELECT CURRENT_USER;"
     )
     GET_PG_CONNPIDS = (
         'SELECT {pid} as pid '
@@ -718,20 +748,21 @@ class Queries:
         'WHERE datname=(%s);'
     )
     TERMINATE_BACKEND_PG_ALL = (
-        'SELECT pg_terminate_backend({pg_pid}) '
-        'FROM pg_stat_activity '
-        'WHERE {pg_pid} <> pg_backend_pid();'
+        "SELECT pg_terminate_backend({pg_pid}) "
+        "FROM pg_stat_activity "
+        "WHERE {pg_pid} <> pg_backend_pid();"
     )
     TERMINATE_BACKEND_PG_DB = (
-        'SELECT pg_terminate_backend({pg_pid}) '
-        'FROM pg_stat_activity '
-        'WHERE datname = "{target_db}" '
-        'AND {pg_pid} <> pg_backend_pid();'
+        "SELECT pg_terminate_backend({pg_pid}) "
+        "FROM pg_stat_activity "
+        "WHERE datname = '{target_db}' "
+        "AND {pg_pid} <> pg_backend_pid();"
     )
     TERMINATE_BACKEND_PG_USER = (
-        'SELECT pg_terminate_backend({pg_pid}) '
-        'FROM pg_stat_activity '
-        'WHERE usename = "{target_user}";'
+        "SELECT pg_terminate_backend({pg_pid}) "
+        "FROM pg_stat_activity "
+        "WHERE usename = '{target_user}' "
+        "AND usename <> CURRENT_USER;"
     )
 
     def __init__(self):
