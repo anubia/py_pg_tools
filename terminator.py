@@ -20,9 +20,6 @@ class Terminator:
     def __init__(self, connecter, target_all=False, target_user='',
                  target_dbs=[], logger=None):
 
-        # TODO: comprobar por qué no es posible terminar las conexiones a
-        # ciertas bases de datos y de ciertos usuarios
-
         if logger:
             self.logger = logger
         else:
@@ -50,6 +47,13 @@ class Terminator:
             self.target_dbs = target_dbs
         else:
             self.target_dbs = Casting.str_to_list(target_dbs)
+
+        message = Messenger.TERMINATOR_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, target_all=self.target_all,
+            target_user=target_user, target_dbs=self.target_dbs)
+        self.logger.debug(Messenger.TERMINATOR_VARS_INTRO)
+        self.logger.debug(message)
 
     def terminate_backend_user(self):
         '''

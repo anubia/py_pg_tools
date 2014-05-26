@@ -81,6 +81,15 @@ class Vacuumer:
         else:
             self.db_owner = db_owner
 
+        message = Messenger.VACUUMER_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, in_dbs=self.in_dbs,
+            in_regex=self.in_regex, in_priority=self.in_priority,
+            ex_dbs=self.ex_dbs, ex_regex=self.ex_regex,
+            ex_templates=self.ex_templates, db_owner=self.db_owner)
+        self.logger.debug(Messenger.VACUUMER_VARS_INTRO)
+        self.logger.debug(message)
+
     def vacuum_db(self, dbname):
         '''
         Target:

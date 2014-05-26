@@ -42,6 +42,13 @@ class Restorer:
         else:
             self.logger.stop_exe(Messenger.NO_DBNAME_TO_RESTORE)
 
+        message = Messenger.DB_RESTORER_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, db_backup=self.db_backup,
+            new_dbname=self.new_dbname)
+        self.logger.debug(Messenger.DB_RESTORER_VARS_INTRO)
+        self.logger.debug(message)
+
     def restore_db_backup(self):
         '''
         Target:
@@ -131,6 +138,12 @@ class RestorerCluster:
             self.cluster_backup = cluster_backup
         else:
             self.logger.stop_exe(Messenger.NO_BKP_TO_RESTORE)
+
+        message = Messenger.CL_RESTORER_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, cluster_backup=self.cluster_backup)
+        self.logger.debug(Messenger.CL_RESTORER_VARS_INTRO)
+        self.logger.debug(message)
 
     def restore_cluster_backup(self):
         '''

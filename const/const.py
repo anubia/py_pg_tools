@@ -225,6 +225,57 @@ class Messenger:
     BEGINNING_EXE_CL_TRIMMER = 'INICIANDO EJECUCIÓN DE TRIMMER (CLÚSTER)'
     BEGINNING_EXE_VACUUMER = 'INICIANDO EJECUCIÓN DE VACUUMER'
 
+    ACTIVE_CONNS_ERROR = 'No se pudo completar la operación, ya que hay ' \
+                         'procesos en curso usando la base de datos ' \
+                         '"{dbname}". Puede volver a intentarlo indicando ' \
+                         'el argumento -t o terminando directamente los ' \
+                         'procesos mencionados.'
+
+    DB_BACKER_VARS_INTRO = 'VARIABLES DE BACKER (BASE DE DATOS):'
+    DB_BACKER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                     'BKP_PATH: {bkp_path}, GROUP: {group}, BKP_TYPE: ' \
+                     '{bkp_type}, PREFIX: {prefix}, IN_DBS: {in_dbs}, ' \
+                     'IN_REGEX: {in_regex}, IN_PRIORITY: {in_priority}, ' \
+                     'EX_DBS: {ex_dbs}, EX_REGEX: {ex_regex}, EX_TEMPLATES: ' \
+                     '{ex_templates}, VACUUM: {vacuum}, DB_OWNER: {db_owner}.'
+    CL_BACKER_VARS_INTRO = 'VARIABLES DE BACKER (CLÚSTER):'
+    CL_BACKER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                     'BKP_PATH: {bkp_path}, GROUP: {group}, BKP_TYPE: ' \
+                     '{bkp_type}, PREFIX: {prefix}, VACUUM: {vacuum}.'
+    DROPPER_VARS_INTRO = 'VARIABLES DE DROPPER:'
+    DROPPER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                   'DBNAMES: {dbnames}.'
+    REPLICATOR_VARS_INTRO = 'VARIABLES DE REPLICATOR:'
+    REPLICATOR_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                      'ORIGINAL_DBNAME: {original_dbname}, NEW_DBNAME: ' \
+                      '{new_dbname}.'
+    DB_RESTORER_VARS_INTRO = 'VARIABLES DE RESTORER (BASE DE DATOS):'
+    DB_RESTORER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                       'DB_BACKUP: {db_backup}, NEW_DBNAME: {new_dbname}.'
+    CL_RESTORER_VARS_INTRO = 'VARIABLES DE RESTORER (CLÚSTER):'
+    CL_RESTORER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                       'DB_BACKUP: {db_backup}, NEW_DBNAME: {new_dbname}.'
+    TERMINATOR_VARS_INTRO = 'VARIABLES DE TERMINATOR:'
+    TERMINATOR_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                      'TARGET_ALL: {target_all}, TARGET_USER: ' \
+                      '{target_user}, TARGET_DBS: {target_dbs}.'
+    DB_TRIMMER_VARS_INTRO = 'VARIABLES DE TRIMMER (BASE DE DATOS):'
+    DB_TRIMMER_VARS = 'BKP_PATH: {bkp_path}, PREFIX: {prefix}, IN_DBS: ' \
+                      '{in_dbs}, IN_REGEX: {in_regex}, IN_PRIORITY: ' \
+                      '{in_priority}, EX_DBS: {ex_dbs}, EX_REGEX: ' \
+                      '{ex_regex},  MIN_N_BKPS: {min_n_bkps}, EXP_DAYS: ' \
+                      '{exp_days}, MAX_SIZE: {max_size}, PG_WARNINGS: ' \
+                      '{pg_warnings}.'
+    CL_TRIMMER_VARS_INTRO = 'VARIABLES DE TRIMMER (CLÚSTER):'
+    CL_TRIMMER_VARS = 'BKP_PATH: {bkp_path}, PREFIX: {prefix}, MIN_N_BKPS: ' \
+                      '{min_n_bkps}, EXP_DAYS: {exp_days}, MAX_SIZE: ' \
+                      '{max_size}, PG_WARNINGS: {pg_warnings}.'
+    VACUUMER_VARS_INTRO = 'VARIABLES DE VACUUMER:'
+    VACUUMER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                    'IN_DBS: {in_dbs}, IN_REGEX: {in_regex}, IN_PRIORITY: ' \
+                    '{in_priority}, EX_DBS: {ex_dbs}, EX_REGEX: {ex_regex}, ' \
+                    'EX_TEMPLATES: {ex_templates}, DB_OWNER: {db_owner}.'
+
     ACTION_DB_NO_SUPERUSER = 'El usuario especificado para la conexión a ' \
                              'PostgreSQL no tiene rol de superusuario: sólo ' \
                              'podrá actuar sobre las bases de datos de las ' \
@@ -577,6 +628,7 @@ class Messenger:
                        'sigue el formato estándar de nombres del programa.'
     ANALIZING_PG_DATA = 'Analizando datos en PostgreSQL...'
     DETECTED_DB = 'Detectada base de datos: "{dbname}".'
+    DB_DOES_NOT_EXIST = 'La base de datos: "{dbname}" no existe en PostgreSQL.'
 
     def __init__(self):
         pass

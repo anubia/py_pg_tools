@@ -32,6 +32,12 @@ class Dropper:
         else:
             self.dbnames = Casting.str_to_list(dbnames)
 
+        message = Messenger.DROPPER_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, dbnames=self.dbnames)
+        self.logger.debug(Messenger.DROPPER_VARS_INTRO)
+        self.logger.debug(message)
+
     def drop_pg_db(self, dbname):
         '''
         Target:
@@ -40,12 +46,30 @@ class Dropper:
             - dbname: the PostgreSQL database's name which is going to be
               removed.
         '''
-        formatted_query_drop_db = Queries.DROP_PG_DB.format(dbname=dbname)
-
         try:
-            self.connecter.cursor.execute('commit')
-            self.connecter.cursor.execute(formatted_query_drop_db)
-            self.logger.info(Messenger.DROP_DB_DONE.format(dbname=dbname))
+            self.connecter.cursor.execute(Queries.PG_DB_EXISTS, (dbname, ))
+            result = self.connecter.cursor.fetchone()
+
+            if result:
+                pg_pid = self.connecter.get_pid_str()
+                formatted_sql = Queries.BACKEND_PG_DB_EXISTS.format(
+                    pg_pid=pg_pid, target_db=dbname)
+                self.connecter.cursor.execute(formatted_sql)
+                result = self.connecter.cursor.fetchone()
+                if not result:
+                    formatted_query_drop_db = Queries.DROP_PG_DB.format(
+                        dbname=dbname)
+                    self.connecter.cursor.execute('commit')
+                    self.connecter.cursor.execute(formatted_query_drop_db)
+                    self.logger.info(Messenger.DROP_DB_DONE.format(
+                        dbname=dbname))
+                else:
+                    message = Messenger.ACTIVE_CONNS_ERROR.format(
+                        dbname=dbname)
+                    self.logger.highlight('warning', message, 'yellow')
+            else:
+                message = Messenger.DB_DOES_NOT_EXIST.format(dbname=dbname)
+                self.logger.highlight('warning', message, 'yellow')
         except Exception as e:
             self.logger.debug('Error en la función "drop_pg_db": '
                               '{}.'.format(str(e)))

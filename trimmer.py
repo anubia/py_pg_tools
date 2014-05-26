@@ -119,6 +119,15 @@ class Trimmer:
             else:
                 self.logger.stop_exe(Messenger.NO_CONNECTION_PARAMS)
 
+        message = Messenger.DB_TRIMMER_VARS.format(
+            bkp_path=self.bkp_path, prefix=self.prefix, in_dbs=self.in_dbs,
+            in_regex=self.in_regex, in_priority=self.in_priority,
+            ex_dbs=self.ex_dbs, ex_regex=self.ex_regex,
+            min_n_bkps=self.min_n_bkps, exp_days=self.exp_days,
+            max_size=self.max_size, pg_warnings=self.pg_warnings)
+        self.logger.debug(Messenger.DB_TRIMMER_VARS_INTRO)
+        self.logger.debug(message)
+
     def trim_db(self, dbname, db_bkps_list):
         '''
         Target:
@@ -326,6 +335,13 @@ class TrimmerCluster:
             self.max_size = max_size
         else:
             self.logger.stop_exe(Messenger.INVALID_MAX_TSIZE)
+
+        message = Messenger.CL_TRIMMER_VARS.format(
+            bkp_path=self.bkp_path, prefix=self.prefix,
+            min_n_bkps=self.min_n_bkps, exp_days=self.exp_days,
+            max_size=self.max_size)
+        self.logger.debug(Messenger.CL_TRIMMER_VARS_INTRO)
+        self.logger.debug(message)
 
     def trim_cluster(self, ht_bkps_list):
         '''

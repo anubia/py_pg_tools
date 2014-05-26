@@ -122,6 +122,17 @@ class Backer:
         else:
             self.db_owner = Default.DB_OWNER
 
+        message = Messenger.DB_BACKER_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, bkp_path=self.bkp_path, group=self.group,
+            bkp_type=self.bkp_type, prefix=self.prefix, in_dbs=self.in_dbs,
+            in_regex=self.in_regex, in_priority=self.in_priority,
+            ex_dbs=self.ex_dbs, ex_regex=self.ex_regex,
+            ex_templates=self.ex_templates, vacuum=self.vacuum,
+            db_owner=self.db_owner)
+        self.logger.debug(Messenger.DB_BACKER_VARS_INTRO)
+        self.logger.debug(message)
+
     def backup_db(self, dbname, bkps_dir):
         '''
         Target:
@@ -296,6 +307,13 @@ class BackerCluster:
             self.vacuum = Casting.str_to_bool(vacuum)
         else:
             self.logger.stop_exe(Messenger.INVALID_VACUUM)
+
+        message = Messenger.CL_BACKER_VARS.format(
+            server=self.connecter.server, user=self.connecter.user,
+            port=self.connecter.port, bkp_path=self.bkp_path, group=self.group,
+            bkp_type=self.bkp_type, prefix=self.prefix, vacuum=self.vacuum)
+        self.logger.debug(Messenger.CL_BACKER_VARS_INTRO)
+        self.logger.debug(message)
 
     def backup_all(self, bkps_dir):
         '''
