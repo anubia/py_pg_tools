@@ -11,6 +11,7 @@ from casting.casting import Casting
 from checker.checker import Checker
 from const.const import Default
 from const.const import Messenger
+from date_tools.date_tools import DateTools
 from dir_tools.dir_tools import Dir
 from logger.logger import Logger
 
@@ -167,6 +168,8 @@ class Trimmer:
         message = Messenger.BEGINNING_DB_TRIMMER.format(dbname=dbname)
         self.logger.highlight('info', message, 'white')
 
+        start_time = DateTools.get_current_datetime()
+
         for f in db_bkps_list:
 
             # Break if number of backups do not exceed the minimum
@@ -184,6 +187,8 @@ class Trimmer:
                 # Update the number of backups of the database
                 num_bkps -= 1
                 db_bkps_lt.remove(f)  # Update the list of database's backups
+
+        end_time = DateTools.get_current_datetime()
 
         # Get total size of the backups in Bytes
         tsize = Dir.get_files_tsize(db_bkps_lt)
@@ -227,8 +232,10 @@ class Trimmer:
                 size=self.max_size['size'], unit=self.max_size['unit'])
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
+        # Get and show the process' duration
+        diff = DateTools.get_diff_datetimes(start_time, end_time)
         self.logger.highlight('info', Messenger.DB_TRIMMER_DONE.format(
-            dbname=dbname), 'green')
+            dbname=dbname, diff=diff), 'green')
 
     def trim_dbs(self, bkps_list, dbs_to_clean):
         '''
@@ -377,6 +384,8 @@ class TrimmerCluster:
 
         self.logger.highlight('info', Messenger.BEGINNING_CL_TRIMMER, 'white')
 
+        start_time = DateTools.get_current_datetime()
+
         for f in ht_bkps_list:
 
             # Break if number of backups do not exceed the minimum
@@ -394,6 +403,8 @@ class TrimmerCluster:
                 # Update the number of backups of the database
                 num_bkps -= 1
                 ht_bkps_lt.remove(f)  # Update the list of cluster's backups
+
+        end_time = DateTools.get_current_datetime()
 
         # Get total size of the backups in Bytes
         tsize = Dir.get_files_tsize(ht_bkps_lt)
@@ -436,7 +447,10 @@ class TrimmerCluster:
                 unit=self.max_size['unit'])
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
-        self.logger.highlight('info', Messenger.CL_TRIMMER_DONE, 'green')
+        # Get and show the process' duration
+        diff = DateTools.get_diff_datetimes(start_time, end_time)
+        self.logger.highlight('info', Messenger.CL_TRIMMER_DONE.format(
+            diff=diff), 'green')
 
     def trim_clusters(self, bkps_list):
         '''

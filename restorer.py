@@ -7,6 +7,8 @@ import re  # To work with regular expressions
 import subprocess  # To execute commands in the shell
 
 from const.const import Messenger
+from const.const import Default
+from date_tools.date_tools import DateTools
 from logger.logger import Logger
 from replicator import Replicator
 
@@ -54,12 +56,11 @@ class Restorer:
         Target:
             - restore a database's backup in PostgreSQL.
         '''
-        # TODO cambiar template0 por otra
-        replicator = Replicator(self.connecter, self.new_dbname, 'template0',
-                                self.logger)
-        self.connecter.allow_db_conn('template0')
+        replicator = Replicator(self.connecter, self.new_dbname,
+                                Default.RESTORING_TEMPLATE, self.logger)
+        self.connecter.allow_db_conn(Default.RESTORING_TEMPLATE)
         replicator.replicate_pg_db()
-        self.connecter.disallow_db_conn('template0')
+        self.connecter.disallow_db_conn(Default.RESTORING_TEMPLATE)
 
         # Regular expression which must match the backup's name
         regex = r'.*db_(.+)_(\d{8}_\d{6}_.+)\.(dump|bz2|gz|zip)$'
@@ -99,12 +100,19 @@ class Restorer:
                 self.connecter.port, self.new_dbname, self.db_backup)
 
         try:
+            start_time = DateTools.get_current_datetime()
+            # Make the restauration of the database
             result = subprocess.call(command, shell=True)
+            end_time = DateTools.get_current_datetime()
+            # Get and show the process' duration
+            diff = DateTools.get_diff_datetimes(start_time, end_time)
+
             if result != 0:
                 raise Exception()
 
             message = Messenger.RESTORE_DB_DONE.format(
-                db_backup=self.db_backup, new_dbname=self.new_dbname)
+                db_backup=self.db_backup, new_dbname=self.new_dbname,
+                diff=diff)
             self.logger.highlight('info', message, 'green')
 
         except Exception as e:
@@ -190,12 +198,18 @@ class RestorerCluster:
                 self.connecter.port, self.cluster_backup)
 
         try:
+            start_time = DateTools.get_current_datetime()
+            # Make the restauration of the cluster
             result = subprocess.call(command, shell=True)
+            end_time = DateTools.get_current_datetime()
+            # Get and show the process' duration
+            diff = DateTools.get_diff_datetimes(start_time, end_time)
+
             if result != 0:
                 raise Exception()
 
             message = Messenger.RESTORE_CL_DONE.format(
-                cluster_backup=self.cluster_backup)
+                cluster_backup=self.cluster_backup, diff=diff)
             self.logger.highlight('info', message, 'green')
 
         except Exception as e:

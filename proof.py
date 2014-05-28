@@ -9,55 +9,31 @@
     #'SELECT * '
     #'FROM pg_database;'
 #)
-#query_get_dbs2 = (
-    #'SELECT * '
-    #'FOM pg_database;'
-#)
-
-#try:
-    #connecter.cursor.execute(query_get_dbs2)
-#except:
-    #print('ERROR')
 
 #try:
     #connecter.cursor.execute(query_get_dbs1)
 #except:
     #print('ERROR')
 
-#for record in connecter.cursor:
-    #print(record)
+#import time
+#from datetime import datetime
 
-import psycopg2  # To work with PostgreSQL
-import psycopg2.extras  # To get real field names from PostgreSQL
+#timestamp1 = time.time()
+#timestamp2 = time.time()
 
-conn = psycopg2.connect(host='localhost',
-                        database='postgres',
-                        user='anubia',
-                        port=5432)
+#print(timestamp1)
+#print(timestamp2)
+#diff = timestamp2 - timestamp1
+#print(diff)
 
-cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+#print(datetime.fromtimestamp(diff).strftime('%Y-%m-%d %H:%M:%S'))
 
-query_get_dbs1 = (
-    'SELECT * '
-    'FRO pg_database;'
-)
-query_get_dbs2 = (
-    'SELECT * '
-    'FROM pg_database;'
-)
+from datetime import datetime
 
-try:
-    cursor.execute(query_get_dbs1)
-except Exception as e:
-    conn.rollback()
-    print('ERROR')
-    print(str(e))
+timestamp1 = datetime.now()
+timestamp2 = datetime.now()
 
-try:
-    cursor.execute(query_get_dbs2)
-except Exception as e:
-    print('ERROR')
-    print(str(e))
-
-cursor.close()
-conn.close()
+print(timestamp1)
+print(timestamp2)
+diff = timestamp2 - timestamp1
+print(diff)

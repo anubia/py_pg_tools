@@ -68,9 +68,28 @@ class DateTools:
         return month
 
     @staticmethod
-    def get_current_timestamp():
-        return
+    def get_current_datetime():
+        '''
+        Target:
+            - get the current date and time in timestamp format.
+        Return:
+            - a timestamp with the current moment.
+        '''
+        now = datetime.datetime.now()
+
+        return now
 
     @staticmethod
-    def get_diff_timestamp(start_time, end_time):
-        return
+    def get_diff_datetimes(start_time, end_time):
+        '''
+        Target:
+            - extract the month of a date stored in a string.
+        Parameters:
+            - date_str: the string with the date.
+            - fmt: the date format used.
+        Return:
+            - the month of the received date.
+        '''
+        diff = end_time - start_time
+
+        return diff

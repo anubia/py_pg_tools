@@ -178,6 +178,7 @@ class Backer:
             result = subprocess.call(command, shell=True)
             if result != 0:
                 raise Exception()
+
         except Exception as e:
             self.logger.debug('Error en la función "backup_db": {}.'.format(
                 str(e)))
@@ -240,10 +241,16 @@ class Backer:
                 self.logger.info(Messenger.BEGINNING_DB_BACKER.format(
                     dbname=dbname))
 
+                start_time = DateTools.get_current_datetime()
                 # Make the backup of the database
                 success = self.backup_db(dbname, bkps_dir)
+                end_time = DateTools.get_current_datetime()
+                # Get and show the process' duration
+                diff = DateTools.get_diff_datetimes(start_time, end_time)
+
             if success:
-                message = Messenger.DB_BACKER_DONE.format(dbname=dbname)
+                message = Messenger.DB_BACKER_DONE.format(dbname=dbname,
+                                                          diff=diff)
                 self.logger.highlight('info', message, 'green')
             else:
                 message = Messenger.DB_BACKER_FAIL.format(dbname=dbname)
@@ -362,6 +369,7 @@ class BackerCluster:
             result = subprocess.call(command, shell=True)
             if result != 0:
                 raise Exception()
+
         except Exception as e:
             self.logger.debug('Error en la función "backup_all": {}.'.format(
                 str(e)))
@@ -392,11 +400,16 @@ class BackerCluster:
 
         self.logger.highlight('info', Messenger.BEGINNING_CL_BACKER, 'white')
 
+        start_time = DateTools.get_current_datetime()
         # Make the backup of the cluster
         success = self.backup_all(bkps_dir)
+        end_time = DateTools.get_current_datetime()
+        # Get and show the process' duration
+        diff = DateTools.get_diff_datetimes(start_time, end_time)
+
         if success:
-            self.logger.highlight('info', Messenger.CL_BACKER_DONE, 'green',
-                                  effect='bold')
+            message = Messenger.CL_BACKER_DONE.format(diff=diff)
+            self.logger.highlight('info', message, 'green', effect='bold')
         else:
             self.logger.highlight('warning', Messenger.CL_BACKER_FAIL,
                                   'yellow', effect='bold')

@@ -4,6 +4,7 @@
 
 from const.const import Messenger
 from const.const import Queries
+from date_tools.date_tools import DateTools
 from logger.logger import Logger
 
 
@@ -88,11 +89,16 @@ class Replicator:
             self.logger.highlight('info', message, 'white')
 
             self.connecter.cursor.execute('commit')
+            start_time = DateTools.get_current_datetime()
+            # Replicate the database
             self.connecter.cursor.execute(formatted_query_clone_pg_db)
+            end_time = DateTools.get_current_datetime()
+            # Get and show the process' duration
+            diff = DateTools.get_diff_datetimes(start_time, end_time)
 
             message = Messenger.REPLICATE_DB_DONE.format(
                 new_dbname=self.new_dbname,
-                original_dbname=self.original_dbname)
+                original_dbname=self.original_dbname, diff=diff)
             self.logger.highlight('info', message, 'green')
 
         except Exception as e:

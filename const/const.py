@@ -301,7 +301,8 @@ class Messenger:
                             '{tsize_unit} {unit}, que es mayor que el ' \
                             'máximo especificado ({size} {unit}).'
     DB_TRIMMER_DONE = 'Limpieza de copias de seguridad de la base de ' \
-                      'datos "{dbname}" completada.'
+                      'datos "{dbname}" completada (Duración del proceso: ' \
+                      '{diff}).'
     BEGINNING_CL_TRIMMER = 'Iniciando limpieza de copias de seguridad del ' \
                            'clúster de PostgreSQL del servidor...'
     NO_CL_BACKUP_DELETED = 'No se ha eliminado ninguna copia del clúster ' \
@@ -311,7 +312,7 @@ class Messenger:
                             'que es mayor que el máximo especificado ' \
                             '({size} {unit}).'
     CL_TRIMMER_DONE = 'Limpieza de copias de seguridad del clúster del ' \
-                      'servidor completada.'
+                      'servidor completada (Duración del proceso: {diff}).'
     NO_CONNECTION_PARAMS = 'No se han especificado todos los parámetros ' \
                            'necesarios para la conexión a PostgreSQL.'
     CHECKING_BACKUP_DIR = 'Comprobando directorio de destino de las copias... '
@@ -329,20 +330,21 @@ class Messenger:
     BEGINNING_DB_BACKER = 'Iniciando copia de seguridad de la base de datos ' \
                           '"{dbname}"...'
     DB_BACKER_DONE = 'Copia de seguridad de la base de datos "{dbname}" ' \
-                     'completada.'
+                     'completada (Duración del proceso: {diff}).'
     DB_BACKER_FAIL = 'La copia de seguridad de la base de datos "{dbname}" ' \
                      'no se pudo completar.'
     DBS_BACKER_DONE = 'Copias de seguridad finalizadas.'
     BEGINNING_CL_BACKER = 'Iniciando copia de seguridad de del clúster de ' \
                           'bases de datos...'
     CL_BACKER_DONE = 'Copia de seguridad del clúster de bases de datos ' \
-                     'completada.'
+                     'completada (Duración del proceso: {diff}).'
     CL_BACKER_FAIL = 'La copia de seguridad del clúster de bases de datos ' \
                      'no se pudo completar.'
     BEGINNING_VACUUMER = 'Iniciando limpieza de bases de datos...'
     VACUUMER_DONE = 'Limpieza de bases de datos completada.'
     VACUUMER_FAIL = 'La limpieza de bases de datos no se pudo completar.'
-    DB_VACUUMER_DONE = 'Limpieza de la base de datos "{dbname}" completada.'
+    DB_VACUUMER_DONE = 'Limpieza de la base de datos "{dbname}" completada ' \
+                       '(Duración del proceso: {diff}).'
     DB_VACUUMER_FAIL = 'La limpieza de la base de datos "{dbname}" no se ' \
                        'pudo completar.'
     TERMINATE_USER_CONN_DONE = 'Conexiones del usuario "{target_user}" a ' \
@@ -483,14 +485,16 @@ class Messenger:
                          'datos que se desea clonar.'
     BEGINNING_REPLICATOR = 'Copiando la base de datos "{original_dbname}"...'
     REPLICATE_DB_DONE = 'Generada con éxito una copia "{new_dbname}" en ' \
-                        'PostgreSQL de la base de datos "{original_dbname}".'
+                        'PostgreSQL de la base de datos "{original_dbname}" ' \
+                        '(Duración del proceso: {diff}).'
     REPLICATE_DB_FAIL = 'No fue posible copiar la base de datos ' \
                         'especificada de PostgreSQL.'
     NO_DBS_TO_DROP = 'No se ha especificado ninguna base de datos para ' \
                      'eliminar en PostgreSQL.'
     BEGINNING_DROPPER = 'Eliminando bases de datos especificadas en ' \
                         'PostgreSQL...'
-    DROP_DB_DONE = 'Eliminada base de datos "{dbname}".'
+    DROP_DB_DONE = 'Eliminada base de datos "{dbname}" (Duración del ' \
+                   'proceso: {diff}).'
     DROP_DB_FAIL = 'La base de datos "{dbname}" no se pudo eliminar.'
     DROP_DBS_DONE = 'Bases de datos especificadas eliminadas en PostgreSQL.'
     NO_BKP_TO_RESTORE = 'El archivo especificado que contiene la copia a ' \
@@ -503,13 +507,14 @@ class Messenger:
     WAIT_PLEASE = 'Esta operación puede llevar unos minutos, espere por ' \
                   'favor...'
     RESTORE_DB_DONE = 'Restaurada con éxito la copia "{db_backup}" en ' \
-                      'PostgreSQL con el nombre "{new_dbname}".'
+                      'PostgreSQL con el nombre "{new_dbname}" (Duración ' \
+                      'del proceso: {diff}).'
     RESTORE_DB_FAIL = 'No fue posible restaurar la copia "{db_backup}" ' \
                       'especificada de PostgreSQL con el nombre ' \
                       '"{new_dbname}".'
     BEGINNING_CL_RESTORER = 'Restaurando la copia "{cluster_backup}"...'
     RESTORE_CL_DONE = 'Restaurada con éxito la copia "{cluster_backup}" en ' \
-                      'PostgreSQL.'
+                      'PostgreSQL (Duración del proceso: {diff}).'
     RESTORE_CL_FAIL = 'No fue posible restaurar la copia "{cluster_backup}" ' \
                       'en PostgreSQL.'
     INVALID_IN_REGEX = 'La expresión regular para la inclusión de bases de ' \
@@ -657,6 +662,7 @@ class Default:
     MIN_N_BKPS = 1
     MUTE = False
     PREFIX = ''
+    RESTORING_TEMPLATE = 'template0'  # TODO: cambiar template0 por otra
     VACUUM = True
     VALID_BOOLS = ['True', 'true', 'False', 'false']
     VALID_EXP_DAYS = [-1, int]

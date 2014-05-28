@@ -8,6 +8,7 @@ from casting.casting import Casting
 from checker.checker import Checker
 from const.const import Default
 from const.const import Messenger
+from date_tools.date_tools import DateTools
 from logger.logger import Logger
 
 
@@ -144,11 +145,16 @@ class Vacuumer:
                                       effect='bold')
                 success = False
             else:
+                start_time = DateTools.get_current_datetime()
                 # Vacuum the database
                 success = self.vacuum_db(dbname)
+                end_time = DateTools.get_current_datetime()
+                # Get and show the process' duration
+                diff = DateTools.get_diff_datetimes(start_time, end_time)
 
             if success:
-                message = Messenger.DB_VACUUMER_DONE.format(dbname=dbname)
+                message = Messenger.DB_VACUUMER_DONE.format(dbname=dbname,
+                                                            diff=diff)
                 self.logger.highlight('info', message, 'green')
 
             else:
