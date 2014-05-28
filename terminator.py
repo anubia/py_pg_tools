@@ -109,7 +109,15 @@ class Terminator:
             - terminate every connection to a PostgreSQL database (except the
               current one, if it is connected to the target database).
         '''
+        # TODO: Ojo al tema del DELAY aquí, ver si ponerlo o no, porque cuando
+        # se especifica -t en los argumentos de otra operación, a pesar de
+        # terminar primero las conexiones, la otra operación dice que aún no se
+        # terminaron, y sin embargo si se le vuelve a llamar por consola sí que
+        # están terminadas.
         try:
+            # This function is sometimes called by other functions which send
+            # it a dictionary as the target_db (the majority send a string as
+            # the target_db)
             if isinstance(target_db, dict):
                 target_db = target_db['name']
 

@@ -132,7 +132,7 @@ class Dir:
         bkped_dbs = []
 
         # Regular expression which each backup's name must match
-        regex = r'(.*)?db_(.+)_(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
+        regex = r'(.+)?db_(.+)_(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
         regex = re.compile(regex)
 
         for f in bkps_list:

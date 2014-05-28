@@ -29,6 +29,11 @@ class Trimmer:
     min_n_bkps = None  # Minimum number of a database's backups to keep
     exp_days = None  # Number of days which make a backup obsolete
     max_size = None  # Maximum size of a group of database's backups
+    # Maximum size in Bytes of a group of database's backups
+    max_size_bytes = None
+    # Related to max_size, equivalence to turn the specified unit of measure in
+    # the max_size variable into Bytes
+    equivalence = 10 ** 6
     # Flag which determinates whether show alerts about PostgreSQL
     pg_warnings = True
     # An object with connection parameters to connect to PostgreSQL
@@ -99,12 +104,20 @@ class Trimmer:
             self.exp_days = Casting.str_to_int(exp_days)
         else:
             self.logger.stop_exe(Messenger.INVALID_OBS_DAYS)
+
         if max_size is None:
             self.max_size = Default.MAX_SIZE
         elif Checker.str_is_valid_max_size(max_size):
             self.max_size = max_size
         else:
             self.logger.stop_exe(Messenger.INVALID_MAX_TSIZE)
+
+        # Split a string with size and unit of measure into a dictionary
+        self.max_size = Casting.str_to_max_size(self.max_size)
+        # Get the equivalence in Bytes of the specified unit of measure
+        self.equivalence = Casting.get_equivalence(self.max_size['unit'])
+        # Get the specified size in Bytes
+        self.max_size_bytes = self.max_size['size'] * self.equivalence
 
         if isinstance(pg_warnings, bool):
             self.pg_warnings = pg_warnings
@@ -144,20 +157,6 @@ class Trimmer:
         else:
             x_days_ago = time.time() - (60 * 60 * 24 * self.exp_days)
 
-        # Split a string with size and unit of measure into a dictionary
-        max_size = Casting.str_to_max_size(self.max_size)
-
-        if max_size['unit'] == 'MB':
-            equivalence = 10 ** 6
-        elif max_size['unit'] == 'GB':
-            equivalence = 10 ** 9
-        elif max_size['unit'] == 'TB':
-            equivalence = 10 ** 12
-        elif max_size['unit'] == 'PB':
-            equivalence = 10 ** 15
-
-        self.max_size = max_size['size'] * equivalence
-
         # Store the total number of backups of the database
         num_bkps = len(db_bkps_list)
         # Clone the list to avoid conflict errors when removing
@@ -189,7 +188,7 @@ class Trimmer:
         # Get total size of the backups in Bytes
         tsize = Dir.get_files_tsize(db_bkps_lt)
         # Get total size of the backups in the selected unit of measure
-        tsize_unit = ceil(tsize / equivalence)
+        tsize_unit = ceil(tsize / self.equivalence)
 
         ## UNCOMMENT NEXT SECTION TO PROCEDURE WITH THE BACKUP'S DELETION IF
         ## THEIR TOTAL SIZE EXCEEDS THE SPECIFIED MAXIMUM SIZE
@@ -200,14 +199,14 @@ class Trimmer:
             ## If there are less backups than the minimum required...
             #if num_bkps <= self.min_n_bkps:
                 #break
-            #if tsize <= self.max_size:
+            #if tsize <= self.max_size_bytes:
                 #break
             #else:
                 #file_info = os.stat(f)
                 #self.logger.info('Tamaño de copias de seguridad en disco '
                                  #'mayor que {} {}: eliminando el archivo '
-                                 #'{}...' %
-                                 #(max_size['size'], max_size['unit'], f))
+                                 #'{}...' % (self.max_size['size'],
+                                            #self.max_size['unit'], f))
                 #os.unlink(f)  # Remove backup's file
                 #unlinked = True
                 ## Update the number of backups of the database
@@ -221,11 +220,11 @@ class Trimmer:
             message = Messenger.NO_DB_BACKUP_DELETED.format(dbname=dbname)
             self.logger.highlight('warning', message, 'yellow')
 
-        if tsize > self.max_size:  # Total size exceeds the maximum
+        if tsize > self.max_size_bytes:  # Total size exceeds the maximum
 
             message = Messenger.DB_BKPS_SIZE_EXCEEDED.format(
-                dbname=dbname, tsize_unit=tsize_unit, size=max_size['size'],
-                unit=max_size['unit'])
+                dbname=dbname, tsize_unit=tsize_unit,
+                size=self.max_size['size'], unit=self.max_size['unit'])
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
         self.logger.highlight('info', Messenger.DB_TRIMMER_DONE.format(
@@ -248,7 +247,7 @@ class Trimmer:
             regex = r'(' + self.prefix + ')db_(.+)_(\d{8}_\d{6}_.+)\.' \
                     '(?:dump|bz2|gz|zip)$'
         else:
-            regex = r'(.*)?db_(.+)_(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
+            regex = r'(.+)?db_(.+)_(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
         regex = re.compile(regex)
 
         for dbname in dbs_to_clean:
@@ -292,6 +291,11 @@ class TrimmerCluster:
     min_n_bkps = None  # Minimum number of a database's backups to keep
     exp_days = None  # Number of days which make a backup obsolete
     max_size = None  # Maximum size of a group of database's backups
+    # Maximum size in Bytes of a group of database's backups
+    max_size_bytes = None
+    # Related to max_size, equivalence to turn the specified unit of measure in
+    # the max_size variable into Bytes
+    equivalence = 10 ** 6
 
     def __init__(self, bkp_path='', prefix='', min_n_bkps=1, exp_days=365,
                  max_size=5000, logger=None):
@@ -336,6 +340,13 @@ class TrimmerCluster:
         else:
             self.logger.stop_exe(Messenger.INVALID_MAX_TSIZE)
 
+        # Split a string with size and unit of measure into a dictionary
+        self.max_size = Casting.str_to_max_size(self.max_size)
+        # Get the equivalence in Bytes of the specified unit of measure
+        self.equivalence = Casting.get_equivalence(self.max_size['unit'])
+        # Get the specified size in Bytes
+        self.max_size_bytes = self.max_size['size'] * self.equivalence
+
         message = Messenger.CL_TRIMMER_VARS.format(
             bkp_path=self.bkp_path, prefix=self.prefix,
             min_n_bkps=self.min_n_bkps, exp_days=self.exp_days,
@@ -356,19 +367,6 @@ class TrimmerCluster:
             x_days_ago = None
         else:
             x_days_ago = time.time() - (60 * 60 * 24 * self.exp_days)
-
-        max_size = Casting.str_to_max_size(self.max_size)
-
-        if max_size['unit'] == 'MB':
-            equivalence = 10 ** 6
-        elif max_size['unit'] == 'GB':
-            equivalence = 10 ** 9
-        elif max_size['unit'] == 'TB':
-            equivalence = 10 ** 12
-        elif max_size['unit'] == 'PB':
-            equivalence = 10 ** 15
-
-        self.max_size = max_size['size'] * equivalence
 
         # Store the total number of backups of the cluster
         num_bkps = len(ht_bkps_list)
@@ -400,7 +398,7 @@ class TrimmerCluster:
         # Get total size of the backups in Bytes
         tsize = Dir.get_files_tsize(ht_bkps_lt)
         # Get total size of the backups in the selected unit of measure
-        tsize_unit = ceil(tsize / equivalence)
+        tsize_unit = ceil(tsize / self.equivalence)
 
         ## UNCOMMENT NEXT SECTION TO PROCEDURE WITH THE BACKUP'S DELETION IF
         ## THEIR TOTAL SIZE EXCEEDS THE SPECIFIED MAXIMUM SIZE
@@ -411,14 +409,14 @@ class TrimmerCluster:
             ## If there are less backups than the minimum required...
             #if num_bkps <= self.min_n_bkps:
                 #break
-            #if tsize <= self.max_size:
+            #if tsize <= self.max_size_bytes:
                 #break
             #else:
                 #file_info = os.stat(f)
                 #self.logger.info('Tamaño de copias de seguridad en disco '
                                  #'mayor que {} {}: eliminando el archivo '
-                                 #'{}...' %
-                                 #(max_size['size'], max_size['unit'], f))
+                                 #'{}...' % (self.max_size['size'],
+                                            #self.max_size['unit'], f))
                 #os.unlink(f)  # Remove backup's file
                 #unlinked = True
                 ## Update the number of backups of the cluster
@@ -431,11 +429,11 @@ class TrimmerCluster:
             message = Messenger.NO_CL_BACKUP_DELETED
             self.logger.highlight('warning', message, 'yellow')
 
-        if tsize > self.max_size:  # Total size exceeds the maximum
+        if tsize > self.max_size_bytes:  # Total size exceeds the maximum
 
             message = Messenger.CL_BKPS_SIZE_EXCEEDED.format(
-                tsize_unit=tsize_unit, size=max_size['size'],
-                unit=max_size['unit'])
+                tsize_unit=tsize_unit, size=self.max_size['size'],
+                unit=self.max_size['unit'])
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
         self.logger.highlight('info', Messenger.CL_TRIMMER_DONE, 'green')
@@ -455,7 +453,7 @@ class TrimmerCluster:
             regex = r'(' + self.prefix + ')ht_(.+_cluster)_' \
                     '(\d{8}_\d{6}_.+)\.(?:dump|bz2|gz|zip)$'
         else:
-            regex = r'(.*)?ht_(.+_cluster)_(\d{8}_\d{6}_.+)\.' \
+            regex = r'(.+)?ht_(.+_cluster)_(\d{8}_\d{6}_.+)\.' \
                     '(?:dump|bz2|gz|zip)$'
         regex = re.compile(regex)
 

@@ -66,3 +66,11 @@ class DateTools:
         month = str(mm).rjust(2, '0')
 
         return month
+
+    @staticmethod
+    def get_current_timestamp():
+        return
+
+    @staticmethod
+    def get_diff_timestamp(start_time, end_time):
+        return

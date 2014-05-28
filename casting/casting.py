@@ -62,8 +62,8 @@ class Casting:
         '''
         Target:
             - converts a string into a dictionary made up by an integer and a
-              string. The integer will be a size and the string a storing unit of
-              measure.
+              string. The integer will be a size and the string a storing unit
+              of measure.
         Parameters:
             - string: the string to be converted.
         Return:
@@ -81,3 +81,27 @@ class Casting:
             return max_size
         else:
             return None
+
+    @staticmethod
+    def get_equivalence(unit_measure):
+        '''
+        Target:
+            - gets the equivalence in Bytes of the specified unit of measure.
+        Parameters:
+            - unit_measure: the unit of measure whose equivalence is going to
+            be calculated.
+        Return:
+            - an integer which indicates the equivalence.
+        '''
+        equivalence = 10 ** 6
+
+        if unit_measure == 'MB':
+            equivalence = 10 ** 6
+        elif unit_measure == 'GB':
+            equivalence = 10 ** 9
+        elif unit_measure == 'TB':
+            equivalence = 10 ** 12
+        elif unit_measure == 'PB':
+            equivalence = 10 ** 15
+
+        return equivalence
