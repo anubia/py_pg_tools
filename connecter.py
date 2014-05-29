@@ -51,6 +51,7 @@ class Connecter:
             self.conn = psycopg2.connect(host=self.server,
                                          database='postgres', user=self.user,
                                          port=self.port)
+            self.conn.autocommit = True
             # TODO: añadir argumento password a psycopg2.connect en caso de que
             # en futuro se quisiese añadir la opción de introducir contraseña
             # manualmente en vez de revisar .pgpass
@@ -383,7 +384,7 @@ class Connecter:
               going to be changed to allow connections to itself.
         '''
         self.cursor.execute(Queries.ALLOW_CONN_TO_PG_DB, (dbname, ))
-        self.conn.commit()  # Make changes permanent
+        # self.conn.commit()  # Make changes permanent
 
     def disallow_db_conn(self, dbname):
         '''
@@ -394,4 +395,4 @@ class Connecter:
               going to be changed to disallow connections to itself.
         '''
         self.cursor.execute(Queries.DISALLOW_CONN_TO_PG_DB, (dbname, ))
-        self.conn.commit()  # Make changes permanent
+        # self.conn.commit()  # Make changes permanent

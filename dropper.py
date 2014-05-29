@@ -60,7 +60,7 @@ class Dropper:
                 if not result:
                     formatted_query_drop_db = Queries.DROP_PG_DB.format(
                         dbname=dbname)
-                    self.connecter.cursor.execute('commit')
+                    # self.connecter.cursor.execute('commit')
                     start_time = DateTools.get_current_datetime()
                     # Drop the database
                     self.connecter.cursor.execute(formatted_query_drop_db)

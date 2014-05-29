@@ -1,39 +1,31 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
-#from connecter import Connecter
+from connecter import Connecter
 
-#connecter = Connecter('localhost', 'anubia', 5432)
+connecter = Connecter('localhost', 'anubia', 5433)
 
-#query_get_dbs1 = (
-    #'SELECT * '
-    #'FROM pg_database;'
-#)
+DROP_PG_DB = (
+    'DROP DATABASE {dbname};'
+)
 
-#try:
-    #connecter.cursor.execute(query_get_dbs1)
-#except:
-    #print('ERROR')
+TERMINATE_BACKEND_PG_DB = (
+    "SELECT pg_terminate_backend({pg_pid}) "
+    "FROM pg_stat_activity "
+    "WHERE datname = '{target_db}' "
+    "AND {pg_pid} <> pg_backend_pid();"
+)
 
-#import time
-#from datetime import datetime
+pid = connecter.get_pid_str()
+print(pid)
 
-#timestamp1 = time.time()
-#timestamp2 = time.time()
+try:
+    connecter.cursor.execute(TERMINATE_BACKEND_PG_DB.format(pg_pid=pid, target_db='my_replicated_db'))
+except Exception as e:
+    print('TERMINATE ERROR: {}'.format(str(e)))
 
-#print(timestamp1)
-#print(timestamp2)
-#diff = timestamp2 - timestamp1
-#print(diff)
-
-#print(datetime.fromtimestamp(diff).strftime('%Y-%m-%d %H:%M:%S'))
-
-from datetime import datetime
-
-timestamp1 = datetime.now()
-timestamp2 = datetime.now()
-
-print(timestamp1)
-print(timestamp2)
-diff = timestamp2 - timestamp1
-print(diff)
+try:
+    connecter.cursor.execute('commit')
+    connecter.cursor.execute(DROP_PG_DB.format(dbname='my_replicated_db'))
+except Exception as e:
+    print('DROP ERROR: {}'.format(str(e)))

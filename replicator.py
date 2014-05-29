@@ -88,7 +88,7 @@ class Replicator:
                 original_dbname=self.original_dbname)
             self.logger.highlight('info', message, 'white')
 
-            self.connecter.cursor.execute('commit')
+            # self.connecter.cursor.execute('commit')
             start_time = DateTools.get_current_datetime()
             # Replicate the database
             self.connecter.cursor.execute(formatted_query_clone_pg_db)
