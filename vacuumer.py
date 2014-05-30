@@ -132,13 +132,13 @@ class Vacuumer:
 
         for db in vacuum_list:
 
-            dbname = db['name']
+            dbname = db['datname']
 
             message = Messenger.PROCESSING_DB.format(dbname=dbname)
             self.logger.highlight('info', message, 'cyan')
 
             # Let the user know whether the database connection is allowed
-            if not db['allow_connection']:
+            if not db['datallowconn']:
                 message = Messenger.FORBIDDEN_DB_CONNECTION.format(
                     dbname=dbname)
                 self.logger.highlight('warning', message, 'yellow',

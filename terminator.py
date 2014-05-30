@@ -112,11 +112,7 @@ class Terminator:
               current one, if it is connected to the target database).
         '''
         try:
-            # This function is sometimes called by other functions which send
-            # it a dictionary as the target_db (the majority send a string as
-            # the target_db)
-            if isinstance(target_db, dict):
-                target_db = target_db['name']
+            target_db = target_db['datname']
 
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
 
@@ -148,18 +144,26 @@ class Terminator:
                 target_dbname=target_db)
             self.logger.highlight('warning', message, 'yellow')
 
-    def terminate_backend_dbs(self):
+    def terminate_backend_dbs(self, ter_list):
         '''
         Target:
             - terminate every connection to some PostgreSQL databases (except
               the current one, if it is connected to one of the target
               databases).
+        Parameters:
+            - ter_list: the list of databases whose connections are going to be
+              terminated.
         '''
         message = Messenger.BEGINNING_TERMINATE_DBS_CONN
         self.logger.highlight('info', message, 'white')
 
-        for target_db in self.target_dbs:
-            self.terminate_backend_db(target_db)
+        if ter_list:
+            for target_db in ter_list:
+                self.terminate_backend_db(target_db)
+        else:
+            self.logger.highlight('warning',
+                                  Messenger.TERMINATOR_HAS_NOTHING_TO_DO,
+                                  'yellow')
 
         self.logger.highlight('info', Messenger.TERMINATOR_DONE, 'green')
 

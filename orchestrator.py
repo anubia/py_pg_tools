@@ -13,6 +13,7 @@ from dropper import Dropper
 from informer import Informer
 from logger.logger import Logger
 from const.const import Messenger
+from const.const import Queries
 from replicator import Replicator
 from restorer import Restorer
 from restorer import RestorerCluster
@@ -50,7 +51,7 @@ class Orchestrator:
         logger.highlight('info', Messenger.ANALIZING_PG_DATA, 'white')
 
         for db in dbs_list:  # Para cada BD en PostgreSQL...
-            message = Messenger.DETECTED_DB.format(dbname=db['name'])
+            message = Messenger.DETECTED_DB.format(dbname=db['datname'])
             logger.info(message)
 
     @staticmethod
@@ -195,27 +196,6 @@ class Orchestrator:
 
         return alterer
 
-    def setup_alterer(self):
-        '''
-        Target:
-            - change the owner of the specified databases in PostgreSQL.
-        '''
-        connecter = self.get_connecter()
-        self.logger.debug(Messenger.BEGINNING_EXE_ALTERER)
-        alterer = self.get_alterer(connecter)
-
-        # Terminate every connection to the target databases if necessary
-        if self.args.terminate:
-            terminator = Terminator(connecter, target_dbs=alterer.db_name,
-                                    logger=self.logger)
-            terminator.terminate_backend_dbs()
-
-        # Delete the databases
-        alterer.alter_dbs_owner()
-
-        # Close connection to PostgreSQL
-        connecter.pg_disconnect()
-
     def get_db_backer(self, connecter):
         '''
         Target:
@@ -234,7 +214,8 @@ class Orchestrator:
             parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
                                                self.logger)
 
-            # Overwrite the config variables with the console ones if necessary
+            # Overwrite the config variables with the console ones if
+            # necessary
             if self.args.bkp_path:
                 parser.bkp_vars['bkp_path'] = self.args.bkp_path
             if self.args.group:
@@ -712,6 +693,47 @@ class Orchestrator:
 
         return vacuumer
 
+    def setup_alterer(self):
+        '''
+        Target:
+            - change the owner of the specified databases in PostgreSQL.
+        '''
+        connecter = self.get_connecter()
+        self.logger.debug(Messenger.BEGINNING_EXE_ALTERER)
+        alterer = self.get_alterer(connecter)
+
+        # Check if the role of user connected to PostgreSQL is superuser
+        pg_superuser = connecter.is_pg_superuser()
+        if not pg_superuser:
+            # Users who are not superusers will only be able to backup the
+            # databases they own
+            owner = connecter.user
+            self.logger.highlight('warning', Messenger.ACTION_DB_NO_SUPERUSER,
+                                  'yellow', effect='bold')
+        else:
+            owner = ''
+
+        # Get PostgreSQL databases' names, connection permissions and owners
+        dbs_all = connecter.get_pg_dbs_data(ex_templates=False, db_owner=owner)
+        # Show and log their names
+        Orchestrator.show_dbs(dbs_all, self.logger)
+
+        # Get the target databases in a list
+        alt_list = DbSelector.get_filtered_dbs(
+            dbs_all=dbs_all, in_dbs=alterer.in_dbs, logger=self.logger)
+
+        # Terminate every connection to the target databases if necessary
+        if self.args.terminate:
+            terminator = Terminator(connecter, target_dbs=alt_list,
+                                    logger=self.logger)
+            terminator.terminate_backend_dbs(alt_list)
+
+        # Delete the databases
+        alterer.alter_dbs_owner(alt_list)
+
+        # Close connection to PostgreSQL
+        connecter.pg_disconnect()
+
     def setup_backer(self):
         '''
         Target:
@@ -748,9 +770,8 @@ class Orchestrator:
 
             # Get PostgreSQL databases' names, connection permissions and
             # owners
-            connecter.get_cursor_dbs(backer.ex_templates, backer.db_owner)
-            # Get these data in a list
-            dbs_all = DbSelector.list_pg_dbs(connecter.cursor)
+            dbs_all = connecter.get_pg_dbs_data(backer.ex_templates,
+                                                backer.db_owner)
             # Show and log their names
             Orchestrator.show_dbs(dbs_all, self.logger)
 
@@ -763,7 +784,7 @@ class Orchestrator:
             if self.args.terminate:
                 terminator = Terminator(connecter, target_dbs=bkp_list,
                                         logger=self.logger)
-                terminator.terminate_backend_dbs()
+                terminator.terminate_backend_dbs(bkp_list)
 
             backer.backup_dbs(bkp_list)  # Make databases' backup
 
@@ -780,7 +801,7 @@ class Orchestrator:
         # Close connection to PostgreSQL
         connecter.pg_disconnect()
 
-    def setup_dropper(self):
+    def setup_dropper(self):  # TODO: controlar que sea pg_superuser o owner
         '''
         Target:
             - delete specified databases in PostgreSQL.
@@ -793,7 +814,7 @@ class Orchestrator:
         if self.args.terminate:
             terminator = Terminator(connecter, target_dbs=dropper.dbnames,
                                     logger=self.logger)
-            terminator.terminate_backend_dbs()
+            terminator.terminate_backend_dbs(dropper.dbnames)
 
         # Delete the databases
         dropper.drop_pg_dbs()
@@ -843,13 +864,21 @@ class Orchestrator:
         self.logger.debug(Messenger.BEGINNING_EXE_REPLICATOR)
         replicator = self.get_replicator(connecter)
 
+        pg_superuser = connecter.is_pg_superuser()
+        if not pg_superuser:
+            connecter.cursor.execute(Queries.GET_PG_DB_SOME_DATA,
+                                     (replicator.original_dbname, ))
+            db = connecter.cursor.fetchone()
+            if db['owner'] != connecter.user:
+                self.logger.stop_exe(Messenger.ACTION_DB_NO_SUPERUSER)
+
         # Terminate every connection to the database which is going to be
         # replicated, if necessary
         if self.args.terminate:
             terminator = Terminator(connecter,
                                     target_dbs=replicator.original_dbname,
                                     logger=self.logger)
-            terminator.terminate_backend_dbs()
+            terminator.terminate_backend_dbs(replicator.original_dbname)
 
         # Clone the database
         replicator.replicate_pg_db()
@@ -866,9 +895,16 @@ class Orchestrator:
         connecter = self.get_connecter()
 
         if self.args.cluster:  # Restore a cluster (must be created first)
-            restorer = self.get_cl_restorer(connecter)
-            self.logger.debug(Messenger.BEGINNING_EXE_CL_RESTORER)
-            restorer.restore_cluster_backup()
+            # Check if the role of user connected to PostgreSQL is
+            # superuser
+            pg_superuser = connecter.is_pg_superuser()
+            if pg_superuser:
+                restorer = self.get_cl_restorer(connecter)
+                self.logger.debug(Messenger.BEGINNING_EXE_CL_RESTORER)
+                restorer.restore_cluster_backup()
+            else:
+                self.logger.stop_exe(Messenger.ACTION_NO_SUPERUSER)
+
         else:  # Restore a database
             restorer = self.get_db_restorer(connecter)
             self.logger.debug(Messenger.BEGINNING_EXE_DB_RESTORER)
@@ -887,12 +923,55 @@ class Orchestrator:
         self.logger.debug(Messenger.BEGINNING_EXE_TERMINATOR)
         terminator = self.get_terminator(connecter)
 
-        if terminator.target_all:  # Terminate all connections
-            terminator.terminate_backend_all()
-        elif terminator.target_dbs:  # Terminate connections to some databases
-            terminator.terminate_backend_dbs()
-        elif terminator.target_user:  # Terminate connections of a user
-            terminator.terminate_backend_user()
+        if terminator.target_all:
+            # Check if the role of user connected to PostgreSQL is
+            # superuser
+            pg_superuser = connecter.is_pg_superuser()
+            if pg_superuser:
+                # Terminate all connections
+                terminator.terminate_backend_all()
+            else:
+                self.logger.stop_exe(Messenger.ACTION_NO_SUPERUSER)
+
+        elif terminator.target_dbs:
+            # Check if the role of user connected to PostgreSQL is
+            # superuser
+            pg_superuser = connecter.is_pg_superuser()
+            if not pg_superuser:
+                # Users who are not superusers will only be able to
+                # terminate the connections to the databases they own
+                owner = connecter.user
+                self.logger.highlight('warning',
+                                      Messenger.ACTION_DB_NO_SUPERUSER,
+                                      'yellow', effect='bold')
+            else:
+                owner = ''
+
+            # Get PostgreSQL databases' names, connection permissions and
+            # owners
+            dbs_all = connecter.get_pg_dbs_data(ex_templates=False,
+                                                db_owner=owner)
+            # Show and log their names
+            Orchestrator.show_dbs(dbs_all, self.logger)
+
+            # Get the target databases in a list
+            ter_list = DbSelector.get_filtered_dbs(
+                dbs_all=dbs_all, in_dbs=terminator.target_dbs,
+                logger=self.logger)
+
+            # Terminate connections to some databases
+            terminator.terminate_backend_dbs(ter_list)
+
+        elif terminator.target_user:
+            # Check if the role of user connected to PostgreSQL is
+            # superuser
+            pg_superuser = connecter.is_pg_superuser()
+            if pg_superuser:
+                # Terminate connections of a user
+                terminator.terminate_backend_user()
+            else:
+                self.logger.stop_exe(Messenger.ACTION_NO_SUPERUSER)
+
         else:
             pass
 
@@ -955,12 +1034,12 @@ class Orchestrator:
 
             # Get PostgreSQL databases' names, connection permissions and
             # owners
-            trimmer.connecter.get_cursor_dbs(False)
+            dbs = trimmer.connecter.get_pg_dbs_data(False)
 
             # On the one hand, store their names in a list
             pg_dbs = []
-            for record in trimmer.connecter.cursor:
-                pg_dbs.append(record['datname'])
+            for db in dbs:
+                pg_dbs.append(db['datname'])
 
             # On the other hand, store the databases' names which have a backup
             # in the specified directory
@@ -991,9 +1070,9 @@ class Orchestrator:
             self.logger.warning(Messenger.ACTION_DB_NO_SUPERUSER)
 
         # Get PostgreSQL databases' names, connection permissions and owners
-        connecter.get_cursor_dbs(vacuumer.ex_templates, vacuumer.db_owner)
-        # Get their names in a list
-        dbs_all = DbSelector.list_pg_dbs(connecter.cursor)
+        dbs_all = connecter.get_pg_dbs_data(vacuumer.ex_templates,
+                                            vacuumer.db_owner)
+
         # Show and log their names
         Orchestrator.show_dbs(dbs_all, self.logger)
 
@@ -1006,7 +1085,7 @@ class Orchestrator:
         if self.args.terminate:
             terminator = Terminator(connecter, target_dbs=vacuum_list,
                                     logger=self.logger)
-            terminator.terminate_backend_dbs()
+            terminator.terminate_backend_dbs(vacuum_list)
 
         # Vacuum the target databases
         vacuumer.vacuum_dbs(vacuum_list)

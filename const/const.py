@@ -220,9 +220,12 @@ class Messenger:
     TERMINATOR_ARGS_ERROR = 'insufficient parameters to work - [-C/--config ' \
                             '| -a/--all | -d/--db-name | -u/--user] must be ' \
                             'specified'
-    TRIMMER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
-                         '(-f/--bkp-folder & (-d/--db-name | ' \
-                         '-c/--cluster))] must be specified'
+    TRIMMER_ARGS_ERROR_1 = 'insufficient parameters to work - [-C/--config ' \
+                           '| (-f/--bkp-folder & (-d/--db-name | ' \
+                           '-c/--cluster))] must be specified'
+    TRIMMER_ARGS_ERROR_2 = 'insufficient parameters to work - ' \
+                           '[-n/--n-backups & -e/--expiry-days] must be ' \
+                           'specified'
     TRIMMER_CONNECTION_ARGS_ERROR = 'connection parameters no needed to ' \
                                     'work with clusters\' trimmer'
     VACUUMER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config ' \
@@ -308,6 +311,9 @@ class Messenger:
     ACTION_CL_NO_SUPERUSER = 'El usuario especificado para la conexión a ' \
                              'PostgreSQL no tiene rol de superusuario: no ' \
                              'puede actuar sobre el clúster de bases de datos.'
+    ACTION_NO_SUPERUSER = 'El usuario especificado para la conexión a ' \
+                          'PostgreSQL no tiene rol de superusuario: no ' \
+                          'puede realizar la operación especificada.'
     DIR_DOES_NOT_EXIST = 'El directorio especificado en el archivo de ' \
                          'configuración no existe.'
     NO_FILE_IN_DIR = 'El directorio especificado en el archivo de ' \
@@ -323,9 +329,13 @@ class Messenger:
                               'base de datos.'
     REASSIGN_PG_DB_TBLS_OWNER_FAIL = 'No fue posible cambiar el propietario ' \
                                      'de las tablas de la base de datos.'
-    PROCESSING_ALTERER = 'Modificando propietario de la base de datos y de ' \
-                         'aquéllas de sus tablas cuyo propietario es ' \
-                         '"{old_role}" a "{new_role}"...'
+    DB_OWNED_BY_POSTGRES_NOT_ALLOWED = 'No se permite cambiar el ' \
+                                       'propietario de la base de datos ' \
+                                       'cuando éste es "postgres".'
+    PROCESSING_ALTERER = 'Procesando bases de datos a modificar...'
+    ALTERER_FEEDBACK = 'Modificando propietario de la base de datos y de ' \
+                       'aquéllas de sus tablas cuyo propietario es ' \
+                       '"{old_role}" a "{new_role}"...'
     DB_ALTERER_DONE = 'Cambio de propietario en la base de datos "{dbname}" ' \
                       'completado (Duración del proceso: {diff}).'
     DB_ALTERER_FAIL = 'El cambio de propietario en la base de datos ' \
@@ -406,6 +416,8 @@ class Messenger:
     NO_TERMINATE_PARAMS = 'No se han especificado todos los parámetros ' \
                           'necesarios para la terminación de conexiones a ' \
                           'PostgreSQL.'
+    TERMINATOR_HAS_NOTHING_TO_DO = 'Sin bases de datos en las que terminar ' \
+                                   'conexiones.'
     EMPTY_DB_LIST = 'Ninguna base de datos cumple los parámetros de ' \
                     'configuración especificados: no se realizará ninguna ' \
                     'operación.'
@@ -510,6 +522,8 @@ class Messenger:
                           'que lleva PostgreSQL ejecutándose.'
     GET_PG_DB_DATA = 'Ha ocurrido un problema al recuperar información de ' \
                      'la base de datos "{dbname}" de PostgreSQL.'
+    GET_PG_DBS_DATA = 'Ha ocurrido un problema al recuperar información de ' \
+                      'las bases de datos en PostgreSQL.'
     GET_PG_USER_DATA = 'Ha ocurrido un problema al recuperar información ' \
                        'del usuario "{username}" de PostgreSQL.'
     GET_PG_CONN_DATA = 'Ha ocurrido un problema al recuperar información ' \
@@ -684,6 +698,8 @@ class Messenger:
     ANALIZING_PG_DATA = 'Analizando datos en PostgreSQL...'
     DETECTED_DB = 'Detectada base de datos: "{dbname}".'
     DB_DOES_NOT_EXIST = 'La base de datos "{dbname}" no existe en PostgreSQL.'
+    DB_DOES_NOT_ALLOW_CONN = 'La base de datos "{dbname}" no admite ' \
+                             'conexiones.'
     USER_DOES_NOT_EXIST = 'El usuario "{user}" no existe en PostgreSQL.'
     NO_CONNECTION_DATABASE = 'No se ha especificado una base de datos de ' \
                              'PostgreSQL a la que conectarse.'
@@ -775,16 +791,19 @@ class Queries:
         'SELECT datname '
         'FROM pg_database;'
     )
+    GET_PG_DB_DATALLOWCONN = (
+        "SELECT datallowconn "
+        "FROM pg_database "
+        "WHERE datname = (%s);"
+    )
     GET_PG_DBS = (
-        'SELECT d.datname, d.datallowconn, '
-        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-        'FROM pg_catalog.pg_database d;'
+        'SELECT datname, pg_get_userbyid(datdba) as owner, datallowconn '
+        'FROM pg_database;'
     )
     GET_PG_DBS_BY_OWNER = (
-        'SELECT d.datname, d.datallowconn, '
-        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-        'FROM pg_catalog.pg_database d '
-        'WHERE pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
+        'SELECT datname, pg_get_userbyid(datdba) as owner, datallowconn '
+        'FROM pg_database '
+        'WHERE pg_get_userbyid(datdba) = (%s);'
     )
     GET_PG_NO_TEMPLATE_DBNAMES = (
         'SELECT datname '
@@ -792,17 +811,15 @@ class Queries:
         'WHERE not datistemplate;'
     )
     GET_PG_NO_TEMPLATE_DBS = (
-        'SELECT d.datname, d.datallowconn, '
-        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-        'FROM pg_catalog.pg_database d '
+        'SELECT datname, pg_get_userbyid(datdba) as owner, datallowconn '
+        'FROM pg_database '
         'WHERE not datistemplate;'
     )
     GET_PG_NO_TEMPLATE_DBS_BY_OWNER = (
-        'SELECT d.datname, d.datallowconn, '
-        'pg_catalog.pg_get_userbyid(d.datdba) as owner '
-        'FROM pg_catalog.pg_database d '
+        'SELECT datname, pg_get_userbyid(datdba) as owner, datallowconn '
+        'FROM pg_database '
         'WHERE not datistemplate '
-        'AND pg_catalog.pg_get_userbyid(d.datdba) = (%s);'
+        'AND pg_get_userbyid(datdba) = (%s);'
     )
     GET_PG_DB_DATA = (
         'SELECT datname, pg_get_userbyid(datdba) as owner, '
@@ -810,6 +827,11 @@ class Queries:
         'datistemplate, datallowconn, datconnlimit, datlastsysoid, '
         'datfrozenxid, dattablespace, datacl, '
         'pg_size_pretty(pg_database_size(datname)) as size '
+        'FROM pg_database '
+        'WHERE datname = (%s);'
+    )
+    GET_PG_DB_SOME_DATA = (
+        'SELECT datname, pg_get_userbyid(datdba) as owner, datallowconn '
         'FROM pg_database '
         'WHERE datname = (%s);'
     )

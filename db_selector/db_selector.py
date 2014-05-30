@@ -38,7 +38,7 @@ class DbSelector:
 
         if in_regex:
             for db in dbs_list:
-                dbname = db['name']
+                dbname = db['datname']
                 # If database's name is in the inclusion list or matches the
                 # regular expression...
                 if dbname in in_dbs or re.match(in_regex, dbname):
@@ -46,7 +46,7 @@ class DbSelector:
                     logger.debug('Base de datos incluida: {}'.format(dbname))
         else:
             for db in dbs_list:
-                dbname = db['name']
+                dbname = db['datname']
                 # If database's name is in the inclusion list...
                 if dbname in in_dbs:
                     dbs_filtered.append(db)  # Add database to the list
@@ -81,7 +81,7 @@ class DbSelector:
 
         if ex_regex:
             for db in dbs_list:
-                dbname = db['name']
+                dbname = db['datname']
                 # If database's name is in the exclusion list or matches the
                 # regular expression...
                 if dbname in ex_dbs or re.match(ex_regex, dbname):
@@ -90,7 +90,7 @@ class DbSelector:
                     logger.debug('Base de datos excluida: {}'.format(dbname))
         else:
             for db in dbs_list:
-                dbname = db['name']
+                dbname = db['datname']
                 # If database's name is in the exclusion list...
                 if dbname in ex_dbs:
                     # Remove database from the list
@@ -144,7 +144,7 @@ class DbSelector:
             logger.highlight('warning', Messenger.EMPTY_DB_LIST, 'yellow')
         else:
             for db in bkp_list:
-                logger.info(Messenger.SELECTED_DB.format(dbname=db['name']))
+                logger.info(Messenger.SELECTED_DB.format(dbname=db['datname']))
 
         return bkp_list
 
@@ -279,43 +279,3 @@ class DbSelector:
             for dbname in bkp_list:
                 logger.info(Messenger.SELECTED_DB.format(dbname=dbname))
         return bkp_list
-
-    @staticmethod
-    def list_pg_dbs(cursor):
-        '''
-        Target:
-            - turns a cursor's data into a list.
-        Parameters:
-            - cursor: a connection cursor with data stored.
-        Return:
-            - a list with dictionaries which have databases' name, connection
-              permissions and their owner stored.
-        '''
-        dbs_all = []
-
-        for record in cursor:
-            dictionary = {
-                'name': record['datname'],
-                'allow_connection': record['datallowconn'],
-                'owner': record['owner'],
-            }
-            dbs_all.append(dictionary)  # Add database info to list
-
-        return dbs_all
-
-    @staticmethod
-    def list_pg_dbnames(cursor):
-        '''
-        Target:
-            - turns a cursor's data into a list.
-        Parameters:
-            - cursor: a connection cursor with data stored.
-        Return:
-            - a list with databases' name.
-        '''
-        dbs_all = []
-
-        for record in cursor:
-            dbs_all.append(record['datname'])  # Add database's name to list
-
-        return dbs_all

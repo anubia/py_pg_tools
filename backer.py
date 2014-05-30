@@ -9,7 +9,6 @@ from checker.checker import Checker
 from const.const import Default
 from const.const import Messenger
 from date_tools.date_tools import DateTools
-from db_selector.db_selector import DbSelector
 from dir_tools.dir_tools import Dir
 from logger.logger import Logger
 from vacuumer import Vacuumer
@@ -206,12 +205,12 @@ class Backer:
         if dbs_all:
             for db in dbs_all:
 
-                dbname = db['name']
+                dbname = db['datname']
                 message = Messenger.PROCESSING_DB.format(dbname=dbname)
                 self.logger.highlight('info', message, 'cyan')
 
                 # Let the user know whether the database connection is allowed
-                if not db['allow_connection']:
+                if not db['datallowconn']:
                     message = Messenger.FORBIDDEN_DB_CONNECTION.format(
                         dbname=dbname)
                     self.logger.highlight('warning', message, 'yellow',
@@ -400,9 +399,8 @@ class BackerCluster:
         # Vaccum the databases before the backup process if necessary
         if self.vacuum:
             vacuumer = Vacuumer(connecter=self.connecter, logger=self.logger)
-            vacuumer.connecter.get_cursor_dbs(vacuumer.ex_templates,
-                                              vacuumer.db_owner)
-            dbs_all = DbSelector.list_pg_dbs(self.connecter.cursor)
+            dbs_all = vacuumer.connecter.get_pg_dbs_data(vacuumer.ex_templates,
+                                                         vacuumer.db_owner)
             vacuumer.vacuum_dbs(dbs_all)
 
         self.logger.highlight('info', Messenger.BEGINNING_CL_BACKER, 'white')

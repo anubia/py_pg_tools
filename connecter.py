@@ -191,7 +191,7 @@ class Connecter:
                                   'yellow')
             return None
 
-    def get_cursor_dbs(self, ex_templates=True, db_owner=''):
+    def get_pg_dbs_data(self, ex_templates=True, db_owner=''):
         '''
         Target:
             - do different queries to PostgreSQL depending on the parameters
@@ -201,19 +201,37 @@ class Connecter:
               databases which are templates.
             - db_owner: the name of the user whose databases are going to be
               obtained.
+        Return:
+            - a list with the PostgreSQL databases and their names,
+              datallowconn and owners.
         '''
-        # Get all databases (no templates) of a specific owner
-        if db_owner and ex_templates:
-            self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS_BY_OWNER,
-                                (db_owner, ))
-        # Get all databases (templates too) of a specific owner
-        elif db_owner and ex_templates is False:
-            self.cursor.execute(Queries.GET_PG_DBS_BY_OWNER, (db_owner, ))
-        # Get all databases (no templates)
-        elif not db_owner and ex_templates is False:
-            self.cursor.execute(Queries.GET_PG_DBS)
-        else:  # Get all databases (templates too)
-            self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS)
+        try:
+            # Get all databases (no templates) of a specific owner
+            if db_owner and ex_templates:
+                self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS_BY_OWNER,
+                                    (db_owner, ))
+            # Get all databases (templates too) of a specific owner
+            elif db_owner and ex_templates is False:
+                self.cursor.execute(Queries.GET_PG_DBS_BY_OWNER, (db_owner, ))
+            # Get all databases (no templates)
+            elif not db_owner and ex_templates is False:
+                self.cursor.execute(Queries.GET_PG_DBS)
+            else:  # Get all databases (templates too)
+                self.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS)
+
+            dbs = self.cursor.fetchall()
+
+        except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
+            self.logger.debug('Error en la función "get_pg_dbs_data": '
+                              '{}.'.format(str(e)))
+            message = Messenger.GET_PG_DBS_DATA
+            self.logger.highlight('warning', message, 'yellow')
+            dbs = None
+
+        return dbs
 
     def get_pg_db_data(self, dbname):
         '''
@@ -221,7 +239,7 @@ class Connecter:
             - show some info about a specified database.
         Parameters:
             - dbname: name of the database whose information is going to be
-              shown.
+              gattered.
         '''
 
         try:
@@ -243,10 +261,10 @@ class Connecter:
     def get_pg_user_data(self, username):
         '''
         Target:
-            - show some info about a specified user.
+            - get some info about a specified user.
         Parameters:
             - username: name of the user whose information is going to be
-              shown.
+              gattered.
         '''
         try:
             pg_version = self.get_pg_version()  # Get PostgreSQL version

@@ -461,7 +461,8 @@ if __name__ == '__main__':
                 (args.db_name and args.old_role and args.new_role)):
             alterer.error(Messenger.ALTERER_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             alterer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************** BACKER REQUIREMENTS **************************
@@ -470,7 +471,8 @@ if __name__ == '__main__':
         if not (args.config or args.db_name or args.cluster):
             backer.error(Messenger.BACKER_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             backer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************** DROPPER REQUIREMENTS *************************
@@ -479,7 +481,8 @@ if __name__ == '__main__':
         if not (args.config or args.db_name):
             dropper.error(Messenger.DROPPER_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             dropper.dropper(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************* INFORMER REQUIREMENTS *************************
@@ -494,7 +497,8 @@ if __name__ == '__main__':
                          or args.time_start or args.time_up):
             informer.error(Messenger.INFORMER_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             informer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ****************************** REPLICATOR *******************************
@@ -503,7 +507,8 @@ if __name__ == '__main__':
         if not (args.config or args.db_name):
             replicator.error(Messenger.REPLICATOR_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             replicator.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ******************************* RESTORER ********************************
@@ -513,7 +518,8 @@ if __name__ == '__main__':
                 (args.cluster and args.cluster_backup)):
             restorer.error(Messenger.RESTORER_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             restorer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************ TERMINATOR REQUIREMENTS ************************
@@ -522,7 +528,8 @@ if __name__ == '__main__':
         if not (args.config or args.all or args.db_name or args.user):
             terminator.error(Messenger.TERMINATOR_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             terminator.error(Messenger.CONNECTION_ARGS_ERROR)
 
     # ************************** TRIMMER REQUIREMENTS *************************
@@ -530,10 +537,15 @@ if __name__ == '__main__':
     elif action == 'T':
         if not (args.config or
                 ((args.db_name or args.cluster) and args.bkp_folder)):
-            trimmer.error(Messenger.TRIMMER_ARGS_ERROR)
+            trimmer.error(Messenger.TRIMMER_ARGS_ERROR_1)
+        if not (args.config or
+                (isinstance(args.n_backups, int) and
+                 isinstance(args.expiry_days, int))):
+            trimmer.error(Messenger.TRIMMER_ARGS_ERROR_2)
         if not args.cluster and not \
             (args.config_connection or
-             (args.pg_host and args.pg_port and args.pg_user)):
+             (args.pg_host and isinstance(args.pg_port, int)
+              and args.pg_user)):
             trimmer.error(Messenger.CONNECTION_ARGS_ERROR)
         if args.cluster and (args.config_connection or args.pg_host
                              or args.pg_port or args.pg_user):
@@ -545,7 +557,8 @@ if __name__ == '__main__':
         if not (args.config or args.db_name):
             vacuumer.error(Messenger.VACUUMER_ARGS_ERROR)
         if not (args.config_connection or
-                (args.pg_host and args.pg_port and args.pg_user)):
+                (args.pg_host and isinstance(args.pg_port, int)
+                 and args.pg_user)):
             vacuumer.error(Messenger.CONNECTION_ARGS_ERROR)
 
     else:
