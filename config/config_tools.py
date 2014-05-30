@@ -110,6 +110,24 @@ class CfgParser:
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CONNECTER_CFG_DAMAGED)
 
+    def parse_alterer(self):
+        '''
+        Target:
+            - get the alterer variables from a configuration file and store
+              them in a dictionary.
+        '''
+        try:
+            self.bkp_vars = {
+                'in_dbs': self.cfg.get('settings', 'in_dbs'),
+                'old_role': self.cfg.get('settings', 'old_role'),
+                'new_role': self.cfg.get('settings', 'new_role'),
+            }
+
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_alterer": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe(Messenger.ALTERER_CFG_DAMAGED)
+
     def parse_backer(self):
         '''
         Target:

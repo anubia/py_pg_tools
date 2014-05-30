@@ -47,6 +47,46 @@ if __name__ == '__main__':
 
     sub_parsers = arg_parser.add_subparsers()
 
+    # ******************************** ALTERER ********************************
+
+    alterer = sub_parsers.add_parser('a', help=Messenger.ALTERER_HELP)
+
+    alterer.add_argument('-cC', '--config-connection',
+                         help=Messenger.CONFIG_CONNECTION_HELP)
+
+    alterer.add_argument('-ch', '--pg-host', help=Messenger.HOST_HELP)
+
+    alterer.add_argument('-cp', '--pg-port', type=int,
+                         help=Messenger.PORT_HELP)
+
+    alterer.add_argument('-cu', '--pg-user', help=Messenger.USER_HELP)
+
+    alterer.add_argument('-C', '--config', help=Messenger.A_CONFIG_HELP)
+
+    alterer.add_argument('-d', '--db-name', nargs='+',
+                         help=Messenger.A_DB_NAME_HELP)
+
+    alterer.add_argument('-o', '--old-role', help=Messenger.A_OLD_ROLE_HELP)
+
+    alterer.add_argument('-n', '--new-role', help=Messenger.A_NEW_ROLE_HELP)
+
+    alterer.add_argument('-t', '--terminate', action='store_true',
+                         help=Messenger.A_TERMINATE_HELP)
+
+    alterer.add_argument('-Lc', '--config-logger',
+                         help=Messenger.CONFIG_LOGGER_HELP)
+
+    alterer.add_argument('-Lf', '--logger-logfile',
+                         help=Messenger.LOGGER_LOGFILE_HELP)
+
+    alterer.add_argument('-Ll', '--logger-level',
+                         help=Messenger.LOGGER_LEVEL_HELP,
+                         choices=['debug', 'info', 'warning', 'error',
+                                  'critical'])
+
+    alterer.add_argument('-Lm', '--logger-mute', action='store_true',
+                         help=Messenger.LOGGER_MUTE_HELP)
+
     # ******************************** BACKER *********************************
 
     backer = sub_parsers.add_parser('B', help=Messenger.BACKER_HELP)
@@ -414,9 +454,19 @@ if __name__ == '__main__':
     elif ('-v' in sys.argv or '--version' in sys.argv) and len(sys.argv) > 2:
         arg_parser.error(Messenger.PROGRAM_VERSION_ARGS_ERROR)
 
+    # ************************** ALTERER REQUIREMENTS *************************
+
+    if action == 'a':
+        if not (args.config or
+                (args.db_name and args.old_role and args.new_role)):
+            alterer.error(Messenger.ALTERER_ARGS_ERROR)
+        if not (args.config_connection or
+                (args.pg_host and args.pg_port and args.pg_user)):
+            alterer.error(Messenger.CONNECTION_ARGS_ERROR)
+
     # ************************** BACKER REQUIREMENTS **************************
 
-    if action == 'B':
+    elif action == 'B':
         if not (args.config or args.db_name or args.cluster):
             backer.error(Messenger.BACKER_ARGS_ERROR)
         if not (args.config_connection or

@@ -7,6 +7,7 @@ import psycopg2.extras  # To get real field names from PostgreSQL
 
 from casting.casting import Casting
 from checker.checker import Checker
+from const.const import Default
 from const.const import Messenger
 from const.const import Queries
 from logger.logger import Logger
@@ -22,6 +23,7 @@ class Connecter:
     server = None  # The target host of the connection
     user = None  # The PostgreSQL user who makes the connection
     port = None  # The target port of the connection
+    database = None  # The target database of the connection
     logger = None  # A logger to show and log some messages
 
     # PostgreSQL version (from this one on some variables change their names)
@@ -29,7 +31,7 @@ class Connecter:
     pg_pid_91 = 'procpid'  # Name for PostgreSQL PID variable till version 9.1
     pg_pid_92 = 'pid'  # Name for PostgreSQL PID variable since version 9.2
 
-    def __init__(self, server, user, port, logger=None):
+    def __init__(self, server, user, port, database=None, logger=None):
 
         if logger:
             self.logger = logger
@@ -47,10 +49,17 @@ class Connecter:
         else:
             self.logger.stop_exe(Messenger.INVALID_PORT)
 
+        if database is None:
+            self.database = Default.CONNECTION_DATABASE
+        elif database:
+            self.database = database
+        else:
+            self.logger.stop_exe(Messenger.NO_CONNECTION_DATABASE)
+
         try:
-            self.conn = psycopg2.connect(host=self.server,
-                                         database='postgres', user=self.user,
-                                         port=self.port)
+            self.conn = psycopg2.connect(host=self.server, user=self.user,
+                                         port=self.port,
+                                         database=self.database)
             self.conn.autocommit = True
             # TODO: añadir argumento password a psycopg2.connect en caso de que
             # en futuro se quisiese añadir la opción de introducir contraseña

@@ -30,6 +30,23 @@ class Messenger:
                         'version, the repository where you can download ' \
                         'it, the author and the year when it was created)'
 
+    ALTERER_HELP = 'ALTERER: changes the owner of a specified group of ' \
+                   'PostgreSQL databases'
+
+    A_CONFIG_HELP = 'load a configuration file (.cfg) to get the alterer ' \
+                    'conditions'
+
+    A_DB_NAME_HELP = 'specify the name/s of the PostgreSQL database/s ' \
+                     'whose owner/s are going to be changed'
+
+    A_OLD_ROLE_HELP = 'specify the old owner of the PostgreSQL database/s ' \
+                      'tables'
+
+    A_NEW_ROLE_HELP = 'specify the new owner of the PostgreSQL database/s'
+
+    A_TERMINATE_HELP = 'terminate every connection (except yours) to each ' \
+                       'database which is going to be altered'
+
     BACKER_HELP = 'BACKER: makes a backup of a PostgreSQL cluster or a ' \
                   'specified group of databases'
     B_CONFIG_HELP = 'load a configuration file (.cfg) to get the backer ' \
@@ -181,6 +198,9 @@ class Messenger:
                               '[-i/--info]'
     PROGRAM_VERSION_ARGS_ERROR = 'cannot specify more parameters when using ' \
                                  '[-v/--version]'
+    ALTERER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
+                         '-d/--db-name | -o/--old-role | -n/--new-role] ' \
+                         'must be specified'
     BACKER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
                         '-d/--db-name | -c/--cluster] must be specified'
     DROPPER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
@@ -211,6 +231,7 @@ class Messenger:
                             '[-cC/--config-connection | (-ch/--host & ' \
                             '-cp/--port & -cu/--user)] must be specified'
 
+    BEGINNING_EXE_ALTERER = 'INICIANDO EJECUCIÓN DE ALTERER'
     BEGINNING_EXE_DB_BACKER = 'INICIANDO EJECUCIÓN DE BACKER (BASES DE DATOS)'
     BEGINNING_EXE_CL_BACKER = 'INICIANDO EJECUCIÓN DE BACKER (CLÚSTER)'
     BEGINNING_EXE_DROPPER = 'INICIANDO EJECUCIÓN DE DROPPER'
@@ -231,6 +252,10 @@ class Messenger:
                          'el argumento -t o terminando directamente los ' \
                          'procesos mencionados.'
 
+    ALTERER_VARS_INTRO = 'VARIABLES DE ALTERER:'
+    ALTERER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
+                   'IN_DBS: {in_dbs}, OLD_ROLE: {old_role}, NEW_ROLE: ' \
+                   '{new_role}.'
     DB_BACKER_VARS_INTRO = 'VARIABLES DE BACKER (BASE DE DATOS):'
     DB_BACKER_VARS = 'SERVER: {server}, USER: {user}, PORT: {port}, ' \
                      'BKP_PATH: {bkp_path}, GROUP: {group}, BKP_TYPE: ' \
@@ -290,6 +315,23 @@ class Messenger:
     NO_BACKUP_IN_DIR = 'El directorio especificado en el archivo de ' \
                        'configuración no contiene copias de seguridad ' \
                        'cuyos nombres sigan el patrón del programa.'
+    NO_OLD_ROLE = 'No se ha especificado el antiguo propietario de las ' \
+                  'bases de datos a cambiar.'
+    NO_NEW_ROLE = 'No se ha especificado el nuevo propietario de las bases ' \
+                  'de datos a cambiar.'
+    CHANGE_PG_DB_OWNER_FAIL = 'No fue posible cambiar el propietario de la ' \
+                              'base de datos.'
+    REASSIGN_PG_DB_TBLS_OWNER_FAIL = 'No fue posible cambiar el propietario ' \
+                                     'de las tablas de la base de datos.'
+    PROCESSING_ALTERER = 'Modificando propietario de la base de datos y de ' \
+                         'aquéllas de sus tablas cuyo propietario es ' \
+                         '"{old_role}" a "{new_role}"...'
+    DB_ALTERER_DONE = 'Cambio de propietario en la base de datos "{dbname}" ' \
+                      'completado (Duración del proceso: {diff}).'
+    DB_ALTERER_FAIL = 'El cambio de propietario en la base de datos ' \
+                      '"{dbname}" no se pudo completar.'
+    ALTERER_HAS_NOTHING_TO_DO = 'Sin bases de datos a alterar.'
+    ALTERER_DONE = 'Fin del proceso Alterer.'
     BEGINNING_DB_TRIMMER = 'Iniciando limpieza de copias de seguridad de la ' \
                            'base de datos "{dbname}"...'
     DELETING_OBSOLETE_BACKUP = 'Copia de seguridad obsoleta: eliminando el ' \
@@ -313,11 +355,13 @@ class Messenger:
                             '({size} {unit}).'
     CL_TRIMMER_DONE = 'Limpieza de copias de seguridad del clúster del ' \
                       'servidor completada (Duración del proceso: {diff}).'
+    TRIMMER_DONE = 'Fin del proceso Trimmer.'
     NO_CONNECTION_PARAMS = 'No se han especificado todos los parámetros ' \
                            'necesarios para la conexión a PostgreSQL.'
     CHECKING_BACKUP_DIR = 'Comprobando directorio de destino de las copias... '
     DESTINY_DIR = 'Directorio de destino: "{path}".'
-    PROCESSING_DUMPER = 'Procesando copias de seguridad a realizar...'
+    PROCESSING_DB_BACKER = 'Procesando copias de seguridad a realizar...'
+    BACKER_HAS_NOTHING_TO_DO = 'Sin copias de seguridad a realizar.'
     ALLOWING_DB_CONN = 'Habilitando conexiones a la base de datos...'
     DISALLOWING_DB_CONN = 'Deshabilitando conexiones a la base de datos...'
     PROCESSING_DB = 'Base de datos: "{dbname}".'
@@ -333,15 +377,15 @@ class Messenger:
                      'completada (Duración del proceso: {diff}).'
     DB_BACKER_FAIL = 'La copia de seguridad de la base de datos "{dbname}" ' \
                      'no se pudo completar.'
-    DBS_BACKER_DONE = 'Copias de seguridad finalizadas.'
-    BEGINNING_CL_BACKER = 'Iniciando copia de seguridad de del clúster de ' \
+    BACKER_DONE = 'Fin del proceso Backer.'
+    BEGINNING_CL_BACKER = 'Iniciando copia de seguridad del clúster de ' \
                           'bases de datos...'
     CL_BACKER_DONE = 'Copia de seguridad del clúster de bases de datos ' \
                      'completada (Duración del proceso: {diff}).'
     CL_BACKER_FAIL = 'La copia de seguridad del clúster de bases de datos ' \
                      'no se pudo completar.'
     BEGINNING_VACUUMER = 'Iniciando limpieza de bases de datos...'
-    VACUUMER_DONE = 'Limpieza de bases de datos completada.'
+    VACUUMER_DONE = 'Fin del proceso Vacuumer.'
     VACUUMER_FAIL = 'La limpieza de bases de datos no se pudo completar.'
     DB_VACUUMER_DONE = 'Limpieza de la base de datos "{dbname}" completada ' \
                        '(Duración del proceso: {diff}).'
@@ -349,11 +393,10 @@ class Messenger:
                        'pudo completar.'
     TERMINATE_USER_CONN_DONE = 'Conexiones del usuario "{target_user}" a ' \
                                'PostgreSQL terminadas.'
-    TERMINATE_DB_CONN_DONE = 'Conexiones a la bases de datos ' \
+    TERMINATE_DB_CONN_DONE = 'Conexiones a la base de datos ' \
                              '"{target_dbname}" terminadas.'
-    TERMINATE_DBS_CONN_DONE = 'Conexiones a las bases de datos de ' \
-                              'PostgreSQL especificadas terminadas.'
-    TERMINATE_ALL_CONN_DONE = 'Conexiones a PostgreSQL terminadas con éxito.'
+    TERMINATE_ALL_CONN_DONE = 'Conexiones a PostgreSQL terminadas.'
+    TERMINATOR_DONE = 'Fin del proceso Terminator.'
     TERMINATE_USER_CONN_FAIL = 'No fue posible terminar las conexiones del ' \
                                'usuario "{target_user}" a PostgreSQL.'
     TERMINATE_DB_CONN_FAIL = 'No fue posible terminar las conexiones a la ' \
@@ -489,6 +532,7 @@ class Messenger:
                         '(Duración del proceso: {diff}).'
     REPLICATE_DB_FAIL = 'No fue posible copiar la base de datos ' \
                         'especificada de PostgreSQL.'
+    REPLICATOR_DONE = 'Fin del proceso Replicator.'
     NO_DBS_TO_DROP = 'No se ha especificado ninguna base de datos para ' \
                      'eliminar en PostgreSQL.'
     BEGINNING_DROPPER = 'Eliminando bases de datos especificadas en ' \
@@ -496,7 +540,7 @@ class Messenger:
     DROP_DB_DONE = 'Eliminada base de datos "{dbname}" (Duración del ' \
                    'proceso: {diff}).'
     DROP_DB_FAIL = 'La base de datos "{dbname}" no se pudo eliminar.'
-    DROP_DBS_DONE = 'Bases de datos especificadas eliminadas en PostgreSQL.'
+    DROP_DBS_DONE = 'Fin del proceso Dropper.'
     NO_BKP_TO_RESTORE = 'El archivo especificado que contiene la copia a ' \
                         'restaurar no existe.'
     NO_DBNAME_TO_RESTORE = 'No se ha especificado un nombre para la nueva ' \
@@ -509,6 +553,7 @@ class Messenger:
     RESTORE_DB_DONE = 'Restaurada con éxito la copia "{db_backup}" en ' \
                       'PostgreSQL con el nombre "{new_dbname}" (Duración ' \
                       'del proceso: {diff}).'
+    RESTORER_DONE = 'Fin del proceso Restorer.'
     RESTORE_DB_FAIL = 'No fue posible restaurar la copia "{db_backup}" ' \
                       'especificada de PostgreSQL con el nombre ' \
                       '"{new_dbname}".'
@@ -556,6 +601,11 @@ class Messenger:
                             'de la conexión a PostgreSQL está dañado. Por ' \
                             'favor, revise que los nombres por defecto de ' \
                             'secciones y atributos son correctos.'
+    ALTERER_CFG_DAMAGED = 'El archivo de configuración con las condiciones ' \
+                          'para el cambio de propietario de bases de datos ' \
+                          'en PostgreSQL está dañado. Por favor, revise que ' \
+                          'los nombres por defecto de secciones y atributos ' \
+                          'son correctos.'
     DB_BACKER_CFG_DAMAGED = 'El archivo de configuración con las ' \
                             'condiciones para las copias de seguridad de ' \
                             'bases de datos en PostgreSQL está dañado. Por ' \
@@ -633,7 +683,10 @@ class Messenger:
                        'sigue el formato estándar de nombres del programa.'
     ANALIZING_PG_DATA = 'Analizando datos en PostgreSQL...'
     DETECTED_DB = 'Detectada base de datos: "{dbname}".'
-    DB_DOES_NOT_EXIST = 'La base de datos: "{dbname}" no existe en PostgreSQL.'
+    DB_DOES_NOT_EXIST = 'La base de datos "{dbname}" no existe en PostgreSQL.'
+    USER_DOES_NOT_EXIST = 'El usuario "{user}" no existe en PostgreSQL.'
+    NO_CONNECTION_DATABASE = 'No se ha especificado una base de datos de ' \
+                             'PostgreSQL a la que conectarse.'
 
     def __init__(self):
         pass
@@ -647,6 +700,7 @@ class Default:
     DB_BKPS_DIR = '/db_backups/'
     DB_OWNER = ''
     CL_BKPS_DIR = '/cl_backups/'
+    CONNECTION_DATABASE = 'postgres'
     EX_DBS = []
     EX_REGEX = ''
     EX_TEMPLATES = True
@@ -694,6 +748,9 @@ class Queries:
         "FROM pg_stat_activity "
         "WHERE usename = '{target_user}' "
         "AND usename <> CURRENT_USER;"
+    )
+    CHANGE_PG_DB_OWNER = (
+        "ALTER DATABASE {dbname} OWNER TO {new_role};"
     )
     CLONE_PG_DB = (
         'CREATE DATABASE {dbname} '
@@ -804,6 +861,14 @@ class Queries:
         'SELECT 1 '
         'FROM pg_database '
         'WHERE datname=(%s);'
+    )
+    PG_USER_EXISTS = (
+        'SELECT 1 '
+        'FROM pg_user '
+        'WHERE usename=(%s);'
+    )
+    REASSIGN_PG_DB_TBLS_OWNER = (
+        "REASSIGN OWNED BY {old_role} TO {new_role};"
     )
     TERMINATE_BACKEND_PG_ALL = (
         "SELECT pg_terminate_backend({pg_pid}) "

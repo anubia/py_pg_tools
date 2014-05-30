@@ -201,62 +201,69 @@ class Backer:
 
         self.logger.info(Messenger.DESTINY_DIR.format(path=bkps_dir))
 
-        self.logger.highlight('info', Messenger.PROCESSING_DUMPER, 'white')
+        self.logger.highlight('info', Messenger.PROCESSING_DB_BACKER, 'white')
 
-        for db in dbs_all:
+        if dbs_all:
+            for db in dbs_all:
 
-            dbname = db['name']
-            message = Messenger.PROCESSING_DB.format(dbname=dbname)
-            self.logger.highlight('info', message, 'cyan')
+                dbname = db['name']
+                message = Messenger.PROCESSING_DB.format(dbname=dbname)
+                self.logger.highlight('info', message, 'cyan')
 
-            # Let the user know whether the database connection is allowed
-            if not db['allow_connection']:
-                message = Messenger.FORBIDDEN_DB_CONNECTION.format(
-                    dbname=dbname)
-                self.logger.highlight('warning', message, 'yellow',
-                                      effect='bold')
-                success = False
+                # Let the user know whether the database connection is allowed
+                if not db['allow_connection']:
+                    message = Messenger.FORBIDDEN_DB_CONNECTION.format(
+                        dbname=dbname)
+                    self.logger.highlight('warning', message, 'yellow',
+                                          effect='bold')
+                    success = False
 
-            else:
-                # Vaccum the database before the backup process if necessary
-                if self.vacuum:
-                    self.logger.info(Messenger.PRE_VACUUMING_DB.format(
+                else:
+                    # Vaccum the database before the backup process if
+                    # necessary
+                    if self.vacuum:
+                        self.logger.info(Messenger.PRE_VACUUMING_DB.format(
+                            dbname=dbname))
+                        vacuumer = Vacuumer(self.connecter, self.in_dbs,
+                                            self.in_regex, self.in_priority,
+                                            self.ex_dbs, self.ex_regex,
+                                            self.ex_templates, self.db_owner,
+                                            self.logger)
+
+                        # Vacuum the database
+                        success = vacuumer.vacuum_db(dbname)
+                        if success:
+                            message = Messenger.PRE_VACUUMING_DB_DONE.format(
+                                dbname=dbname)
+                            self.logger.info(message)
+                        else:
+                            message = Messenger.PRE_VACUUMING_DB_FAIL.format(
+                                dbname=dbname)
+                            self.logger.highlight('warning', message, 'yellow')
+                    self.logger.info(Messenger.BEGINNING_DB_BACKER.format(
                         dbname=dbname))
-                    vacuumer = Vacuumer(self.connecter, self.in_dbs,
-                                        self.in_regex, self.in_priority,
-                                        self.ex_dbs, self.ex_regex,
-                                        self.ex_templates, self.db_owner,
-                                        self.logger)
 
-                    # Vacuum the database
-                    success = vacuumer.vacuum_db(dbname)
-                    if success:
-                        message = Messenger.PRE_VACUUMING_DB_DONE.format(
-                            dbname=dbname)
-                        self.logger.info(message)
-                    else:
-                        message = Messenger.PRE_VACUUMING_DB_FAIL.format(
-                            dbname=dbname)
-                        self.logger.highlight('warning', message, 'yellow')
-                self.logger.info(Messenger.BEGINNING_DB_BACKER.format(
-                    dbname=dbname))
+                    start_time = DateTools.get_current_datetime()
+                    # Make the backup of the database
+                    success = self.backup_db(dbname, bkps_dir)
+                    end_time = DateTools.get_current_datetime()
+                    # Get and show the process' duration
+                    diff = DateTools.get_diff_datetimes(start_time, end_time)
 
-                start_time = DateTools.get_current_datetime()
-                # Make the backup of the database
-                success = self.backup_db(dbname, bkps_dir)
-                end_time = DateTools.get_current_datetime()
-                # Get and show the process' duration
-                diff = DateTools.get_diff_datetimes(start_time, end_time)
+                if success:
+                    message = Messenger.DB_BACKER_DONE.format(dbname=dbname,
+                                                              diff=diff)
+                    self.logger.highlight('info', message, 'green')
+                else:
+                    message = Messenger.DB_BACKER_FAIL.format(dbname=dbname)
+                    self.logger.highlight('warning', message, 'yellow',
+                                          effect='bold')
+        else:
+            self.logger.highlight('warning',
+                                  Messenger.BACKER_HAS_NOTHING_TO_DO,
+                                  'yellow', effect='bold')
 
-            if success:
-                message = Messenger.DB_BACKER_DONE.format(dbname=dbname,
-                                                          diff=diff)
-                self.logger.highlight('info', message, 'green')
-            else:
-                message = Messenger.DB_BACKER_FAIL.format(dbname=dbname)
-                self.logger.highlight('warning', message, 'yellow',
-                                      effect='bold')
-        self.logger.highlight('info', Messenger.DBS_BACKER_DONE, 'green',
+        self.logger.highlight('info', Messenger.BACKER_DONE, 'green',
                               effect='bold')
 
 
@@ -413,3 +420,6 @@ class BackerCluster:
         else:
             self.logger.highlight('warning', Messenger.CL_BACKER_FAIL,
                                   'yellow', effect='bold')
+
+        self.logger.highlight('info', Messenger.BACKER_DONE, 'green',
+                              effect='bold')

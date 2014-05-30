@@ -6,12 +6,13 @@ import sys
 import os
 sys.path.append(os.path.abspath('.'))
 
-__all__ = ['casting', 'backer', 'checker', 'config',  'configurator',
+__all__ = ['alterer', 'casting', 'backer', 'checker', 'config', 'configurator',
            'connecter', 'const', 'date_tools', 'db_selector', 'dir_tools',
            'dropper', 'informer', 'logger', 'mailer', 'orchestrator',
            'py_pg_tools', 'replicator', 'restorer', 'terminator', 'trimmer',
            'vacuumer']
 
+from . import alterer
 from . import casting
 from . import backer
 from . import checker

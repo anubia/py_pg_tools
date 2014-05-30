@@ -290,6 +290,9 @@ class Trimmer:
         # Remove directories which could be empty after the trim
         Dir.remove_empty_dirs(self.bkp_path)
 
+        self.logger.highlight('info', Messenger.TRIMMER_DONE, 'green',
+                              effect='bold')
+
 
 class TrimmerCluster:
 
@@ -497,3 +500,6 @@ class TrimmerCluster:
         else:
             self.logger.highlight('warning', Messenger.NO_BACKUP_IN_DIR,
                                   'yellow', effect='bold')
+
+        self.logger.highlight('info', Messenger.TRIMMER_DONE, 'green',
+                              effect='bold')

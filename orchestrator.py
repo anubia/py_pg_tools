@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 
+from alterer import Alterer
 from backer import Backer
 from backer import BackerCluster
 from configurator import Configurator
@@ -138,18 +139,82 @@ class Orchestrator:
                 parser.conn_vars['port'] = self.args.pg_port
 
             # Create the connecter with the specified variables
-            connecter = Connecter(parser.conn_vars['server'],
-                                  parser.conn_vars['user'],
-                                  parser.conn_vars['port'], self.logger)
+            connecter = Connecter(server=parser.conn_vars['server'],
+                                  user=parser.conn_vars['user'],
+                                  port=parser.conn_vars['port'],
+                                  logger=self.logger)
 
         # If the user did not specify a connecter config file through console..
         else:
 
             # Create the connecter with the console variables
-            connecter = Connecter(self.args.pg_host, self.args.pg_user,
-                                  self.args.pg_port, self.logger)
+            connecter = Connecter(server=self.args.pg_host,
+                                  user=self.args.pg_user,
+                                  port=self.args.pg_port, logger=self.logger)
 
         return connecter
+
+    def get_alterer(self, connecter):
+        '''
+        Target:
+            - get an alterer object with variables to change owners of some
+              PostgreSQL databases.
+        Parameters:
+            - connecter: an object with connection parameters to connect to
+              PostgreSQL.
+        Return:
+            - an alterer which will change owners of PostgreSQL databases.
+        '''
+        # If the user specified an alterer config file through console...
+        if self.args.config:
+            config_type = 'alter'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.db_name:
+                parser.bkp_vars['in_dbs'] = True
+            elif self.args.old_role:
+                parser.bkp_vars['old_role'] = self.args.old_role
+            elif self.args.new_role:
+                parser.bkp_vars['new_role'] = self.args.new_role
+            else:
+                pass
+
+            # Create the alterer with the specified variables
+            alterer = Alterer(connecter, parser.bkp_vars['in_dbs'],
+                              parser.bkp_vars['old_role'],
+                              parser.bkp_vars['new_role'], self.logger)
+
+        # If the user did not specify an alterer config file through console...
+        else:
+            # Create the alterer with the console variables
+            alterer = Alterer(connecter, self.args.db_name, self.args.old_role,
+                              self.args.new_role, self.logger)
+
+        return alterer
+
+    def setup_alterer(self):
+        '''
+        Target:
+            - change the owner of the specified databases in PostgreSQL.
+        '''
+        connecter = self.get_connecter()
+        self.logger.debug(Messenger.BEGINNING_EXE_ALTERER)
+        alterer = self.get_alterer(connecter)
+
+        # Terminate every connection to the target databases if necessary
+        if self.args.terminate:
+            terminator = Terminator(connecter, target_dbs=alterer.db_name,
+                                    logger=self.logger)
+            terminator.terminate_backend_dbs()
+
+        # Delete the databases
+        alterer.alter_dbs_owner()
+
+        # Close connection to PostgreSQL
+        connecter.pg_disconnect()
 
     def get_db_backer(self, connecter):
         '''
@@ -955,7 +1020,10 @@ class Orchestrator:
             - call the corresponding function to the action stored.
         '''
 
-        if self.action == 'B':  # Call backer
+        if self.action == 'a':  # Call alterer
+            self.setup_alterer()
+
+        elif self.action == 'B':  # Call backer
             self.setup_backer()
 
         elif self.action == 'd':  # Call dropper

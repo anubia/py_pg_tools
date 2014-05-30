@@ -141,8 +141,7 @@ class DbSelector:
         logger.highlight('info', Messenger.SEARCHING_SELECTED_DBS, 'white')
 
         if bkp_list == []:
-            logger.highlight('warning', Messenger.EMPTY_DB_LIST, 'yellow',
-                             effect='bold')
+            logger.highlight('warning', Messenger.EMPTY_DB_LIST, 'yellow')
         else:
             for db in bkp_list:
                 logger.info(Messenger.SELECTED_DB.format(dbname=db['name']))

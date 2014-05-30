@@ -100,6 +100,8 @@ class Replicator:
                 new_dbname=self.new_dbname,
                 original_dbname=self.original_dbname, diff=diff)
             self.logger.highlight('info', message, 'green')
+            self.logger.highlight('info', Messenger.REPLICATOR_DONE, 'green',
+                                  effect='bold')
 
         except Exception as e:
             self.logger.debug('Error en la función "clone_pg_db": '

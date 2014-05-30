@@ -103,17 +103,14 @@ class Terminator:
                 target_user=self.target_user)
             self.logger.highlight('warning', message, 'yellow', effect='bold')
 
+        self.logger.highlight('info', Messenger.TERMINATOR_DONE, 'green')
+
     def terminate_backend_db(self, target_db):
         '''
         Target:
             - terminate every connection to a PostgreSQL database (except the
               current one, if it is connected to the target database).
         '''
-        # TODO: Ojo al tema del DELAY aquí, ver si ponerlo o no, porque cuando
-        # se especifica -t en los argumentos de otra operación, a pesar de
-        # terminar primero las conexiones, la otra operación dice que aún no se
-        # terminaron, y sin embargo si se le vuelve a llamar por consola sí que
-        # están terminadas.
         try:
             # This function is sometimes called by other functions which send
             # it a dictionary as the target_db (the majority send a string as
@@ -164,8 +161,7 @@ class Terminator:
         for target_db in self.target_dbs:
             self.terminate_backend_db(target_db)
 
-        self.logger.highlight('info', Messenger.TERMINATE_DBS_CONN_DONE,
-                              'green')
+        self.logger.highlight('info', Messenger.TERMINATOR_DONE, 'green')
 
     def terminate_backend_all(self):
         '''
@@ -198,3 +194,5 @@ class Terminator:
                               '{}.'.format(str(e)))
             message = Messenger.TERMINATE_ALL_CONN_FAIL
             self.logger.highlight('warning', message, 'yellow', effect='bold')
+
+        self.logger.highlight('info', Messenger.TERMINATOR_DONE, 'green')

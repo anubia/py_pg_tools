@@ -115,6 +115,9 @@ class Restorer:
                 diff=diff)
             self.logger.highlight('info', message, 'green')
 
+            self.logger.highlight('info', Messenger.RESTORER_DONE, 'green',
+                                  effect='bold')
+
         except Exception as e:
             self.logger.debug('Error en la función "restore_db_backup": '
                               '{}.'.format(str(e)))
@@ -211,6 +214,9 @@ class RestorerCluster:
             message = Messenger.RESTORE_CL_DONE.format(
                 cluster_backup=self.cluster_backup, diff=diff)
             self.logger.highlight('info', message, 'green')
+
+            self.logger.highlight('info', Messenger.RESTORER_DONE, 'green',
+                                  effect='bold')
 
         except Exception as e:
             self.logger.debug('Error en la función "restore_cluster_backup": '

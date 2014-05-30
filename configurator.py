@@ -41,6 +41,10 @@ class Configurator:
             self.parser.load_cfg(self.path)
             self.parser.parse_connecter()
 
+        elif self.cfg_type == 'alter':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_alterer()
+
         elif self.cfg_type == 'backup':
             self.parser.load_cfg(self.path)
             self.parser.parse_backer()
