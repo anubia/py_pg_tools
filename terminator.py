@@ -112,7 +112,10 @@ class Terminator:
               current one, if it is connected to the target database).
         '''
         try:
-            target_db = target_db['datname']
+            # The variable "target_db" sometimes could be a string or a list
+            # of list, so it is necessary to check it first
+            if not isinstance(target_db, str):
+                target_db = target_db['datname']
 
             pg_pid = self.connecter.get_pid_str()  # Get PID variable's name
 

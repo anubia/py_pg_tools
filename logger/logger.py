@@ -38,8 +38,12 @@ class Logger:
     level = None  # The verbosity level of the file handler
     # A flag to determinate if use a file handler and create log files
     mute = False
+    # A controller which stores the level of the most critical message shown
+    # during the execution of the program
+    police = 0
+    mailer = None  # A mailer to send some messages
 
-    def __init__(self, log_dir=None, level=None, mute=False):
+    def __init__(self, log_dir=None, level=None, mute=False, police=0):
         '''
         Target:
             - create a logger to store the activity of the program.
@@ -117,6 +121,24 @@ class Logger:
         if self.mute is False:  # If log files are required...
             self.logger.addHandler(fh)  # Add file handler
 
+        self.police = police
+
+    def create_mailer(self, level=1, username='', email='', password='',
+                      to_infos=[], cc_infos=[], bcc_infos=[]):
+
+        from mail_tools.mailer import Mailer
+        self.mailer = Mailer(level, username, email, password, to_infos,
+                             cc_infos, bcc_infos, self)
+
+    def change_police(self, new_value):
+        '''
+        Target:
+            - changes the detected level.
+        Parameters:
+            - new_value: the new value of the detected level.
+        '''
+        self.police = new_value
+
     def debug(self, message):
         '''
         Target:
@@ -142,6 +164,8 @@ class Logger:
         Parameters:
             - message: the message to show and log.
         '''
+        if self.police <= 0:
+            self.change_police(1)
         self.logger.warning(message)
 
     def error(self, message):
@@ -151,6 +175,8 @@ class Logger:
         Parameters:
             - message: the message to show and log.
         '''
+        if self.police <= 1:
+            self.change_police(2)
         self.logger.error(message)
 
     def critical(self, message):
@@ -160,6 +186,8 @@ class Logger:
         Parameters:
             - message: the message to show and log.
         '''
+        if self.police <= 2:
+            self.change_police(3)
         self.logger.critical(message)
 
     def highlight(self, level, message, txtcolor='default', bgcolor='black',
@@ -199,6 +227,8 @@ class Logger:
             - message: the message to show and log.
         '''
         self.highlight('error', message, 'white', 'red', 'bold')
+        if self.mailer:
+            self.mailer.send_mail(self.police)
         sys.exit(1)
 
     @staticmethod

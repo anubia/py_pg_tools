@@ -182,8 +182,8 @@ class Connecter:
             return row[0]
 
         except Exception as e:
-            # Rollback to avoid errors in next queries because of waiting
-            # this transaction to finish
+            # Rollback to avoid errors in next queries becaustop_exese of
+            # waiting this transaction to finish
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_time_up": '
                               '{}.'.format(str(e)))
@@ -409,9 +409,20 @@ class Connecter:
         Parameters:
             - dbname: name of the database whose property "datallowconn" is
               going to be changed to allow connections to itself.
+        Return:
+            - a boolean which indicates if the process succeded.
         '''
-        self.cursor.execute(Queries.ALLOW_CONN_TO_PG_DB, (dbname, ))
-        # self.conn.commit()  # Make changes permanent
+        try:
+            self.cursor.execute(Queries.ALLOW_CONN_TO_PG_DB, (dbname, ))
+            return True
+
+        except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
+            self.logger.debug('Error en la función "allow_db_conn": '
+                              '{}.'.format(str(e)))
+            return False
 
     def disallow_db_conn(self, dbname):
         '''
@@ -420,6 +431,17 @@ class Connecter:
         Parameters:
             - dbname: name of the database whose property "datallowconn" is
               going to be changed to disallow connections to itself.
+        Return:
+            - a boolean which indicates if the process succeded.
         '''
-        self.cursor.execute(Queries.DISALLOW_CONN_TO_PG_DB, (dbname, ))
-        # self.conn.commit()  # Make changes permanent
+        try:
+            self.cursor.execute(Queries.DISALLOW_CONN_TO_PG_DB, (dbname, ))
+            return True
+
+        except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
+            self.logger.debug('Error en la función "disallow_db_conn": '
+                              '{}.'.format(str(e)))
+            return False

@@ -1,41 +1,76 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
-from connecter import Connecter
-from const.const import Messenger
-from const.const import Queries
-import psycopg2  # To work with PostgreSQL
-import psycopg2.extras  # To get real field names from PostgreSQL
+#from connecter import Connecter
+#from const.const import Messenger
+#from const.const import Queries
+#import psycopg2  # To work with PostgreSQL
+#import psycopg2.extras  # To get real field names from PostgreSQL
 
-connecter = Connecter('localhost', 'anubia', 5433)
+#connecter = Connecter('localhost', 'anubia', 5433)
+#query1 = "REVOKE ALL ON DATABASE my_replicated_db3 FROM openerp61;"
+#query2 = "GRANT CONNECT ON DATABASE my_replicated_db3 TO openerp61;"
 
-ex_templates = False
-db_owner = ''
+#try:
+    #connecter.cursor.execute(query1)
+    ##connecter.cursor.execute(query2)
 
-try:
-    # Get all databases (no templates) of a specific owner
-    if db_owner and ex_templates:
-        connecter.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS_BY_OWNER,
-                                 (db_owner, ))
-    # Get all databases (templates too) of a specific owner
-    elif db_owner and ex_templates is False:
-        connecter.cursor.execute(Queries.GET_PG_DBS_BY_OWNER, (db_owner, ))
-    # Get all databases (no templates)
-    elif not db_owner and ex_templates is False:
-        connecter.cursor.execute(Queries.GET_PG_DBS)
-    else:  # Get all databases (templates too)
-        connecter.cursor.execute(Queries.GET_PG_NO_TEMPLATE_DBS)
+#except Exception as e:
+    ## Rollback to avoid errors in next queries because of waiting
+    ## this transaction to finish
+    #connecter.conn.rollback()
+    #print(str(e))
 
-    dbs = connecter.cursor.fetchall()
+#import hashlib
+#from hashlib import md5
 
-except Exception as e:
-    # Rollback to avoid errors in next queries because of waiting
-    # this transaction to finish
-    connecter.conn.rollback()
-    connecter.logger.debug('Error en la función "get_pg_dbs_data": '
-                           '{}.'.format(str(e)))
-    message = Messenger.GET_PG_DBS_DATA
-    connecter.logger.highlight('warning', message, 'yellow')
-    dbs = None
+#string = "hola"
 
-print(dbs)
+#m = hashlib.md5()
+#m.update(string.encode('utf-8'))
+#print(m.hexdigest())
+
+#from mailer.mailer import Mailer
+#from orchestrator import Orchestrator
+
+#config_type = 'mail'
+## Get the variables from the config file
+#parser = Orchestrator.get_cfg_vars(config_type,
+                                   #'/mnt/store1/devel/code/ide-workspace/py_pg_tools/config/mailer/mailer.cfg')
+#mailer = Mailer(parser.mail_vars['level'], parser.mail_vars['name'],
+                #parser.mail_vars['address'], parser.mail_vars['password'],
+                #parser.mail_vars['to'], parser.mail_vars['cc'],
+                #parser.mail_vars['bcc'], parser.logger)
+
+#mailer.send_mail()
+
+
+class Logger:
+
+    l = None
+    m = None
+
+    def __init__(self, l=None):
+
+        self.l = l
+
+    def create_mailer(self):
+        self.m = Mailer(self)
+
+
+class Mailer:
+
+    m = None
+    l = None
+
+    def __init__(self, l=None, m=None):
+
+        self.m = m
+        self.l = l
+
+    def s(self):
+        print(self.l.l)
+
+logger = Logger('Juan')
+logger.create_mailer()
+logger.m.s()

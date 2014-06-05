@@ -65,6 +65,10 @@ class Configurator:
             self.parser.load_cfg(self.path)
             self.parser.parse_logger()
 
+        elif self.cfg_type == 'mail':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_mailer()
+
         elif self.cfg_type == 'replicate':
             self.parser.load_cfg(self.path)
             self.parser.parse_replicator()

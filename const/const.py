@@ -129,6 +129,12 @@ class Messenger:
     RS_CLUSTER_HELP = 'specifies whether the specified path is a ' \
                       'database\'s backup or a cluster\'s backup'
 
+    SCHEDULER_HELP = 'SCHEDULER: add, remove or show some lines of the ' \
+                     'program\'s CRON file, to execute it automatically'
+    S_CONFIG_HELP = 'load a configuration file (.cfg) to get the scheduler ' \
+                    'conditions'
+    S_SHOW_HELP = 'show all the lines of the program\'s CRON file'
+
     TERMINATOR_HELP = 'TERMINATOR: terminates the specified connections to ' \
                       'PostgreSQL'
     T_CONFIG_HELP = 'load a configuration file (.cfg) to get the terminator ' \
@@ -194,6 +200,11 @@ class Messenger:
 
     LOGGER_MUTE_HELP = 'indicates not to store anything'
 
+    CONFIG_MAIL_HELP = 'allows the possibility of sending an email ' \
+                       'informing about the result of the process, if the ' \
+                       'user specify here a configuration file (.cfg) to ' \
+                       'get the mailer parameters'
+
     PROGRAM_INFO_ARGS_ERROR = 'cannot specify more parameters when using ' \
                               '[-i/--info]'
     PROGRAM_VERSION_ARGS_ERROR = 'cannot specify more parameters when using ' \
@@ -247,6 +258,7 @@ class Messenger:
     BEGINNING_EXE_DB_TRIMMER = 'INICIANDO EJECUCIÓN DE TRIMMER (BASES DE ' \
                                'DATOS)'
     BEGINNING_EXE_CL_TRIMMER = 'INICIANDO EJECUCIÓN DE TRIMMER (CLÚSTER)'
+    BEGINNING_EXE_SCHEDULER = 'INICIANDO EJECUCIÓN DE SCHEDULER'
     BEGINNING_EXE_VACUUMER = 'INICIANDO EJECUCIÓN DE VACUUMER'
 
     ACTIVE_CONNS_ERROR = 'No se pudo completar la operación, ya que hay ' \
@@ -615,6 +627,10 @@ class Messenger:
                             'de la conexión a PostgreSQL está dañado. Por ' \
                             'favor, revise que los nombres por defecto de ' \
                             'secciones y atributos son correctos.'
+    MAILER_CFG_DAMAGED = 'El archivo de configuración con los parámetros ' \
+                         'del envío de correos electrónicos está dañado. ' \
+                         'Por favor, revise que los nombres por defecto de ' \
+                         'secciones y atributos son correctos.'
     ALTERER_CFG_DAMAGED = 'El archivo de configuración con las condiciones ' \
                           'para el cambio de propietario de bases de datos ' \
                           'en PostgreSQL está dañado. Por favor, revise que ' \
@@ -652,6 +668,11 @@ class Messenger:
                               'en PostgreSQL está dañado. Por favor, ' \
                               'revise que los nombres por defecto de ' \
                               'secciones y atributos son correctos.'
+    SCHEDULER_CFG_DAMAGED = 'El archivo de configuración con las ' \
+                            'condiciones para la modificación de acciones ' \
+                            'del programa en Cron está dañado. Por favor, ' \
+                            'revise que los nombres por defecto de ' \
+                            'secciones y atributos son correctos.'
     TERMINATOR_CFG_DAMAGED = 'El archivo de configuración con las ' \
                              'condiciones para la finalización de ' \
                              'conexiones a PostgreSQL está dañado. Por ' \
@@ -703,6 +724,56 @@ class Messenger:
     USER_DOES_NOT_EXIST = 'El usuario "{user}" no existe en PostgreSQL.'
     NO_CONNECTION_DATABASE = 'No se ha especificado una base de datos de ' \
                              'PostgreSQL a la que conectarse.'
+    DROP_DB_NOT_ALLOWED = 'El usuario "{user}" no es superusuario de ' \
+                          'PostgreSQL ni propietario de la base de datos ' \
+                          '"{dbname}": no se permite eliminar dicha base de ' \
+                          'datos.'
+    DROPPER_HAS_NOTHING_TO_DO = 'Sin bases de datos a eliminar.'
+    ALLOW_DB_CONN_FAIL = 'No fue posible habilitar conexiones a la base de ' \
+                         'datos "{dbname}". La conexión no se pudo ' \
+                         'establecer y la operación ha sido cancelada.'
+    CRON_FILE_DOES_NOT_EXIST = 'No se pudo encontrar el archivo de ' \
+                               'configuración del programa para ejecuciones ' \
+                               'automáticas en Cron: por favor, compruebe ' \
+                               'la existencia del archivo "{cron_path}".'
+
+    INVALID_FROM_USERNAME = 'El usuario de la cuenta de correo electrónico ' \
+                            'emisora no ha sido especificado.'
+    INVALID_FROM_MAIL = 'La dirección de correo electrónico emisora ' \
+                        '"{email}" es incorrecta.'
+    INVALID_FROM_PASSWORD = 'La contraseña de la cuenta de correo ' \
+                            'electrónico emisora no ha sido especificada.'
+    INVALID_TO_MAIL = 'La dirección de correo electrónico "{email}" es ' \
+                      'incorrecta. No se enviará el correo a dicho ' \
+                      'destinatario.'
+    INVALID_TO_MAIL_INFO = 'El formato del destinatario "{mail_info}" es ' \
+                           'incorrecto. Debe ser especificado como ' \
+                           '"John Doe <john_doe@mailserver.ext>". Recuerde ' \
+                           'que en caso de haber varios destinatarios ' \
+                           'especificados, éstos deben estar separados por ' \
+                           'comas.'
+    BEGINNING_MAILER = 'Enviando correo electrónico a sus destinatarios...'
+    MAIL_DESTINATARIES = 'Lista de destinatarios: {emails}.'
+    SEND_MAIL_FAIL = 'No ha sido posible enviar el correo electrónico a sus ' \
+                     'destinatarios.'
+    SEND_MAIL_DONE = 'Fin del proceso Mailer.'
+    MAIL_HEADER = 'From: {h_from}\n' \
+                  'To: {h_to}\n' \
+                  'Cc: {h_cc}\n' \
+                  'MIME-Version: {h_mime}\n' \
+                  'Content-type: {h_content}\n' \
+                  'Subject: {h_subject}\n'
+    MAIL_CONTENT = '<h1>Sending HTML emails with Python is easy!</h1>\n' \
+                   'This is an e-mail message to be sent in HTML format.\n' \
+                   '<br><b>This is HTML message.</b><br>\n' \
+                   'Tutorial: <a href="http://www.tutorialspoint.com/\n' \
+                   'python/python_sending_email.htm">http://\n' \
+                   'www.tutorialspoint.com/python/python_sending_email.htm\n' \
+                   '</a><br>With To, CC and BCC.<br><br>\n' \
+                   '¡Con eñes! ¿Y dónde hay tildes?<br>\n'
+    MAILER_HAS_NOTHING_TO_DO = 'No ha sido posible encontrar ningún ' \
+                               'destinatario válido: no se enviará ningún ' \
+                               'correo electrónico.'
 
     def __init__(self):
         pass
@@ -710,6 +781,7 @@ class Messenger:
 
 class Default:
 
+    ARGV1_CHOICES = ['a', 'B', 'd', 'i', 'r', 'R', 't', 'T', 'v']
     BKP_PATH = '/opt/backups/pg_backups/'
     BKP_TYPE = 'dump'
     BKP_TYPES = ['dump', 'gz', 'bz2', 'zip']
@@ -717,6 +789,7 @@ class Default:
     DB_OWNER = ''
     CL_BKPS_DIR = '/cl_backups/'
     CONNECTION_DATABASE = 'postgres'
+    CRON_PATH = '/etc/cron.d/py_pg_tools'
     EX_DBS = []
     EX_REGEX = ''
     EX_TEMPLATES = True
@@ -728,6 +801,8 @@ class Default:
     IN_PRIORITY = False
     LOG_LEVEL = 'debug'
     LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
+    MAIL_LEVEL = 1
+    MAIL_LEVELS = [0, 1, 2, 3]
     MAX_SIZE = '10000MB'
     MIN_N_BKPS = 1
     MUTE = False
@@ -795,6 +870,11 @@ class Queries:
         "SELECT datallowconn "
         "FROM pg_database "
         "WHERE datname = (%s);"
+    )
+    GET_PG_DB_OWNER = (
+        'SELECT pg_get_userbyid(datdba) as owner '
+        'FROM pg_database '
+        'WHERE datname = (%s);'
     )
     GET_PG_DBS = (
         'SELECT datname, pg_get_userbyid(datdba) as owner, datallowconn '

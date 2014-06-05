@@ -58,9 +58,13 @@ class Restorer:
         '''
         replicator = Replicator(self.connecter, self.new_dbname,
                                 Default.RESTORING_TEMPLATE, self.logger)
-        self.connecter.allow_db_conn(Default.RESTORING_TEMPLATE)
-        replicator.replicate_pg_db()
-        self.connecter.disallow_db_conn(Default.RESTORING_TEMPLATE)
+        result = self.connecter.allow_db_conn(Default.RESTORING_TEMPLATE)
+        if result:
+            replicator.replicate_pg_db()
+            self.connecter.disallow_db_conn(Default.RESTORING_TEMPLATE)
+        else:
+            self.logger.stop_exe(Messenger.ALLOW_DB_CONN_FAIL.format(
+                dbname=Default.RESTORING_TEMPLATE))
 
         # Regular expression which must match the backup's name
         regex = r'.*db_(.+)_(\d{8}_\d{6}_.+)\.(dump|bz2|gz|zip)$'

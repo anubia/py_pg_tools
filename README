@@ -3,6 +3,7 @@ py_pg_tools:
 
 imported packages:
     python3
+    python-crontab
     python3-dateutil
     python3-psycopg2
 

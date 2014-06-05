@@ -68,6 +68,7 @@ class CfgParser:
     conn_vars = {}  # Dictionary to store the loaded connection variables
     bkp_vars = {}  # Dictionary to store the loaded backup variables
     kill_vars = {}  # Dictionary to store the loaded terminator variables
+    mail_vars = {}  # Dictionary to store the loaded logger variables
 
     def __init__(self, logger):
         if logger:
@@ -109,6 +110,28 @@ class CfgParser:
             self.logger.debug('Error en la función "parse_connecter": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CONNECTER_CFG_DAMAGED)
+
+    def parse_mailer(self):
+        '''
+        Target:
+            - get the mailer variables from a configuration file and store
+              them in a dictionary.
+        '''
+        try:
+            self.mail_vars = {
+                'name': self.cfg.get('from', 'name').strip(),
+                'address': self.cfg.get('from', 'address').strip(),
+                'password': self.cfg.get('from', 'password').strip(),
+                'to': self.cfg.get('to', 'to').strip(),
+                'cc': self.cfg.get('to', 'cc').strip(),
+                'bcc': self.cfg.get('to', 'bcc').strip(),
+                'level': self.cfg.get('settings', 'level').strip(),
+            }
+
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_mailer": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe(Messenger.MAILER_CFG_DAMAGED)
 
     def parse_alterer(self):
         '''
@@ -241,6 +264,37 @@ class CfgParser:
             self.logger.debug('Error en la función "parse_restorer_cluster": '
                               '{}.'.format(str(e)))
             self.logger.stop_exe(Messenger.CL_RESTORER_CFG_DAMAGED)
+
+    def parse_scheduler(self):
+        '''
+        Target:
+            - get the scheduler variables from a configuration file and store
+              them in a dictionary.
+        '''
+        try:
+            self.bkp_vars = {
+                'a_line': self.cfg.get('add', 'line').strip(),
+                'a_m': self.cfg.get('add', 'm').strip(),
+                'a_h': self.cfg.get('add', 'h').strip(),
+                'a_dom': self.cfg.get('add', 'dom').strip(),
+                'a_mon': self.cfg.get('add', 'mon').strip(),
+                'a_dow': self.cfg.get('add', 'dow').strip(),
+                'a_user': self.cfg.get('add', 'user').strip(),
+                'a_command': self.cfg.get('add', 'command').strip(),
+                'r_line': self.cfg.get('remove', 'line').strip(),
+                'r_m': self.cfg.get('remove', 'm').strip(),
+                'r_h': self.cfg.get('remove', 'h').strip(),
+                'r_dom': self.cfg.get('remove', 'dom').strip(),
+                'r_mon': self.cfg.get('remove', 'mon').strip(),
+                'r_dow': self.cfg.get('remove', 'dow').strip(),
+                'r_user': self.cfg.get('remove', 'user').strip(),
+                'r_command': self.cfg.get('remove', 'command').strip(),
+            }
+
+        except Exception as e:
+            self.logger.debug('Error en la función "parse_scheduler": '
+                              '{}.'.format(str(e)))
+            self.logger.stop_exe(Messenger.SCHEDULER_CFG_DAMAGED)
 
     def parse_terminator(self):
         '''

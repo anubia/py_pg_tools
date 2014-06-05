@@ -37,6 +37,8 @@ class Casting:
             - the resultant list.
         '''
         str_list = string.split(',')  # Split the string on each comma
+        if str_list == ['']:
+            return []
         for i in range(len(str_list)):
             str_list[i] = str_list[i].strip()  # Delete spaces of each element
         return str_list
@@ -71,7 +73,7 @@ class Casting:
               if the conversion was impossible.
         '''
         regex = r'(\d+)(MB|GB|TB|PB)$'
-        regex = re.compile(regex)  # Validar la expresión regular
+        regex = re.compile(regex)
         if re.match(regex, string):
             parts = regex.search(string).groups()
             max_size = {
@@ -105,3 +107,28 @@ class Casting:
             equivalence = 10 ** 15
 
         return equivalence
+
+    @staticmethod
+    def str_to_mail_info(string):
+        '''
+        Target:
+            - converts a string into a dictionary made up by two strings. The
+              first one will be the username of the mail account and the second
+              one the address.
+        Parameters:
+            - string: the string to be converted.
+        Return:
+            - a dictionary with the username and the address of a mail account
+              or None if the conversion was impossible.
+        '''
+        regex = r'(.*)<(.+)>$'
+        regex = re.compile(regex)
+        if re.match(regex, string):
+            parts = regex.search(string).groups()
+            mail_info = {
+                'name': parts[0].strip(),
+                'email': parts[1].strip(),
+            }
+            return mail_info
+        else:
+            return None

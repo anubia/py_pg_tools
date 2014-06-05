@@ -15,6 +15,7 @@ import sys  # To get the console subparser
 
 from argparse import RawTextHelpFormatter  # To insert newlines in console help
 
+from const.const import Default
 from const.const import Messenger
 from orchestrator import Orchestrator
 
@@ -87,6 +88,9 @@ if __name__ == '__main__':
     alterer.add_argument('-Lm', '--logger-mute', action='store_true',
                          help=Messenger.LOGGER_MUTE_HELP)
 
+    alterer.add_argument('-zc', '--config-mailer',
+                         help=Messenger.CONFIG_MAIL_HELP)
+
     # ******************************** BACKER *********************************
 
     backer = sub_parsers.add_parser('B', help=Messenger.BACKER_HELP)
@@ -147,6 +151,9 @@ if __name__ == '__main__':
     backer.add_argument('-Lm', '--logger-mute', action='store_true',
                         help=Messenger.LOGGER_MUTE_HELP)
 
+    backer.add_argument('-zc', '--config-mailer',
+                        help=Messenger.CONFIG_MAIL_HELP)
+
     # ******************************** DROPPER ********************************
 
     dropper = sub_parsers.add_parser('d', help=Messenger.DROPPER_HELP)
@@ -182,6 +189,9 @@ if __name__ == '__main__':
 
     dropper.add_argument('-Lm', '--logger-mute', action='store_true',
                          help=Messenger.LOGGER_MUTE_HELP)
+
+    dropper.add_argument('-zc', '--config-mailer',
+                         help=Messenger.CONFIG_MAIL_HELP)
 
     # ******************************** INFORMER *******************************
 
@@ -277,6 +287,9 @@ if __name__ == '__main__':
     replicator.add_argument('-Lm', '--logger-mute', action='store_true',
                             help=Messenger.LOGGER_MUTE_HELP)
 
+    replicator.add_argument('-zc', '--config-mailer',
+                            help=Messenger.CONFIG_MAIL_HELP)
+
     # ******************************* RESTORER ********************************
 
     restorer = sub_parsers.add_parser('R', help=Messenger.RESTORER_HELP)
@@ -316,6 +329,32 @@ if __name__ == '__main__':
     restorer.add_argument('-Lm', '--logger-mute', action='store_true',
                           help=Messenger.LOGGER_MUTE_HELP)
 
+    restorer.add_argument('-zc', '--config-mailer',
+                          help=Messenger.CONFIG_MAIL_HELP)
+
+    # ******************************* SCHEDULER *******************************
+
+    scheduler = sub_parsers.add_parser('S', help=Messenger.SCHEDULER_HELP)
+
+    scheduler.add_argument('-C', '--config', help=Messenger.S_CONFIG_HELP)
+
+    scheduler.add_argument('-s', '--show', action='store_true',
+                           help=Messenger.S_SHOW_HELP)
+
+    scheduler.add_argument('-Lc', '--config-logger',
+                           help=Messenger.CONFIG_LOGGER_HELP)
+
+    scheduler.add_argument('-Lf', '--logger-logfile',
+                           help=Messenger.LOGGER_LOGFILE_HELP)
+
+    scheduler.add_argument('-Ll', '--logger-level',
+                           help=Messenger.LOGGER_LEVEL_HELP,
+                           choices=['debug', 'info', 'warning', 'error',
+                                    'critical'])
+
+    scheduler.add_argument('-Lm', '--logger-mute', action='store_true',
+                           help=Messenger.LOGGER_MUTE_HELP)
+
     # ****************************** TERMINATOR *******************************
 
     terminator = sub_parsers.add_parser('t', help=Messenger.TERMINATOR_HELP)
@@ -352,6 +391,9 @@ if __name__ == '__main__':
 
     terminator.add_argument('-Lm', '--logger-mute', action='store_true',
                             help=Messenger.LOGGER_MUTE_HELP)
+
+    terminator.add_argument('-zc', '--config-mailer',
+                            help=Messenger.CONFIG_MAIL_HELP)
 
     # ******************************** TRIMMER ********************************
 
@@ -402,6 +444,9 @@ if __name__ == '__main__':
     trimmer.add_argument('-Lm', '--logger-mute', action='store_true',
                          help=Messenger.LOGGER_MUTE_HELP)
 
+    trimmer.add_argument('-zc', '--config-mailer',
+                         help=Messenger.CONFIG_MAIL_HELP)
+
     # ******************************* VACUUMER ********************************
 
     vacuumer = sub_parsers.add_parser('v', help=Messenger.VACUUMER_HELP)
@@ -440,10 +485,14 @@ if __name__ == '__main__':
     vacuumer.add_argument('-Lm', '--logger-mute', action='store_true',
                           help=Messenger.LOGGER_MUTE_HELP)
 
+    vacuumer.add_argument('-zc', '--config-mailer',
+                          help=Messenger.CONFIG_MAIL_HELP)
+
     # *************************** PARSING SYS.ARGV ****************************
 
     args = arg_parser.parse_args()
 
+    # Store the action selected by the user
     action = sys.argv[1]
 
     # ********************* INFO & VERSION REQUIREMENTS ***********************
@@ -451,7 +500,9 @@ if __name__ == '__main__':
     if ('-i' in sys.argv or '--info' in sys.argv) and len(sys.argv) > 2:
         arg_parser.error(Messenger.PROGRAM_INFO_ARGS_ERROR)
 
-    elif ('-v' in sys.argv or '--version' in sys.argv) and len(sys.argv) > 2:
+    # If an action was selected by the user, -v is not going to mean --version
+    elif (('-v' in sys.argv and sys.argv[1] not in Default.ARGV1_CHOICES)
+          or '--version' in sys.argv) and len(sys.argv) > 2:
         arg_parser.error(Messenger.PROGRAM_VERSION_ARGS_ERROR)
 
     # ************************** ALTERER REQUIREMENTS *************************

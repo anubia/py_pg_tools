@@ -306,6 +306,7 @@ class TrimmerCluster:
     # Related to max_size, equivalence to turn the specified unit of measure in
     # the max_size variable into Bytes
     equivalence = 10 ** 6
+    logger = None  # Logger to show and log some messages
 
     def __init__(self, bkp_path='', prefix='', min_n_bkps=1, exp_days=365,
                  max_size=5000, logger=None):

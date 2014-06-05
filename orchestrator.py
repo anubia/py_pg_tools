@@ -7,16 +7,17 @@ from backer import Backer
 from backer import BackerCluster
 from configurator import Configurator
 from connecter import Connecter
+from const.const import Messenger
+from const.const import Queries
 from db_selector.db_selector import DbSelector
 from dir_tools.dir_tools import Dir
 from dropper import Dropper
 from informer import Informer
 from logger.logger import Logger
-from const.const import Messenger
-from const.const import Queries
 from replicator import Replicator
 from restorer import Restorer
 from restorer import RestorerCluster
+from scheduler import Scheduler
 from terminator import Terminator
 from trimmer import Trimmer
 from trimmer import TrimmerCluster
@@ -25,15 +26,25 @@ from vacuumer import Vacuumer
 
 class Orchestrator:
 
+    # TODO: disallow and allow connections to a database during an action
+
     action = None  # The action to do
     args = []  # The list of parameters received in console
     logger = None  # A logger to show and log some messages
+    mailer = None  # A mailer to send some messages
 
     def __init__(self, action, args):
 
         self.action = action
         self.args = args
         self.logger = self.get_logger()
+
+        try:
+            # Create mailer if necessary
+            if self.args.config_mailer:
+                self.mailer = self.get_mailer()
+        except NameError:
+            pass
 
         # Stop execution if the user running the program is root
         Dir.forbid_root(self.logger)
@@ -114,6 +125,30 @@ class Orchestrator:
                             self.args.logger_mute)
 
         return logger
+
+    def get_mailer(self):
+        '''
+        Target:
+            - get a mailer object with variables to send emails informing
+              about the results of the program's execution.
+        Return:
+            - a mailer which will send emails informing about the results of
+              the program's execution.
+        '''
+        config_type = 'mail'
+        # Get the variables from the config file
+        parser = Orchestrator.get_cfg_vars(config_type,
+                                           self.args.config_mailer,
+                                           self.logger)
+
+        # Create the mailer with the specified variables
+        self.logger.create_mailer(parser.mail_vars['level'],
+                                  parser.mail_vars['name'],
+                                  parser.mail_vars['address'],
+                                  parser.mail_vars['password'],
+                                  parser.mail_vars['to'],
+                                  parser.mail_vars['cc'],
+                                  parser.mail_vars['bcc'])
 
     def get_connecter(self):
         '''
@@ -489,6 +524,35 @@ class Orchestrator:
 
         return restorer
 
+    def get_scheduler(self):
+        '''
+        Target:
+            - get a scheduler object with variables to modify or show the
+              content of the program's CRON file.
+        Return:
+            - a scheduler which will modify or show the content of the
+              program's CRON file.
+        '''
+        # If the user specified a scheduler config file through console...
+        if self.args.config:
+            #config_type = 'schedule'
+            # Get the variables from the config file
+            #parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
+                                               #self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            pass
+
+            # Create the scheduler with the specified variables
+            scheduler = Scheduler(self.logger)
+
+        # If the user did not specify a scheduler config file through console..
+        else:
+            # Create the scheduler with the console variables
+            scheduler = Scheduler(self.logger)
+
+        return scheduler
+
     def get_terminator(self, connecter):
         '''
         Target:
@@ -801,7 +865,7 @@ class Orchestrator:
         # Close connection to PostgreSQL
         connecter.pg_disconnect()
 
-    def setup_dropper(self):  # TODO: controlar que sea pg_superuser o owner
+    def setup_dropper(self):
         '''
         Target:
             - delete specified databases in PostgreSQL.
@@ -817,7 +881,7 @@ class Orchestrator:
             terminator.terminate_backend_dbs(dropper.dbnames)
 
         # Delete the databases
-        dropper.drop_pg_dbs()
+        dropper.drop_pg_dbs(dropper.dbnames)
 
         # Close connection to PostgreSQL
         connecter.pg_disconnect()
@@ -876,9 +940,9 @@ class Orchestrator:
         # replicated, if necessary
         if self.args.terminate:
             terminator = Terminator(connecter,
-                                    target_dbs=replicator.original_dbname,
+                                    target_dbs=[replicator.original_dbname],
                                     logger=self.logger)
-            terminator.terminate_backend_dbs(replicator.original_dbname)
+            terminator.terminate_backend_dbs([replicator.original_dbname])
 
         # Clone the database
         replicator.replicate_pg_db()
@@ -912,6 +976,17 @@ class Orchestrator:
 
         # Close connection to PostgreSQL
         connecter.pg_disconnect()
+
+    def setup_scheduler(self):
+        '''
+        Target:
+            - modify or show the content of the program's CRON file.
+        '''
+        self.logger.debug(Messenger.BEGINNING_EXE_SCHEDULER)
+        scheduler = self.get_scheduler()
+
+        if self.args.show:
+            scheduler.show_lines()
 
     def setup_terminator(self):
         '''
@@ -1098,7 +1173,6 @@ class Orchestrator:
         Target:
             - call the corresponding function to the action stored.
         '''
-
         if self.action == 'a':  # Call alterer
             self.setup_alterer()
 
@@ -1117,6 +1191,9 @@ class Orchestrator:
         elif self.action == 'R':  # Call restorer
             self.setup_restorer()
 
+        elif self.action == 'S':  # Call scheduler
+            self.setup_scheduler()
+
         elif self.action == 't':  # Call terminator
             self.setup_terminator()
 
@@ -1128,3 +1205,8 @@ class Orchestrator:
 
         else:  # Do nothing
             pass
+
+        # Send the emails if necessary
+        if self.logger.mailer:
+            if self.logger.mailer.level <= self.logger.police:
+                self.logger.mailer.send_mail(self.logger.police)
