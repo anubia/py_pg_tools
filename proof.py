@@ -44,33 +44,12 @@
 
 #mailer.send_mail()
 
+dictionary = {
+    'hola': 'holaword',
+    'adios': 'adiosword',
+}
 
-class Logger:
-
-    l = None
-    m = None
-
-    def __init__(self, l=None):
-
-        self.l = l
-
-    def create_mailer(self):
-        self.m = Mailer(self)
-
-
-class Mailer:
-
-    m = None
-    l = None
-
-    def __init__(self, l=None, m=None):
-
-        self.m = m
-        self.l = l
-
-    def s(self):
-        print(self.l.l)
-
-logger = Logger('Juan')
-logger.create_mailer()
-logger.m.s()
+if 'hola' in dictionary.keys():
+    print('SI')
+else:
+    print('NO')

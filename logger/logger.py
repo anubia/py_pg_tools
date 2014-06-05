@@ -35,6 +35,7 @@ class Logger:
 
     logger = None  # A logger to show and log some messages
     log_dir = None  # The directory where the log files will be stored
+    log_file = None  # The file where the logger is going to write
     level = None  # The verbosity level of the file handler
     # A flag to determinate if use a file handler and create log files
     mute = False
@@ -80,7 +81,7 @@ class Logger:
         # Set format for the log files' names
         log_name = script_name + '_' + init_ts + '.log'
         # Set absolute path for log files
-        log_file = os.path.join(self.log_dir, log_name)
+        self.log_file = os.path.join(self.log_dir, log_name)
         # Create logger with the main program's name
         self.logger = logging.getLogger(script_name)
         # Set DEBUG as maximum verbosity level
@@ -100,7 +101,7 @@ class Logger:
             # Set size for each log file
             max_bytes = 4 * 1024 * 1024  # 4MiB
             # Create a file handler
-            fh = CustomRotatingFileHandler(log_file, 'a', max_bytes, 10)
+            fh = CustomRotatingFileHandler(self.log_file, 'a', max_bytes, 10)
             # Set the verbosity of console handler to the selected level
             if self.level == 'debug':
                 fh.setLevel(logging.DEBUG)
@@ -124,11 +125,11 @@ class Logger:
         self.police = police
 
     def create_mailer(self, level=1, username='', email='', password='',
-                      to_infos=[], cc_infos=[], bcc_infos=[]):
+                      to_infos=[], cc_infos=[], bcc_infos=[], op_type=''):
 
         from mail_tools.mailer import Mailer
         self.mailer = Mailer(level, username, email, password, to_infos,
-                             cc_infos, bcc_infos, self)
+                             cc_infos, bcc_infos, op_type, self)
 
     def change_police(self, new_value):
         '''

@@ -31,7 +31,6 @@ class Orchestrator:
     action = None  # The action to do
     args = []  # The list of parameters received in console
     logger = None  # A logger to show and log some messages
-    mailer = None  # A mailer to send some messages
 
     def __init__(self, action, args):
 
@@ -42,7 +41,7 @@ class Orchestrator:
         try:
             # Create mailer if necessary
             if self.args.config_mailer:
-                self.mailer = self.get_mailer()
+                self.create_mailer()
         except NameError:
             pass
 
@@ -126,7 +125,7 @@ class Orchestrator:
 
         return logger
 
-    def get_mailer(self):
+    def create_mailer(self):
         '''
         Target:
             - get a mailer object with variables to send emails informing
@@ -148,7 +147,7 @@ class Orchestrator:
                                   parser.mail_vars['password'],
                                   parser.mail_vars['to'],
                                   parser.mail_vars['cc'],
-                                  parser.mail_vars['bcc'])
+                                  parser.mail_vars['bcc'], self.action)
 
     def get_connecter(self):
         '''

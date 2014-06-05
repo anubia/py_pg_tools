@@ -16,39 +16,46 @@ class Mailer:
     to_infos = []
     cc_infos = []
     bcc_infos = []
+    op_type = ''
     logger = None
 
     # Definition of constants
-    MSG_LEVELS = {
-        0: 'INFO',
-        1: 'WARN',
-        2: 'ERROR',
-        3: 'CRITICAL',
-    }
     OP_TYPES = {
-        'alter': 'Alter database',
-        'db_backup': 'Backup database',
-        'cl_backup': 'Backup cluster',
-        'drop': 'Drop database',
-        'replicate': 'Replicate database',
-        'db_restore': 'Restore database',
-        'cl_restore': 'Restore cluster',
-        'db_trim': 'Trim database',
-        'cl_trim': 'Trim cluster',
-        'terminate': 'Terminate connections',
-        'vacuum': 'Vacuum database',
+        'u': 'Undefined method',
+        'a': 'Alterer',
+        'B': 'Backer',
+        'd': 'Dropper',
+        'r': 'Replicator',
+        'R': 'Restorer',
+        'T': 'Trimmer',
+        't': 'Terminator',
+        'v': 'Vacuumer',
     }
     OP_RESULTS = {
-        0: 'OK',
-        1: 'Warnings, but not critical errors. Anyway, please check.',
-        2: ('There were some errors that prevented some operations. '
-            'Please check immediately.'),
-        3: ('Some critical error occurred!! Uh, uh, nothing good. '
-            'Please check immediately.'),
+        0: ('<h1>{op_type} > <font color="green">OK</font></h1>\n'
+            'The process has been executed succesfully.<br/><br/>You can see\n'
+            'its log file at the following path:<br/><br/>\n'
+            '<b>{log_file}</b>.\n'),
+        1: ('<h1>{op_type} > <font color="orange">WARNING</font></h1>\n'
+            'There were some warnings during the process, but not critical\n'
+            'errors. Anyway, please check it, because its behaviour is not\n'
+            'bound to have been the expected one.<br/><br/>You can see its\n'
+            'log file at the following path:<br/><br/><b>{log_file}</b>.\n'),
+        2: ('<h1>{op_type} > <font color="red">ERROR</font></h1>\n'
+            'There were some errors during the process, and they prevented\n'
+            'some operations, because the execution was truncated. Please\n'
+            'check immediately.<br/><br/>You can see its log file at the\n'
+            'following path:<br/><br/><b>{log_file}</b>.\n'),
+        3: ('<h1>{op_type} > <font color="purple">CRITICAL</font></h1>\n'
+            'There were some critical errors during the process. The\n'
+            'execution could not be carried out. Please check immediately.\n'
+            '<br/><br/>You can see its log file at the following path:\n'
+            '<br/><br/><b>{log_file}</b>.\n'),
     }
 
     def __init__(self, level=1, username='', email='', password='',
-                 to_infos=[], cc_infos=[], bcc_infos=[], logger=None):
+                 to_infos=[], cc_infos=[], bcc_infos=[], op_type='',
+                 logger=None):
 
         if logger:
             self.logger = logger
@@ -87,6 +94,11 @@ class Mailer:
 
         bcc_infos = Casting.str_to_list(bcc_infos)
         self.bcc_infos = self.get_mail_infos(bcc_infos)
+
+        if op_type in self.OP_TYPES.keys():
+            self.op_type = op_type
+        else:
+            self.op_type = 'u'
 
     def get_mail_infos(self, mail_infos):
         '''
@@ -149,7 +161,8 @@ class Mailer:
         # Specifying other email data (used in email message header)
         mime_version = '1.0'
         content_type = 'text/html'
-        subject = '[INFO] SMTP HTML e-mail test'
+        subject = '[INFO] {op_type} results'.format(
+            op_type=self.OP_TYPES[self.op_type].upper())
 
         # Email header: Note Bcc info is not shown in this header
         msg_header = Messenger.MAIL_HEADER.format(
@@ -157,7 +170,9 @@ class Mailer:
             h_mime=mime_version, h_content=content_type, h_subject=subject)
 
         #msg_content = Messenger.MAIL_CONTENT
-        msg_content = self.OP_RESULTS[detected_level]
+        msg_content = self.OP_RESULTS[detected_level].format(
+            op_type=self.OP_TYPES[self.op_type],
+            log_file=str(self.logger.log_file))
 
         msg_full = (''.join([msg_header, msg_content])).encode()
 
