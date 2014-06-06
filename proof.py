@@ -29,27 +29,41 @@
 #m = hashlib.md5()
 #m.update(string.encode('utf-8'))
 #print(m.hexdigest())
+#import smtplib
 
-#from mailer.mailer import Mailer
-#from orchestrator import Orchestrator
+#msg_header = 'From: sender@server\n' \
+             #'To: receiver@server\n' \
+             #'Cc: receiver2@server\n' \
+             #'MIME-Version: 1.0\n' \
+             #'Content-type: text/html\n' \
+             #'Subject: Any subject\n'
+#title = 'My title'
+#msg_content = '<h2>{title} > <font color="green">OK</font></h2>\n'.format(
+    #title=title)
+#msg_full = (''.join([msg_header, msg_content])).encode()
 
-#config_type = 'mail'
-## Get the variables from the config file
-#parser = Orchestrator.get_cfg_vars(config_type,
-                                   #'/mnt/store1/devel/code/ide-workspace/py_pg_tools/config/mailer/mailer.cfg')
-#mailer = Mailer(parser.mail_vars['level'], parser.mail_vars['name'],
-                #parser.mail_vars['address'], parser.mail_vars['password'],
-                #parser.mail_vars['to'], parser.mail_vars['cc'],
-                #parser.mail_vars['bcc'], parser.logger)
+#server = smtplib.SMTP('smtp.gmail.com:587')
+#server.starttls()
+#server.login('sender@server.com', 'receiver@server.com', 'receiver2@server.com')
+#server.sendmail('Sender Name <sender@server.com>',
+                #['Receiver Name <receiver@server.com>',
+                 #'Receiver2 Name <receiver@server.com>'], msg_full)
+#server.quit()
 
-#mailer.send_mail()
+#from crontab import CronTab
 
-dictionary = {
-    'hola': 'holaword',
-    'adios': 'adiosword',
-}
+#cron = CronTab(user=True)
 
-if 'hola' in dictionary.keys():
-    print('SI')
-else:
-    print('NO')
+#job = cron.new(command='python3 /mnt/store1/devel/code/ide-workspace/py_pg_tools/py_pg_tools.py v -ch localhost -cu anubia -cp 5432 -d devel__v61__test_01 -zc config/mailer/mailer.cfg')
+
+#job.minute.on(2)
+#job.hour.on(12)
+#cron.write()
+#print(cron.render())
+
+from crontab import CronTab
+
+cron = CronTab(user=True)
+
+for job in cron:
+    print(job)

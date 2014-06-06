@@ -1,48 +1,118 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
-import os  # To check the existance of some files
+# To work with the crontab whose user is running the script
+from crontab import CronTab
 
 from const.const import Messenger
-from const.const import Default
 from logger.logger import Logger
 
 
 class Scheduler:
 
-    cron_path = ''
-    cron_file = None
+    time = ''  # Time when the command is going to be executed in Cron
+    command = ''  # Command which is going to be executed in Cron.
     logger = None  # Logger to show and log some messages
 
-    def __init__(self, logger=None):
+    def __init__(self, time='', command='', logger=None):
 
         if logger:
             self.logger = logger
         else:
             self.logger = Logger()
 
-        if os.path.isfile(Default.CRON_PATH):
-            self.cron_path = Default.CRON_PATH
-        else:
-            #cron_file = open(Default.CRON_PATH, 'w')
-            #cron_file.close()
-            self.logger.stop_exe(Messenger.CRON_FILE_DOES_NOT_EXIST.format(
-                Default.CRON_PATH))
-
-        #message = Messenger.SCHEDULER_VARS.format()
-        #self.logger.debug(Messenger.SCHEDULER_VARS_INTRO)
-        #self.logger.debug(message)
+        self.time = time.strip()
+        self.command = command.strip()
 
     def show_lines(self):
         '''
         Target:
             - show the lines of the program's CRON file.
         '''
-        self.cron_file = open(Default.CRON_PATH, 'r')
+        self.logger.highlight('info', Messenger.SHOWING_CRONTAB_FILE, 'white')
+        print()
 
-        for line in self.cron_file:
-            line = line.rstrip()
-            if line:
-                self.logger.info('{}'.format(line))
+        cron = CronTab(user=True)
 
-        self.cron_file.close()
+        if cron:
+            for line in cron.lines:
+                print(str(line))
+        else:
+            print('\033[1;40;93m' + Messenger.NO_CRONTAB_FILE + '\033[0m')
+
+    def add_line(self):
+        '''
+        Target:
+            - add a line to the program's CRON file.
+        '''
+        cron = CronTab(user=True)
+
+        job = cron.new(command=self.command)
+
+        if self.time in ['@yearly', '@annually']:
+            job.setall('0 0 1 1 *')
+        elif self.time == '@monthly':
+            job.setall('0 0 1 * *')
+        elif self.time == '@weekly':
+            job.setall('0 0 * * 0')
+        elif self.time in ['@daily', '@midnight']:
+            job.setall('0 0 * * *')
+        elif self.time == '@hourly':
+            job.setall('0 * * * *')
+        elif self.time == '@reboot':
+            job.every_reboot()
+        else:
+            job.setall(self.time)
+
+        self.logger.highlight('info', Messenger.SCHEDULER_ADDING, 'white')
+
+        if not cron:
+            self.logger.info(Messenger.CREATING_CRONTAB)
+
+        try:
+            cron.write()
+            self.logger.highlight('info', Messenger.SCHEDULER_ADD_DONE,
+                                  'green')
+            #print(cron.render())
+
+        except Exception as e:
+            self.logger.debug('Error en la función "add_line": {}.'.format(
+                str(e)))
+            self.logger.stop_exe(Messenger.SCHEDULER_ADD_FAIL)
+
+    def remove_line(self):
+        '''
+        Target:
+            - remove a line from the program's CRON file.
+        '''
+        self.logger.highlight('info', Messenger.SCHEDULER_REMOVING, 'white')
+
+        cron = CronTab(user=True)
+
+        if not cron:
+            self.logger.stop_exe(Messenger.NO_CRONTAB_FILE)
+
+        deletion = False
+
+        line = self.time + ' ' + self.command
+
+        for job in cron:
+
+            if str(job).strip() == line:
+
+                try:
+                    cron.remove(job)
+                    message = Messenger.SCHEDULER_REMOVE_DONE.format(job=job)
+                    self.logger.highlight('info', message, 'green')
+                    deletion = True
+
+                except Exception as e:
+                    self.logger.debug('Error en la función "remove_line": '
+                                      '{}.'.format(str(e)))
+                    message = Messenger.SCHEDULER_REMOVE_FAIL.format(job=job)
+                    self.logger.highlight('warning', message, 'yellow')
+
+        if not deletion:
+            self.logger.stop_exe(Messenger.NO_CRONTAB_JOB_TO_DEL)
+
+        cron.write()

@@ -336,7 +336,14 @@ if __name__ == '__main__':
 
     scheduler = sub_parsers.add_parser('S', help=Messenger.SCHEDULER_HELP)
 
-    scheduler.add_argument('-C', '--config', help=Messenger.S_CONFIG_HELP)
+    groupA = scheduler.add_mutually_exclusive_group()
+    groupA.add_argument('-aC', '--add-config', help=Messenger.S_CONFIG_HELP)
+    groupA.add_argument('-rC', '--remove-config', help=Messenger.S_CONFIG_HELP)
+
+    groupB = scheduler.add_mutually_exclusive_group()
+    groupB.add_argument('-a', '--add', nargs=2, help=Messenger.S_ADD_HELP)
+    groupB.add_argument('-r', '--remove', nargs=2,
+                        help=Messenger.S_REMOVE_HELP)
 
     scheduler.add_argument('-s', '--show', action='store_true',
                            help=Messenger.S_SHOW_HELP)
@@ -552,7 +559,7 @@ if __name__ == '__main__':
                  and args.pg_user)):
             informer.error(Messenger.CONNECTION_ARGS_ERROR)
 
-    # ****************************** REPLICATOR *******************************
+    # ************************ REPLICATOR REQUIREMENTS ************************
 
     elif action == 'r':
         if not (args.config or args.db_name):
@@ -562,7 +569,7 @@ if __name__ == '__main__':
                  and args.pg_user)):
             replicator.error(Messenger.CONNECTION_ARGS_ERROR)
 
-    # ******************************* RESTORER ********************************
+    # ************************** RESTORER REQUIREMENTS ************************
 
     elif action == 'R':
         if not (args.config or args.db_backup or
@@ -572,6 +579,14 @@ if __name__ == '__main__':
                 (args.pg_host and isinstance(args.pg_port, int)
                  and args.pg_user)):
             restorer.error(Messenger.CONNECTION_ARGS_ERROR)
+
+    # ************************* SCHEDULER REQUIREMENTS ************************
+
+    elif action == 'S':
+        if args.add and args.remove_config:
+            scheduler.error(Messenger.SCHEDULER_ARGS_ERROR_1)
+        if args.remove and args.add_config:
+            scheduler.error(Messenger.SCHEDULER_ARGS_ERROR_2)
 
     # ************************ TERMINATOR REQUIREMENTS ************************
 

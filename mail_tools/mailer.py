@@ -32,25 +32,25 @@ class Mailer:
         'v': 'Vacuumer',
     }
     OP_RESULTS = {
-        0: ('<h1>{op_type} > <font color="green">OK</font></h1>\n'
+        0: ('<h2>{op_type} > <font color="green">OK</font></h2>\n'
             'The process has been executed succesfully.<br/><br/>You can see\n'
             'its log file at the following path:<br/><br/>\n'
-            '<b>{log_file}</b>.\n'),
-        1: ('<h1>{op_type} > <font color="orange">WARNING</font></h1>\n'
+            '{log_file}.\n'),
+        1: ('<h2>{op_type} > <font color="orange">WARNING</font></h2>\n'
             'There were some warnings during the process, but not critical\n'
             'errors. Anyway, please check it, because its behaviour is not\n'
             'bound to have been the expected one.<br/><br/>You can see its\n'
-            'log file at the following path:<br/><br/><b>{log_file}</b>.\n'),
-        2: ('<h1>{op_type} > <font color="red">ERROR</font></h1>\n'
+            'log file at the following path:<br/><br/>{log_file}.\n'),
+        2: ('<h2>{op_type} > <font color="red">ERROR</font></h2>\n'
             'There were some errors during the process, and they prevented\n'
             'some operations, because the execution was truncated. Please\n'
             'check immediately.<br/><br/>You can see its log file at the\n'
-            'following path:<br/><br/><b>{log_file}</b>.\n'),
-        3: ('<h1>{op_type} > <font color="purple">CRITICAL</font></h1>\n'
+            'following path:<br/><br/>{log_file}.\n'),
+        3: ('<h2>{op_type} > <font color="purple">CRITICAL</font></h2>\n'
             'There were some critical errors during the process. The\n'
             'execution could not be carried out. Please check immediately.\n'
             '<br/><br/>You can see its log file at the following path:\n'
-            '<br/><br/><b>{log_file}</b>.\n'),
+            '<br/><br/>{log_file}.\n'),
     }
 
     def __init__(self, level=1, username='', email='', password='',

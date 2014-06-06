@@ -273,22 +273,8 @@ class CfgParser:
         '''
         try:
             self.bkp_vars = {
-                'a_line': self.cfg.get('add', 'line').strip(),
-                'a_m': self.cfg.get('add', 'm').strip(),
-                'a_h': self.cfg.get('add', 'h').strip(),
-                'a_dom': self.cfg.get('add', 'dom').strip(),
-                'a_mon': self.cfg.get('add', 'mon').strip(),
-                'a_dow': self.cfg.get('add', 'dow').strip(),
-                'a_user': self.cfg.get('add', 'user').strip(),
-                'a_command': self.cfg.get('add', 'command').strip(),
-                'r_line': self.cfg.get('remove', 'line').strip(),
-                'r_m': self.cfg.get('remove', 'm').strip(),
-                'r_h': self.cfg.get('remove', 'h').strip(),
-                'r_dom': self.cfg.get('remove', 'dom').strip(),
-                'r_mon': self.cfg.get('remove', 'mon').strip(),
-                'r_dow': self.cfg.get('remove', 'dow').strip(),
-                'r_user': self.cfg.get('remove', 'user').strip(),
-                'r_command': self.cfg.get('remove', 'command').strip(),
+                'time': self.cfg.get('settings', 'time').strip(),
+                'command': self.cfg.get('settings', 'command').strip(),
             }
 
         except Exception as e:

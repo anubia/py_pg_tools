@@ -133,6 +133,15 @@ class Messenger:
                      'program\'s CRON file, to execute it automatically'
     S_CONFIG_HELP = 'load a configuration file (.cfg) to get the scheduler ' \
                     'conditions'
+    S_ADD_HELP = 'add a new line to your crontab file. A whole crontab line ' \
+                 'must be written following the add argument, but divided ' \
+                 'in two parts: time specifications and the command, each ' \
+                 'one between quotes'
+    S_REMOVE_HELP = 'remove a line from your crontab file. A whole crontab ' \
+                    'line must be written following the remove argument, ' \
+                    'but divided in two parts: time specifications and the ' \
+                    'command, each one between quotes. The specified line ' \
+                    'must exist'
     S_SHOW_HELP = 'show all the lines of the program\'s CRON file'
 
     TERMINATOR_HELP = 'TERMINATOR: terminates the specified connections to ' \
@@ -228,6 +237,10 @@ class Messenger:
     RESTORER_ARGS_ERROR = 'insufficient parameters to work - [-C/--config | ' \
                           '-d/--db-backup | (-c/--cluster & ' \
                           '-p/--cluster-backup)] must be specified'
+    SCHEDULER_ARGS_ERROR_1 = 'argument -a/--add: not allowed with argument ' \
+                             '-rC/--remove-config'
+    SCHEDULER_ARGS_ERROR_2 = 'argument -r/--remove: not allowed with ' \
+                             'argument -aC/--add-config'
     TERMINATOR_ARGS_ERROR = 'insufficient parameters to work - [-C/--config ' \
                             '| -a/--all | -d/--db-name | -u/--user] must be ' \
                             'specified'
@@ -775,6 +788,28 @@ class Messenger:
                                'destinatario válido: no se enviará ningún ' \
                                'correo electrónico.'
 
+    SHOWING_CRONTAB_FILE = 'Cargando archivo crontab del usuario...'
+    NO_CRONTAB_FILE = 'No hay archivo crontab para el usuario que está ' \
+                      'ejecutando el programa.'
+    CREATING_CRONTAB_FILE = 'Creando archivo crontab del usuario...'
+    SCHEDULER_ADD_DONE = 'Añadida instrucción al archivo crontab del usuario.'
+    SCHEDULER_ADD_FAIL = 'No ha sido posible añadir la instrucción al ' \
+                         'archivo crontab del usuario.'
+    SCHEDULER_ADDING = 'Añadiendo instrucción al archivo crontab del ' \
+                       'usuario...'
+    SCHEDULER_REMOVING = 'Eliminando instrucción del archivo crontab del ' \
+                         'usuario...'
+    SCHEDULER_REMOVE_DONE = 'La instrucción "{job}" fue eliminada del ' \
+                            'archivo crontab del usuario.'
+    SCHEDULER_REMOVE_FAIL = 'No fue posible eliminar La instrucción "{job}" ' \
+                            'del archivo crontab del usuario.'
+    INVALID_CRONTAB_SPECIAL_COMMAND = 'El comando especial especificado de ' \
+                                      'crontab es incorrecto.'
+    INVALID_CRONTAB_TIME = 'El tiempo especificado de crontab es incorrecto.'
+    NO_CRONTAB_JOB_TO_DEL = 'La instrucción especificada no existe en el ' \
+                            'archivo crontab del usuario.'
+    SCHEDULER_DONE = 'Fin del proceso Scheduler.'
+
     def __init__(self):
         pass
 
@@ -789,7 +824,6 @@ class Default:
     DB_OWNER = ''
     CL_BKPS_DIR = '/cl_backups/'
     CONNECTION_DATABASE = 'postgres'
-    CRON_PATH = '/etc/cron.d/py_pg_tools'
     EX_DBS = []
     EX_REGEX = ''
     EX_TEMPLATES = True

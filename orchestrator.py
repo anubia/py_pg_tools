@@ -42,7 +42,7 @@ class Orchestrator:
             # Create mailer if necessary
             if self.args.config_mailer:
                 self.create_mailer()
-        except NameError:
+        except Exception:
             pass
 
         # Stop execution if the user running the program is root
@@ -533,22 +533,46 @@ class Orchestrator:
               program's CRON file.
         '''
         # If the user specified a scheduler config file through console...
-        if self.args.config:
-            #config_type = 'schedule'
+        if self.args.add_config:
+            config_type = 'schedule'
             # Get the variables from the config file
-            #parser = Orchestrator.get_cfg_vars(config_type, self.args.config,
-                                               #self.logger)
+            parser = Orchestrator.get_cfg_vars(config_type,
+                                               self.args.add_config,
+                                               self.logger)
 
             # Overwrite the config variables with the console ones if necessary
-            pass
+            if self.args.add:
+                parser.bkp_vars['time'] = self.args.add[0]
+                parser.bkp_vars['command'] = self.args.add[1]
 
             # Create the scheduler with the specified variables
-            scheduler = Scheduler(self.logger)
+            scheduler = Scheduler(parser.bkp_vars['time'],
+                                  parser.bkp_vars['command'], self.logger)
+        elif self.args.remove_config:
+            config_type = 'schedule'
+            # Get the variables from the config file
+            parser = Orchestrator.get_cfg_vars(config_type,
+                                               self.args.remove_config,
+                                               self.logger)
+
+            # Overwrite the config variables with the console ones if necessary
+            if self.args.remove:
+                parser.bkp_vars['time'] = self.args.remove[0]
+                parser.bkp_vars['command'] = self.args.remove[1]
+
+            # Create the scheduler with the specified variables
+            scheduler = Scheduler(parser.bkp_vars['time'],
+                                  parser.bkp_vars['command'], self.logger)
 
         # If the user did not specify a scheduler config file through console..
+        elif self.args.add:
+            scheduler = Scheduler(self.args.add[0], self.args.add[1],
+                                  self.logger)
+        elif self.args.remove:
+            scheduler = Scheduler(self.args.remove[0], self.args.remove[1],
+                                  self.logger)
         else:
-            # Create the scheduler with the console variables
-            scheduler = Scheduler(self.logger)
+            scheduler = Scheduler(logger=self.logger)
 
         return scheduler
 
@@ -984,8 +1008,15 @@ class Orchestrator:
         self.logger.debug(Messenger.BEGINNING_EXE_SCHEDULER)
         scheduler = self.get_scheduler()
 
+        if self.args.add or self.args.add_config:
+            scheduler.add_line()
+        elif self.args.remove or self.args.remove_config:
+            scheduler.remove_line()
         if self.args.show:
             scheduler.show_lines()
+
+        self.logger.highlight('info', Messenger.SCHEDULER_DONE, 'green',
+                              effect='bold')
 
     def setup_terminator(self):
         '''

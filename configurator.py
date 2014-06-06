@@ -81,9 +81,9 @@ class Configurator:
             self.parser.load_cfg(self.path)
             self.parser.parse_restorer_cluster()
 
-        elif self.cfg_type == 'vacuum':
+        elif self.cfg_type == 'schedule':
             self.parser.load_cfg(self.path)
-            self.parser.parse_vacuumer()
+            self.parser.parse_scheduler()
 
         elif self.cfg_type == 'trim':
             self.parser.load_cfg(self.path)
@@ -96,5 +96,10 @@ class Configurator:
         elif self.cfg_type == 'terminate':
             self.parser.load_cfg(self.path)
             self.parser.parse_terminator()
+
+        elif self.cfg_type == 'vacuum':
+            self.parser.load_cfg(self.path)
+            self.parser.parse_vacuumer()
+
         else:
             pass
