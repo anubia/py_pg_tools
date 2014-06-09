@@ -664,6 +664,11 @@ class Messenger:
                           'PostgreSQL está dañado. Por favor, revise que ' \
                           'los nombres por defecto de secciones y atributos ' \
                           'son correctos.'
+    INFORMER_CFG_DAMAGED = 'El archivo de configuración con las condiciones ' \
+                           'para obtener información diversa de PostgreSQL ' \
+                           'está dañado. Por favor, revise que los nombres ' \
+                           'por defecto de secciones y atributos son ' \
+                           'correctos.'
     REPLICATOR_CFG_DAMAGED = 'El archivo de configuración con las ' \
                              'condiciones para clonar una base de datos de ' \
                              'PostgreSQL está dañado. Por favor, revise que ' \

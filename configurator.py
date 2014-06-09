@@ -57,10 +57,6 @@ class Configurator:
             self.parser.load_cfg(self.path)
             self.parser.parse_dropper()
 
-        elif self.cfg_type == 'inform':
-            self.parser.load_cfg(self.path)
-            self.parser.parse_informer()
-
         elif self.cfg_type == 'log':
             self.parser.load_cfg(self.path)
             self.parser.parse_logger()
