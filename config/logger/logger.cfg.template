@@ -1,0 +1,26 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# ***************************** LOGGER PROPERTIES *****************************
+
+[settings]
+
+# LOG_DIR = Write here the absolute path of the directory in which you want to
+# store all the log files. If it did not exist, it will be created
+# automatically. It can be empty. In this case, the directory of the log files
+# will be log/, which will be in the root folder of the script.
+
+log_dir: log/
+
+# LEVEL = Set here the verbosity level you want the log files to have (debug,
+# info, warning, error, critical). Note that the debug level gives much more
+# information than the others, then the info level, warning, error and finally
+# critical. Leaving this field empty will mean that the chosen level is debug.
+
+level: info
+
+# MUTE: Set this field to True if you do not want any log files to be created.
+# This way you will only receive information through the console window.
+
+mute: False

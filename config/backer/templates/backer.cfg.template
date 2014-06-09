@@ -1,0 +1,103 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# ************************** BACKUPS' DIRECTORY DATA **************************
+
+[dir]
+
+# BKP_PATH = the path where you want the program to store the backups. If
+# empty, they will be stored in /opt/backups/pg_backups by default. Note that
+# the user who is running the program must have permissions to manipulate this
+# directory, if not, the program will stop its execution as a safety measure.
+
+bkp_path: /opt/my_backups/
+
+# GROUP = the name of the group you are making backups for. Actually, when
+# the program makes a backup, it will create a new folder (if it did not exist)
+# with the name of this attribute inside your elected path (BKP_PATH).
+
+group: my_group
+
+# **************************** BACKUPS' FILE DATA *****************************
+
+[file]
+
+# BKP_TYPE = the type of the backups the program is going to make. They can be
+# automatically compressed as gz, bz2, or zip if you want. Choose one of
+# them. If you do not want the backups compressed, write dump. Therefore, the
+# options in this field must be one of these: [dump, gz, bz2, zip]
+
+bkp_type: zip
+
+# PREFIX = the prefix you want to be in each backup's name. It can help you,
+# for example, to differ daily backups from the weekly, monthly or yearly ones,
+# or whatever attribute you want to take into account. This field can be empty
+# if you do not want any prefix.
+
+prefix: daily_
+
+# *********************** DATABASES TO MAKE A BACKUP OF ***********************
+
+[includes]
+
+# IN_DBS = the list of the databases' names which you want to make a backup of.
+# They must be separated by commas if you specify more than one. If you want to
+# make a backup of all databases, you can write *. If you do not want to
+# specify a list, you can leave this field empty.
+
+in_dbs: my_db_to_be_backuped_1, my_db_to_be_backuped_2
+
+# IN_REGEX = a regular expression which indicates the databases'names you want
+# to make a backup of. You can combine this one with a list of databases' names
+# (IN_DBS) and the result will be the addition of both. Can be empty too.
+
+in_regex:
+
+# IN_PRIORITY = a flag which determinates whether or not the include conditions
+# must have priority over the exclude ones. Must be True or False.
+
+in_priority: False
+
+# ********************* DATABASES NOT TO MAKE A BACKUP OF *********************
+
+[excludes]
+
+# EX_DBS = the list of the databases' names which you do not want to make a
+# backup of. They must be separated by commas if you specify more than one. If
+# you do not want to make any backup, you can write *. If you do not want to
+# specify a list, you can leave this field empty.
+
+ex_dbs: my_db_not_to_be_backuped_1, my_db_not_to_be_backuped_2
+
+# EX_REGEX = a regular expression which indicates the databases'names you do
+# not want to make a backup of. You can combine this one with a list of
+# databases' names (EX_DBS) and the result will be the addition of both. Can be
+# empty too.
+
+ex_regex: template*
+
+# EX_TEMPLATES = a flag which indicates whether or not you want to exclude
+# those PostgreSQL databases which are templates from the backup process. Must
+# be True or False.
+
+ex_templates: True
+
+# *************************** OTHER SPECIFICATIONS ****************************
+
+[other]
+
+# VACUUM = a flag which indicates whether or not you want to vacuum the
+# databases before the program makes a backup of them. Must be True or False.
+
+vacuum: True
+
+# DB_OWNER = in case you are connecting to PostgreSQL as a superuser, you can
+# tell the program to work as if you were other different user. Remember that
+# you can only make backups of your own databases (unless you are a superuser).
+# This way, if you fill in this field with other user (who is not a superuser),
+# you will only be able to make backups of the databases which this user owns,
+# in spite of being connected as a PostgreSQL superuser. If you are connected
+# as superuser and you want to work as such, leave this empty.
+
+db_owner:

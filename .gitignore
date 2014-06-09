@@ -49,3 +49,4 @@
 help
 help/*
 proof.py
+*.cfg

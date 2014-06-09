@@ -1,0 +1,25 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# ***************************** ALTERER SETTINGS ******************************
+
+[settings]
+
+# IN_DBS = the list of the databases' names which you want to make a backup of.
+# They must be separated by commas if you specify more than one. If you want to
+# make a backup of all databases, you can write *. If you do not want to
+# specify a list, you can leave this field empty.
+
+in_dbs: my_db_to_be_altered_1, my_db_to_be_altered_2
+
+# OLD_ROLE = to change the owner of some tables of the databases, specify here
+# the current owner of those tables (it is usually the same of their database's # owner, but not always). You will not be able to apply the changes if they are
+# owned by the user postgres.
+
+old_role: the_old_owner_of_the_dbs
+
+# NEW_ROLE = specify here the new owner you want the databases and their tables
+# to have. It must exist in PostgreSQL.
+
+new_role: the_new_owner_of_the_dbs
