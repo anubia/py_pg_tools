@@ -1,0 +1,62 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# **************************** DATABASES TO VACUUM ****************************
+
+[includes]
+
+# IN_DBS = the list of the databases' names which you want to vacuum. They must
+# be separated by commas if you specify more than one. If you want to vacuum
+# all databases, you can write *. If you do not want to specify a list, you can
+# leave this field empty.
+
+in_dbs: *
+
+# IN_REGEX = a regular expression which indicates the databases'names you want
+# to vacuum. You can combine this one with a list of databases' names (IN_DBS)
+# and the result will be the addition of both. Can be empty too.
+
+in_regex:
+
+# IN_PRIORITY = a flag which determinates whether or not the include conditions
+# must have priority over the exclude ones. Must be True or False.
+
+in_priority: False
+
+# ************************** DATABASES NOT TO VACUUM **************************
+
+[excludes]
+
+# EX_DBS = the list of the databases' names which you do not want to vacuum.
+# They must be separated by commas if you specify more than one. If you do not
+# want to vacuum any databases, you can write *. If you do not want to specify
+# a list, you can leave this field empty.
+
+ex_dbs: my_db_not_to_be_vacuumed
+
+# EX_REGEX = a regular expression which indicates the databases'names you do
+# not want to vacuum. You can combine this one with a list of databases' names
+# (EX_DBS) and the result will be the addition of both. Can be empty too.
+
+ex_regex: template*
+
+# EX_TEMPLATES = a flag which indicates whether or not you want to exclude
+# those PostgreSQL databases which are templates from the vacuum process. Must
+# be True or False.
+
+ex_templates: False
+
+# *************************** OTHER SPECIFICATIONS ****************************
+
+[other]
+
+# DB_OWNER = in case you are connecting to PostgreSQL as a superuser, you can
+# tell the program to work as if you were other different user. Remember that
+# you can only vacuum your own databases (unless you are a superuser). This
+# way, if you fill in this field with other user (who is not a superuser), you
+# will only be able to vacuum the databases which this user owns, in spite of
+# being connected as a PostgreSQL superuser. If you are connected as superuser
+# and you want to work as such, leave this empty.
+
+db_owner:

@@ -1,0 +1,12 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# ***************************** DATABASES TO DROP *****************************
+
+[includes]
+
+# IN_DBS = the list of the databases' names which you want to drop. They must
+# be separated by commas if you specify more than one.
+
+in_dbs: my_db_to_be_dropped_1, my_db_to_be_dropped_2
