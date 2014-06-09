@@ -48,5 +48,6 @@
 # Custom by Juan
 help
 help/*
+mailer/mailer2.py
 proof.py
 *.cfg
