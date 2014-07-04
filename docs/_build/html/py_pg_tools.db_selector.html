@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py_pg_tools.db_selector package &mdash; py_pg_tools 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="py_pg_tools 0.1.1 documentation" href="index.html" />
+    <link rel="up" title="py_pg_tools package" href="py_pg_tools.html" />
+    <link rel="next" title="py_pg_tools.dir_tools package" href="py_pg_tools.dir_tools.html" />
+    <link rel="prev" title="py_pg_tools.date_tools package" href="py_pg_tools.date_tools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.dir_tools.html" title="py_pg_tools.dir_tools package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.date_tools.html" title="py_pg_tools.date_tools package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" accesskey="U">py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="py-pg-tools-db-selector-package">
+<h1>py_pg_tools.db_selector package<a class="headerlink" href="#py-pg-tools-db-selector-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-py_pg_tools.db_selector.db_selector">
+<span id="py-pg-tools-db-selector-db-selector-module"></span><h2>py_pg_tools.db_selector.db_selector module<a class="headerlink" href="#module-py_pg_tools.db_selector.db_selector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector">
+<em class="property">class </em><tt class="descclassname">py_pg_tools.db_selector.db_selector.</tt><tt class="descname">DbSelector</tt><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.db_filter_exclude">
+<em class="property">static </em><tt class="descname">db_filter_exclude</tt><big>(</big><em>dbs_list</em>, <em>ex_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>ex_regex=''</em>, <em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.db_filter_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>filter a list of databases to remove only the specified ones,
+taking into account the received parameters.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbs_list: list to filter.</li>
+<li>ex_dbs: list with the databases&#8217; names to exclude.</li>
+<li>ex_regex: regular expression which indicates the databases&#8217; names
+to exclude.</li>
+<li>logger: a logger to show and log some messages.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a filtered list (subset of &#8220;dbs_list&#8221;), value from the addition
+of the exclude conditions &#8220;ex_dbs&#8221; y &#8220;ex_regex&#8221;.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.db_filter_include">
+<em class="property">static </em><tt class="descname">db_filter_include</tt><big>(</big><em>dbs_list</em>, <em>in_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>in_regex=''</em>, <em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.db_filter_include" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>filter a list of databases to get only the specified ones, taking
+into account the received parameters.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbs_list: list to filter.</li>
+<li>in_dbs: list with the databases&#8217; names to include.</li>
+<li>in_regex: regular expression which indicates the databases&#8217; names
+to include.</li>
+<li>logger: a logger to show and log some messages.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a filtered list (subset of &#8220;dbs_list&#8221;), value from the addition
+of the include conditions &#8220;in_dbs&#8221; y &#8220;in_regex&#8221;.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.dbname_filter_exclude">
+<em class="property">static </em><tt class="descname">dbname_filter_exclude</tt><big>(</big><em>dbs_list</em>, <em>ex_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>ex_regex=''</em>, <em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.dbname_filter_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>filter a list of databases&#8217; names to remove only the specified
+ones, taking into account the received parameters.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbs_list: list to filter.</li>
+<li>ex_dbs: list with the databases&#8217; names to exclude.</li>
+<li>ex_regex: regular expression which indicates the databases&#8217; names
+to exclude.</li>
+<li>logger: a logger to show and log some messages.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a filtered list (subset of &#8220;dbs_list&#8221;), value from the addition
+of the exclude conditions &#8220;ex_dbs&#8221; y &#8220;ex_regex&#8221;.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.dbname_filter_include">
+<em class="property">static </em><tt class="descname">dbname_filter_include</tt><big>(</big><em>dbs_list</em>, <em>in_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>in_regex=''</em>, <em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.dbname_filter_include" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>filter a list of databases&#8217; names to get only the specified ones,
+taking into account the received parameters.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbs_list: list to filter.</li>
+<li>in_dbs: list with the databases&#8217; names to include.</li>
+<li>in_regex: regular expression which indicates the databases&#8217; names
+to include.</li>
+<li>logger: a logger to show and log some messages.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a filtered list (subset of &#8220;dbs_list&#8221;), value from the addition
+of the include conditions &#8220;in_dbs&#8221; y &#8220;in_regex&#8221;.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.get_filtered_dbnames">
+<em class="property">static </em><tt class="descname">get_filtered_dbnames</tt><big>(</big><em>dbs_all</em>, <em>in_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>ex_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>in_regex=''</em>, <em>ex_regex=''</em>, <em>in_priority=False</em>, <em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.get_filtered_dbnames" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>filter a list of databases&#8217; names taking into account inclusion
+and exclusion parameters and their priority.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbs_all: list to filter.</li>
+<li>in_dbs: list with the databases&#8217; names to include.</li>
+<li>ex_dbs: list with the databases&#8217; names to exclude.</li>
+<li>in_regex: regular expression which indicates the databases&#8217; names
+to include.</li>
+<li>ex_regex: regular expression which indicates the databases&#8217; names
+to exclude.</li>
+<li>in_priority: a flag which determinates if the inclusion
+parameters must predominate over the exclusion ones.</li>
+<li>logger: a logger to show and log some messages.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a filtered list (subset of &#8220;dbs_all&#8221;).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.get_filtered_dbs">
+<em class="property">static </em><tt class="descname">get_filtered_dbs</tt><big>(</big><em>dbs_all</em>, <em>in_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>ex_dbs=</em>, <span class="optional">[</span><span class="optional">]</span><em>in_regex=''</em>, <em>ex_regex=''</em>, <em>in_priority=False</em>, <em>logger=None</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.get_filtered_dbs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>filter a database&#8217;s list taking into account inclusion and
+exclusion parameters and their priority.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>dbs_all: list to filter.</li>
+<li>in_dbs: list with the databases&#8217; names to include.</li>
+<li>ex_dbs: list with the databases&#8217; names to exclude.</li>
+<li>in_regex: regular expression which indicates the databases&#8217; names
+to include.</li>
+<li>ex_regex: regular expression which indicates the databases&#8217; names
+to exclude.</li>
+<li>in_priority: a flag which determinates if the inclusion
+parameters must predominate over the exclusion ones.</li>
+<li>logger: a logger to show and log some messages.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a filtered list (subset of &#8220;dbs_all&#8221;).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.list_pg_dbnames">
+<em class="property">static </em><tt class="descname">list_pg_dbnames</tt><big>(</big><em>cursor</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.list_pg_dbnames" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>turns a cursor&#8217;s data into a list.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>cursor: a connection cursor with data stored.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a list with databases&#8217; name.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="py_pg_tools.db_selector.db_selector.DbSelector.list_pg_dbs">
+<em class="property">static </em><tt class="descname">list_pg_dbs</tt><big>(</big><em>cursor</em><big>)</big><a class="headerlink" href="#py_pg_tools.db_selector.db_selector.DbSelector.list_pg_dbs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>turns a cursor&#8217;s data into a list.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>cursor: a connection cursor with data stored.</li>
+</ul>
+</dd>
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>a list with dictionaries which have databases&#8217; name, connection
+permissions and their owner stored.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-py_pg_tools.db_selector">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-py_pg_tools.db_selector" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">py_pg_tools.db_selector package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.db_selector.db_selector">py_pg_tools.db_selector.db_selector module</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.db_selector">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="py_pg_tools.date_tools.html"
+                        title="previous chapter">py_pg_tools.date_tools package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="py_pg_tools.dir_tools.html"
+                        title="next chapter">py_pg_tools.dir_tools package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/py_pg_tools.db_selector.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.dir_tools.html" title="py_pg_tools.dir_tools package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.date_tools.html" title="py_pg_tools.date_tools package"
+             >previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" >py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Juan Formoso Vasco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

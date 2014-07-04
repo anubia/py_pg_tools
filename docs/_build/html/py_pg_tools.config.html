@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py_pg_tools.config package &mdash; py_pg_tools 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="py_pg_tools 0.1.1 documentation" href="index.html" />
+    <link rel="up" title="py_pg_tools package" href="py_pg_tools.html" />
+    <link rel="next" title="py_pg_tools.const package" href="py_pg_tools.const.html" />
+    <link rel="prev" title="py_pg_tools.checker package" href="py_pg_tools.checker.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.const.html" title="py_pg_tools.const package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.checker.html" title="py_pg_tools.checker package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" accesskey="U">py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="py-pg-tools-config-package">
+<h1>py_pg_tools.config package<a class="headerlink" href="#py-pg-tools-config-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-py_pg_tools.config.config_tools">
+<span id="py-pg-tools-config-config-tools-module"></span><h2>py_pg_tools.config.config_tools module<a class="headerlink" href="#module-py_pg_tools.config.config_tools" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py_pg_tools.config.config_tools.CfgParser">
+<em class="property">class </em><tt class="descclassname">py_pg_tools.config.config_tools.</tt><tt class="descname">CfgParser</tt><big>(</big><em>logger</em><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.CfgParser.bkp_vars">
+<tt class="descname">bkp_vars</tt><em class="property"> = {}</em><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.bkp_vars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.CfgParser.cfg">
+<tt class="descname">cfg</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.cfg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.CfgParser.conn_vars">
+<tt class="descname">conn_vars</tt><em class="property"> = {}</em><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.conn_vars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.CfgParser.kill_vars">
+<tt class="descname">kill_vars</tt><em class="property"> = {}</em><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.kill_vars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.load_cfg">
+<tt class="descname">load_cfg</tt><big>(</big><em>cfg_file</em><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.load_cfg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>create a parser and read a config file.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>cfg_file: the config file to be readed.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.CfgParser.logger">
+<tt class="descname">logger</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_backer">
+<tt class="descname">parse_backer</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_backer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the backer variables from a configuration file and store them
+in a dictionary (database case).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_backer_cluster">
+<tt class="descname">parse_backer_cluster</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_backer_cluster" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the backer variables from a configuration file and store them
+in a dictionary (cluster case).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_connecter">
+<tt class="descname">parse_connecter</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_connecter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the connecter variables from a configuration file and store
+them in a dictionary.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_dropper">
+<tt class="descname">parse_dropper</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_dropper" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the dropper variables from a configuration file and store
+them in a dictionary.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_replicator">
+<tt class="descname">parse_replicator</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_replicator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the replicator variables from a configuration file and store
+them in a dictionary.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_restorer">
+<tt class="descname">parse_restorer</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_restorer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the restorer variables from a configuration file and store
+them in a dictionary (database case).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_restorer_cluster">
+<tt class="descname">parse_restorer_cluster</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_restorer_cluster" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the restorer variables from a configuration file and store
+them in a dictionary (cluster case).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_terminator">
+<tt class="descname">parse_terminator</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_terminator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the terminator variables from a configuration file and store
+them in a dictionary.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_trimmer">
+<tt class="descname">parse_trimmer</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_trimmer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the trimmer variables from a configuration file and store
+them in a dictionary (database case).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_trimmer_cluster">
+<tt class="descname">parse_trimmer_cluster</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_trimmer_cluster" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the trimmer variables from a configuration file and store
+them in a dictionary (cluster case).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.CfgParser.parse_vacuumer">
+<tt class="descname">parse_vacuumer</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.CfgParser.parse_vacuumer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the vacuumer variables from a configuration file and store
+them in a dictionary.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="py_pg_tools.config.config_tools.LogCfgParser">
+<em class="property">class </em><tt class="descclassname">py_pg_tools.config.config_tools.</tt><tt class="descname">LogCfgParser</tt><a class="headerlink" href="#py_pg_tools.config.config_tools.LogCfgParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.LogCfgParser.cfg">
+<tt class="descname">cfg</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.config.config_tools.LogCfgParser.cfg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.LogCfgParser.load_cfg">
+<tt class="descname">load_cfg</tt><big>(</big><em>cfg_file</em><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.LogCfgParser.load_cfg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>create a parser and read a config file.</li>
+</ul>
+</dd>
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>cfg_file: the config file to be readed.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.LogCfgParser.log_vars">
+<tt class="descname">log_vars</tt><em class="property"> = {}</em><a class="headerlink" href="#py_pg_tools.config.config_tools.LogCfgParser.log_vars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="py_pg_tools.config.config_tools.LogCfgParser.logger">
+<tt class="descname">logger</tt><em class="property"> = None</em><a class="headerlink" href="#py_pg_tools.config.config_tools.LogCfgParser.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py_pg_tools.config.config_tools.LogCfgParser.parse_logger">
+<tt class="descname">parse_logger</tt><big>(</big><big>)</big><a class="headerlink" href="#py_pg_tools.config.config_tools.LogCfgParser.parse_logger" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Target:</dt>
+<dd><ul class="first last simple">
+<li>get the logger variables from a configuration file and store them
+in a dictionary.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-py_pg_tools.config">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-py_pg_tools.config" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">py_pg_tools.config package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.config.config_tools">py_pg_tools.config.config_tools module</a></li>
+<li><a class="reference internal" href="#module-py_pg_tools.config">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="py_pg_tools.checker.html"
+                        title="previous chapter">py_pg_tools.checker package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="py_pg_tools.const.html"
+                        title="next chapter">py_pg_tools.const package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/py_pg_tools.config.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.const.html" title="py_pg_tools.const package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py_pg_tools.checker.html" title="py_pg_tools.checker package"
+             >previous</a> |</li>
+        <li><a href="index.html">py_pg_tools 0.1.1 documentation</a> &raquo;</li>
+          <li><a href="py_pg_tools.html" >py_pg_tools package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Juan Formoso Vasco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

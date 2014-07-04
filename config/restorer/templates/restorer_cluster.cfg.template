@@ -1,0 +1,12 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# **************************** RESTORER SETTINGS ******************************
+
+[settings]
+
+# BKP_PATH = the path of the cluster's backup which you want to restore in
+# PostgreSQL.
+
+bkp_path: /opt/my_backups/default_group/cl_backups/2014/06/ht_localhost5432_cluster_20140515_174552_CEST.dump

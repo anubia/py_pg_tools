@@ -1,0 +1,21 @@
+# This is a template file. Fill in the fields in order to do a custom execution
+# of this module and remember to save the file as a .cfg one (remove the
+# ".template" part from the name).
+
+# ****************************** ADD/REMOVE SETTINGS **************************
+
+[settings]
+
+# TIME = the params related to time on a crontab line. This field could be a
+# special command (@yearly, @annually, @monthly, @weekly, @daily, @midnight,
+# @hourly, @reboot) or a simple line of time (m h dom mon dow), in which the
+# special characters like asterisks, hyphens, commas or forward slashes are
+# allowed. If you specify minute, hour, day of month, month and day of week,
+# they must be separated with spaces.
+
+time: 30 12 10 06 *
+
+# COMMAND = the second part of a crontab sentence and the command which is
+# going to be executed at the indicated time.
+
+command: python3 my_program.py
