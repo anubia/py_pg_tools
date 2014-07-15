@@ -67,3 +67,19 @@ bcc: Mike Wazowsky <mike_wazowsky@moninc.com>
 # chosen level is warning.
 
 level: 0
+
+# SERVER_TAG = write here the ID of the server where the mail comes from. It is
+# only an informative field for the user who is receiving the mails, to know
+# in which server the process was executed and differ it from the other ones
+# (it will be useful in those cases in which the user is receiving several
+# mails from different servers). It can be empty.
+
+server_tag: Server where the mail comes from
+
+# EXTERNAL_IP = write here the external IP of the server where the mail comes
+# from. It is only an informative field for the user who is receiving the
+# mails, to know in which server the process was executed and differ it from
+# the other ones (it will be useful in those cases in which the user is
+# receiving several mails from different servers). It can be empty.
+
+external_ip: xxx.xxx.xxx.xxx
