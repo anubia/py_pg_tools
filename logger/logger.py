@@ -125,11 +125,33 @@ class Logger:
         self.police = police
 
     def create_mailer(self, level=1, username='', email='', password='',
-                      to_infos=[], cc_infos=[], bcc_infos=[], op_type=''):
-
+                      to_infos=[], cc_infos=[], bcc_infos=[], server_tag='',
+                      external_ip='', op_type=''):
+        '''
+        Target:
+            - creates a mail object.
+        Parameters:
+            - level: verbosity level of the email.
+            - username: name of the user who is sending the emails.
+            - email: email account of the user who is sending the emails.
+            - password: email account password the user who is sending the
+              emails.
+            - to_info: list of email accounts which are going to receive the
+              emails.
+            - cc_info: list of email accounts which are going to receive the
+              emails as a carbon copy.
+            - bcc_info: list of email accounts which are going to receive the
+              emails as a blind carbon copy.
+            - server_tag: alias of the machine where the script is being
+              executed.
+            - external_ip: external IP of the machine where the script is being
+              executed.
+            - op_type: type of action executed.
+        '''
         from mail_tools.mailer import Mailer
         self.mailer = Mailer(level, username, email, password, to_infos,
-                             cc_infos, bcc_infos, op_type, self)
+                             cc_infos, bcc_infos, server_tag, external_ip,
+                             op_type, self)
 
     def change_police(self, new_value):
         '''
