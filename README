@@ -1,23 +1,62 @@
-py_pg_tools:
-    A group of scripts made to dump and vacuum PostgreSQL databases, dump PostgreSQL clusters, and clean PostgreSQL databases/clusters backups.
 
-imported packages:
-    python3
-    python-crontab
-    python3-dateutil
-    python3-psycopg2
+PY_PG_TOOLS:
 
-imported modules:
-    argparse
-    configparser
-    dateutil
-    getpass
-    logging
-    math
-    os
-    os.path
-    psycopg2
-    re
-    subprocess
-    sys
-    time
+    A powerful tool to use PostgreSQL in an easier and faster way. It allows
+    the possibility to:
+
+    - Change the owner of a database and all of its tables.
+    - Make a custom backup of a PostgreSQL database or a whole cluster.
+    - Delete a PostgreSQL database.
+    - Get some information about some PostgreSQL databases, users or its
+      current active connections.
+    - Clone a PostgreSQL database.
+    - Restore a database or cluster's backup in PostgreSQL.
+    - Add to, delete or get some instructions from the user's crontab file, to
+      execute automatically the program in a specific date and time.
+    - Terminate some connections to PostgreSQL.
+    - Delete a group of backups depending on a very customizable options.
+    - Vacuum some PostgreSQL databases.
+
+    See more information about py_pg_tools and its modules' characteristics
+    letters specifying the argument -h or --help in console. For example
+    (supposing you are in the same directory of py_pg_tools.py):
+
+    - python3 py_pg_tools.py -h
+
+    If you want to see more information about a specific module, write its
+    characteristic letter and then the argument -h or --help. For example,
+    in case you need information about how to make a backup (supposing you are
+    in the same directory of py_pg_tools.py):
+
+    - python3 py_pg_tools.py B -h
+
+IMPORTED PACKAGES:
+
+    python3 (v >= 3.2)
+    python-crontab (v >= 1.8)
+    python3-dateutil (v >= 2.0)
+    python3-psycopg2 (v >= 2.4.5)
+    netifaces (v >= 0.10.4)
+
+INSTALLATION:
+
+    This program only runs in Linux OS. Check you do the next steps:
+
+    - Install the package python3.
+    - Install the package python3-psycopg2.
+    - Install the package python3-dateutil.
+    - Install the package python-crontab. This one is bound to be installed in
+      python2.x directories. Look for the cronlog.py and crontab.py files in 
+      your Linux OS. If they are in a python2.x directory, make a symbolic
+      link to each one in the python3.x counterpart directory.
+    - Install the package netifaces.
+
+USAGE:
+
+    - Open a terminal.
+    - Go to the directory where you have the py_pg_tools.py file.
+    - Execute the command:
+
+      python3 py_pg_tools.py ...
+
+      Where ... are your specified arguments.
