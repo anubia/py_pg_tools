@@ -183,6 +183,7 @@ class RestorerCluster:
         self.logger.highlight('info', message, 'white')
         self.logger.info(Messenger.WAIT_PLEASE)
 
+        # TODO: make dissappear every line about the operation shown in console
         if ext == 'gz':
             command = 'gunzip -c {} -k | psql postgres -U {} -h {} ' \
                       '-p {}'.format(
@@ -198,8 +199,6 @@ class RestorerCluster:
                 self.cluster_backup, self.connecter.user,
                 self.connecter.server, self.connecter.port)
         else:
-            # TODO Hacer que desaparezcan todos los comandos SQL que se ven en
-            # consola, crear automáticamente el clúster antes de restaurarlo
             command = 'psql postgres -U {} -h {} -p {} < {}'.format(
                 self.connecter.user, self.connecter.server,
                 self.connecter.port, self.cluster_backup)

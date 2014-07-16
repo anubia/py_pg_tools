@@ -21,35 +21,6 @@
     #connecter.conn.rollback()
     #print(str(e))
 
-#import hashlib
-#from hashlib import md5
-
-#string = "hola"
-
-#m = hashlib.md5()
-#m.update(string.encode('utf-8'))
-#print(m.hexdigest())
-#import smtplib
-
-#msg_header = 'From: sender@server\n' \
-             #'To: receiver@server\n' \
-             #'Cc: receiver2@server\n' \
-             #'MIME-Version: 1.0\n' \
-             #'Content-type: text/html\n' \
-             #'Subject: Any subject\n'
-#title = 'My title'
-#msg_content = '<h2>{title} > <font color="green">OK</font></h2>\n'.format(
-    #title=title)
-#msg_full = (''.join([msg_header, msg_content])).encode()
-
-#server = smtplib.SMTP('smtp.gmail.com:587')
-#server.starttls()
-#server.login('sender@server.com', 'receiver@server.com', 'receiver2@server.com')
-#server.sendmail('Sender Name <sender@server.com>',
-                #['Receiver Name <receiver@server.com>',
-                 #'Receiver2 Name <receiver@server.com>'], msg_full)
-#server.quit()
-
 #from crontab import CronTab
 
 #cron = CronTab(user=True)
@@ -61,9 +32,64 @@
 #cron.write()
 #print(cron.render())
 
-from crontab import CronTab
+#import socket
+#print(socket.gethostname())
 
-cron = CronTab(user=True)
+#import smtplib
+#from email.mime.text import MIMEText
+#from email.mime.multipart import MIMEMultipart
 
-for job in cron:
-    print(job)
+#title = 'My title'
+#html = '<h2>{title}: <span style="color:green">OK</span></h2>\n'.format(title=title)
+#text = 'Tu servidor de correo es una basura sin HTML.'
+
+#message = MIMEMultipart('alternative')
+#message['From'] = 'Sender Name <sender@server>'
+#message['To'] = 'Receiver Name <receiver@server>'
+#message['Cc'] = 'Receiver2 Name <receiver2@server>'
+#message['Subject'] = 'Any subject'
+
+## Record the MIME types of both parts - text/plain and text/html.
+#part1 = MIMEText(text, 'plain')
+#part2 = MIMEText(html, 'html')
+
+## Attach parts into message container.
+## According to RFC 2046, the last part of a multipart message, in this case
+## the HTML message, is best and preferred.
+#message.attach(part1)
+#message.attach(part2)
+
+#msg_full = message.as_string()
+
+#server = smtplib.SMTP('smtp.gmail.com:587')
+#server.starttls()
+#server.login('jfv@anubia.es', '1337!vomisacaasi')
+#server.sendmail('jfv@anubia.es', ['jfv@anubia.es'], msg_full)
+#server.quit()
+
+#import netifaces
+
+#netifaces_ips = []
+#for netiface in netifaces.interfaces():
+    #addrs = netifaces.ifaddresses(netiface)
+    #for item in addrs[netifaces.AF_INET]:
+        #if 'addr' in item.keys():
+            #netifaces_ips.append({netiface: item['addr'], })
+            #break
+#print(netifaces_ips)
+
+import smtplib
+# Sending the mail
+try:
+    #server = smtplib.SMTP('smtp.gmail.com:587')
+    server = smtplib.SMTP('localhost:25')
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+    #server.login(self.from_info['email'], self.from_info['pwd'])
+    #server.login(None, None)
+    server.sendmail('Juan <jfv@anubia.es>', ['jfv@anubia.es'], 'Hi')
+    server.quit()
+
+except smtplib.SMTPException as e:
+    print('Error en la función "send_mail": {}'.format(str(e)))
