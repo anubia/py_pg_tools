@@ -26,8 +26,6 @@ from vacuumer import Vacuumer
 
 class Orchestrator:
 
-    # TODO: disallow and allow connections to a database during an action
-
     action = None  # The action to do
     args = []  # The list of parameters received in console
     logger = None  # A logger to show and log some messages
@@ -147,7 +145,10 @@ class Orchestrator:
                                   parser.mail_vars['password'],
                                   parser.mail_vars['to'],
                                   parser.mail_vars['cc'],
-                                  parser.mail_vars['bcc'], self.action)
+                                  parser.mail_vars['bcc'],
+                                  parser.mail_vars['server_tag'],
+                                  parser.mail_vars['external_ip'],
+                                  self.action)
 
     def get_connecter(self):
         '''
@@ -839,6 +840,13 @@ class Orchestrator:
             self.logger.debug(Messenger.BEGINNING_EXE_DB_BACKER)
             backer = self.get_db_backer(connecter)
 
+        # If necessary, add group and bkp_path to the mailer to be sent within
+        # the process information
+        if self.args.config_mailer:
+            self.logger.mailer.add_group(backer.group)
+            path = backer.bkp_path + backer.group
+            self.logger.mailer.add_bkp_path(path)
+
         # Check if the role of user connected to PostgreSQL is superuser
         pg_superuser = connecter.is_pg_superuser()
         if not pg_superuser:
@@ -1097,6 +1105,11 @@ class Orchestrator:
         else:
             self.logger.debug(Messenger.BEGINNING_EXE_DB_TRIMMER)
             trimmer = self.get_db_trimmer()
+
+        # If necessary, add the path of backups to the mailer to be sent within
+        # the process information
+        if self.args.config_mailer:
+            self.logger.mailer.add_bkp_path(trimmer.bkp_path)
 
         # Get a list with all the files stored in the specified directory and
         # its subdirectories, sorted by modification date

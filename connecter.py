@@ -8,7 +8,7 @@ import psycopg2.extras  # To get real field names from PostgreSQL
 from casting.casting import Casting
 from checker.checker import Checker
 from const.const import Default
-from const.const import Messenger
+from const.const import Messenger as Msg
 from const.const import Queries
 from logger.logger import Logger
 
@@ -47,29 +47,27 @@ class Connecter:
         elif Checker.str_is_int(port):
             self.port = Casting.str_to_int(port)
         else:
-            self.logger.stop_exe(Messenger.INVALID_PORT)
+            self.logger.stop_exe(Msg.INVALID_PORT)
 
         if database is None:
             self.database = Default.CONNECTION_DATABASE
         elif database:
             self.database = database
         else:
-            self.logger.stop_exe(Messenger.NO_CONNECTION_DATABASE)
+            self.logger.stop_exe(Msg.NO_CONNECTION_DATABASE)
 
         try:
             self.conn = psycopg2.connect(host=self.server, user=self.user,
                                          port=self.port,
                                          database=self.database)
             self.conn.autocommit = True
-            # TODO: añadir argumento password a psycopg2.connect en caso de que
-            # en futuro se quisiese añadir la opción de introducir contraseña
-            # manualmente en vez de revisar .pgpass
+            # TODO: ask for a password here if possible
             self.cursor = self.conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor)
         except Exception as e:
             self.logger.debug('Error en la función "pg_connect": {}.'.format(
                 str(e)))
-            self.logger.stop_exe(Messenger.CONNECT_FAIL)
+            self.logger.stop_exe(Msg.CONNECT_FAIL)
 
     def pg_disconnect(self):
         '''
@@ -82,7 +80,7 @@ class Connecter:
         except Exception as e:
             self.logger.debug('Error en la función "pg_disconnect": '
                               '{}.'.format(str(e)))
-            self.logger.stop_exe(Messenger.DISCONNECT_FAIL)
+            self.logger.stop_exe(Msg.DISCONNECT_FAIL)
 
     def get_pg_version(self):
         '''
@@ -112,8 +110,7 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pretty_pg_version": '
                               '{}.'.format(str(e)))
-            self.logger.highlight('warning', Messenger.GET_PG_VERSION_FAIL,
-                                  'yellow')
+            self.logger.highlight('warning', Msg.GET_PG_VERSION_FAIL, 'yellow')
             return None
 
     def get_pid_str(self):
@@ -164,7 +161,7 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_time_start": '
                               '{}.'.format(str(e)))
-            self.logger.highlight('warning', Messenger.GET_PG_TIME_START_FAIL,
+            self.logger.highlight('warning', Msg.GET_PG_TIME_START_FAIL,
                                   'yellow')
             return None
 
@@ -187,8 +184,7 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_time_up": '
                               '{}.'.format(str(e)))
-            self.logger.highlight('warning', Messenger.GET_PG_TIME_UP_FAIL,
-                                  'yellow')
+            self.logger.highlight('warning', Msg.GET_PG_TIME_UP_FAIL, 'yellow')
             return None
 
     def get_pg_dbs_data(self, ex_templates=True, db_owner=''):
@@ -227,8 +223,8 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_dbs_data": '
                               '{}.'.format(str(e)))
-            message = Messenger.GET_PG_DBS_DATA
-            self.logger.highlight('warning', message, 'yellow')
+            msg = Msg.GET_PG_DBS_DATA
+            self.logger.highlight('warning', msg, 'yellow')
             dbs = None
 
         return dbs
@@ -252,8 +248,8 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_db_data": '
                               '{}.'.format(str(e)))
-            message = Messenger.GET_PG_DB_DATA.format(dbname=dbname)
-            self.logger.highlight('warning', message, 'yellow')
+            msg = Msg.GET_PG_DB_DATA.format(dbname=dbname)
+            self.logger.highlight('warning', msg, 'yellow')
             db = None
 
         return db
@@ -281,8 +277,8 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_user_data": '
                               '{}.'.format(str(e)))
-            message = Messenger.GET_PG_USER_DATA.format(username=username)
-            self.logger.highlight('warning', message, 'yellow')
+            msg = Msg.GET_PG_USER_DATA.format(username=username)
+            self.logger.highlight('warning', msg, 'yellow')
             user = None
 
         return user
@@ -310,8 +306,8 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_conn_data": '
                               '{}.'.format(str(e)))
-            message = Messenger.GET_PG_CONN_DATA.format(connpid=connpid)
-            self.logger.highlight('warning', message, 'yellow')
+            msg = Msg.GET_PG_CONN_DATA.format(connpid=connpid)
+            self.logger.highlight('warning', msg, 'yellow')
             conn = None
 
         return conn
@@ -342,8 +338,7 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_dbnames": '
                               '{}.'.format(str(e)))
-            self.logger.highlight('warning', Messenger.GET_PG_DBNAMES_DATA,
-                                  'yellow')
+            self.logger.highlight('warning', Msg.GET_PG_DBNAMES_DATA, 'yellow')
             dbnames = None
 
         return dbnames
@@ -367,7 +362,7 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_usernames": '
                               '{}.'.format(str(e)))
-            self.logger.highlight('warning', Messenger.GET_PG_USERNAMES_DATA,
+            self.logger.highlight('warning', Msg.GET_PG_USERNAMES_DATA,
                                   'yellow')
             usernames = None
 
@@ -396,7 +391,7 @@ class Connecter:
             self.conn.rollback()
             self.logger.debug('Error en la función "get_pg_connpids": '
                               '{}.'.format(str(e)))
-            self.logger.highlight('warning', Messenger.GET_PG_CONNPIDS_DATA,
+            self.logger.highlight('warning', Msg.GET_PG_CONNPIDS_DATA,
                                   'yellow')
             pids = None
 
@@ -445,3 +440,26 @@ class Connecter:
             self.logger.debug('Error en la función "disallow_db_conn": '
                               '{}.'.format(str(e)))
             return False
+
+    def get_datallowconn(self, dbname):
+        '''
+        Target:
+            - get "datallowconn" from a specified PostgreSQL database.
+        Parameters:
+            - dbname: name of the database whose property "datallowconn" is
+              going to be read.
+        Return:
+            - a boolean which indicates the value of "datallowconn".
+        '''
+        try:
+            self.cursor.execute(Queries.GET_PG_DB_DATALLOWCONN, (dbname, ))
+            result = self.cursor.fetchone()
+            return result[0]
+
+        except Exception as e:
+            # Rollback to avoid errors in next queries because of waiting
+            # this transaction to finish
+            self.conn.rollback()
+            self.logger.debug('Error en la función "get_datallowconn": '
+                              '{}.'.format(str(e)))
+            return None

@@ -5,17 +5,27 @@
 class Messenger:
 
     PROGRAM_DESCRIPTION = 'This program allows the user the possibility to ' \
-                          ' manage PostgreSQL data in an easy way. ' \
+                          'manage PostgreSQL data in an easy way.\n' \
                           'Available options:\n' \
-                          '- Make a backup of a specified database\n' \
-                          '- Make a backup of a specified cluster\n' \
-                          '- Delete a specified database\n' \
-                          '- Get information about databases or users\n' \
-                          '- Replicate a specified database\n' \
-                          '- Terminate a specified connection to ' \
-                          'PostgreSQL\n' \
-                          '- Delete a specified backup\n' \
-                          '- Vacuum a specified database\n' \
+                          '- Change the owner of a database and all of its ' \
+                          'tables.\n' \
+                          '- Make a custom backup of a PostgreSQL database ' \
+                          'or a whole cluster.\n' \
+                          '- Delete a PostgreSQL database.\n' \
+                          '- Get some information about some PostgreSQL ' \
+                          'databases, users or its current active ' \
+                          'connections.\n' \
+                          '- Clone a PostgreSQL database.\n' \
+                          '- Restore a database or cluster\'s backup in ' \
+                          'PostgreSQL.\n' \
+                          '- Add to, delete or get some instructions from ' \
+                          'the user\'s crontab file, to execute ' \
+                          'automatically the program in a specific date and ' \
+                          'time.\n' \
+                          '- Terminate some connections to PostgreSQL.\n' \
+                          '- Delete a group of backups depending on a very ' \
+                          'customizable options.\n' \
+                          '- Vacuum some PostgreSQL databases.\n' \
                           'See more information below and in the help of ' \
                           'each command'
     PROGRAM_VERSION = 'Version: v.0.1'
@@ -82,7 +92,7 @@ class Messenger:
                        'database which is going to be dropped'
 
     INFORMER_HELP = 'INFORMER: gives some information about PostgreSQL'
-    I_CONFIG_HELP = 'load a configuration file (.cfg) to get the dropper ' \
+    I_CONFIG_HELP = 'load a configuration file (.cfg) to get the informer ' \
                     'conditions'
     I_DETAILS_CONNS_HELP = 'specify a list of PIDs and it will give you ' \
                            'some details about the PostgreSQL connections ' \
@@ -116,8 +126,8 @@ class Messenger:
     R_TERMINATE_HELP = 'terminate every connection (except yours) to the ' \
                        'database which is going to be replicated'
 
-    RESTORER_HELP = 'RESTORER: restores a database\'s backup file in ' \
-                    'PostgreSQL'
+    RESTORER_HELP = 'RESTORER: restores a database or a cluster\'s backup ' \
+                    'file in PostgreSQL'
     RS_CONFIG_HELP = 'load a configuration file (.cfg) to get the restorer ' \
                      'conditions'
     RS_DB_BACKUP_HELP = 'specifies the path of the backup\'s file ' \
@@ -129,7 +139,7 @@ class Messenger:
     RS_CLUSTER_HELP = 'specifies whether the specified path is a ' \
                       'database\'s backup or a cluster\'s backup'
 
-    SCHEDULER_HELP = 'SCHEDULER: add, remove or show some lines of the ' \
+    SCHEDULER_HELP = 'SCHEDULER: add to, remove or show some lines from the ' \
                      'program\'s CRON file, to execute it automatically'
     S_CONFIG_HELP = 'load a configuration file (.cfg) to get the scheduler ' \
                     'conditions'
@@ -771,7 +781,7 @@ class Messenger:
                            'especificados, éstos deben estar separados por ' \
                            'comas.'
     BEGINNING_MAILER = 'Enviando correo electrónico a sus destinatarios...'
-    MAIL_DESTINATARIES = 'Lista de destinatarios: {emails}.'
+    MAIL_DESTINY = 'Destinatario: {email}.'
     SEND_MAIL_FAIL = 'No ha sido posible enviar el correo electrónico a sus ' \
                      'destinatarios.'
     SEND_MAIL_DONE = 'Fin del proceso Mailer.'
@@ -815,6 +825,17 @@ class Messenger:
                             'archivo crontab del usuario.'
     SCHEDULER_DONE = 'Fin del proceso Scheduler.'
 
+    ALLOW_CONN_TO_PG_DB_FAIL = 'No fue posible reestablecer los permisos de ' \
+                               'conexión a la base de datos "{dbname}". Las ' \
+                               'conexiones están inhabilitadas hasta cambio ' \
+                               'manual.'
+    DISALLOW_CONN_TO_PG_DB_FAIL = 'No fue posible deshabilitar los permisos ' \
+                                  'de conexión a la base de datos ' \
+                                  '"{dbname}". Las conexiones están ' \
+                                  'durante el proceso y los usuarios pueden ' \
+                                  'alterar el resultado esperado si se ' \
+                                  'conectan a dicha base de datos.'
+
     def __init__(self):
         pass
 
@@ -833,6 +854,7 @@ class Default:
     EX_REGEX = ''
     EX_TEMPLATES = True
     EXP_DAYS = 365
+    # EXT_IP_WEB = 'http://www.trackip.net/ip'
     GROUP = 'default_group'
     IN_DBS = []
     IN_REGEX = ''
@@ -846,7 +868,7 @@ class Default:
     MIN_N_BKPS = 1
     MUTE = False
     PREFIX = ''
-    RESTORING_TEMPLATE = 'template0'  # TODO: cambiar template0 por otra
+    RESTORING_TEMPLATE = 'template0'
     VACUUM = True
     VALID_BOOLS = ['True', 'true', 'False', 'false']
     VALID_EXP_DAYS = [-1, int]

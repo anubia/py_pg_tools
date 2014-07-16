@@ -126,6 +126,8 @@ class CfgParser:
                 'cc': self.cfg.get('to', 'cc').strip(),
                 'bcc': self.cfg.get('to', 'bcc').strip(),
                 'level': self.cfg.get('settings', 'level').strip(),
+                'server_tag': self.cfg.get('settings', 'server_tag').strip(),
+                'external_ip': self.cfg.get('settings', 'external_ip').strip(),
             }
 
         except Exception as e:

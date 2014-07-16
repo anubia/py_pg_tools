@@ -17,7 +17,7 @@ class DateTools:
     def get_date(fmt='%Y%m%d_%H%M%S_%Z'):
         '''
         Target:
-            - get the current date of the zone in the specified format.
+            - gets the current date of the zone in the specified format.
         Parameters:
             - fmt: the date format used.
         Return:
@@ -33,7 +33,7 @@ class DateTools:
     def get_year(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
         '''
         Target:
-            - extract the year of a date stored in a string.
+            - extracts the year of a date stored in a string.
         Parameters:
             - date_str: the string with the date.
             - fmt: the date format used.
@@ -52,7 +52,7 @@ class DateTools:
     def get_month(date_str, fmt='%Y%m%d_%H%M%S_%Z'):
         '''
         Target:
-            - extract the month of a date stored in a string.
+            - extracts the month of a date stored in a string.
         Parameters:
             - date_str: the string with the date.
             - fmt: the date format used.
@@ -71,7 +71,7 @@ class DateTools:
     def get_current_datetime():
         '''
         Target:
-            - get the current date and time in timestamp format.
+            - gets the current date and time in timestamp format.
         Return:
             - a timestamp with the current moment.
         '''
@@ -83,12 +83,12 @@ class DateTools:
     def get_diff_datetimes(start_time, end_time):
         '''
         Target:
-            - extract the month of a date stored in a string.
+            - calculates the difference in time between two dates.
         Parameters:
-            - date_str: the string with the date.
-            - fmt: the date format used.
+            - start_time: the beginning date.
+            - end_time: the ending date.
         Return:
-            - the month of the received date.
+            - a time object with the difference.
         '''
         diff = end_time - start_time
 
