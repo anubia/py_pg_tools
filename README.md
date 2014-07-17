@@ -45,11 +45,17 @@ INSTALLATION:
     - Install the package python3.
     - Install the package python3-psycopg2.
     - Install the package python3-dateutil.
-    - Install the package python-crontab. This one is bound to be installed in
-      python2.x directories. Look for the cronlog.py and crontab.py files in 
-      your Linux OS. If they are in a python2.x directory, make a symbolic
-      link to each one in the python3.x counterpart directory.
-    - Install the package netifaces.
+    - Install the package python-crontab (exactly version 1.8). This one is
+      bound to be installed in python2.x directories. Look for the cronlog.py
+      and crontab.py files in your Linux OS. If they are in a python2.x
+      directory, make a symbolic link to each one in the python3.x counterpart
+      directory.
+    - Install the package netifaces. This one has to be installed via pip3. If
+      Ubuntu version is older than 13.04, python3-pip (pip3) will not be
+      available to install. To manage this, install python3-setuptools with
+      aptitude and then pip with easy_install3 (sudo easy_install3 pip). Now,
+      pip3 will be available. Make sure you have installed python3-dev before
+      installing netifaces with pip3 (install it via aptitude if you have not).
 
 USAGE:
 
