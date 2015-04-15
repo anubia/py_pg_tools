@@ -42,7 +42,7 @@ class IpAddress:
             return netifaces_ips
 
         except Exception as e:
-            logger.debug('Error en la función "get_internal_ip": {}.'.format(
+            logger.debug('Error en la función "get_netifaces_ips": {}.'.format(
                 str(e)))
             return None
 
