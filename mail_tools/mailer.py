@@ -273,7 +273,8 @@ class Mailer:
 
         internal_ips = ''
         netifaces = IpAddress.get_netifaces_ips(self.logger)
-        last_index = len(netifaces) - 1
+        if netifaces:
+            last_index = len(netifaces) - 1
         for index, netiface in enumerate(netifaces):
             internal_ips += '{} > {}'.format(netiface['netiface'],
                                              netiface['ip'])
