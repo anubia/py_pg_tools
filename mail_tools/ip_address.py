@@ -34,7 +34,7 @@ class IpAddress:
                 if re.match(regex, netiface):
                     continue
                 addrs = netifaces.ifaddresses(netiface)
-                for item in addrs[netifaces.AF_INET]:
+                for item in addrs.get(netifaces.AF_INET, []):
                     if 'addr' in item.keys():
                         netifaces_ips.append({'netiface': netiface,
                                               'ip':       item['addr'], })
