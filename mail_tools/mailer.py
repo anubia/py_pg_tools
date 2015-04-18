@@ -42,6 +42,13 @@ class Mailer:
         'v': 'Vacuumer',
     }
 
+    OP_CODES = {
+        0: 'OK',
+        1: 'WARNING',
+        2: 'ERROR',
+        3: 'CRITICAL',
+    }
+
     OP_RESULTS = {
         0: ('<h2>{op_type}: <span style="color: green;">OK</span> at '
             '"{server_tag}"</h2>Date: <span style="font-weight: bold">{date}'
@@ -255,7 +262,7 @@ class Mailer:
 
         return temp_list
 
-    def send_mail(self, detected_level):
+    def send_mail(self, level):
         '''
         Target:
             - send an email to the specified email addresses.
@@ -296,14 +303,14 @@ class Mailer:
         # Specifying an alternative mail in case the receiver does not have a
         # mail server with HTML
 
-        html = self.OP_RESULTS[detected_level].format(
+        html = self.OP_RESULTS[level].format(
             op_type=self.OP_TYPES[self.op_type], server_tag=self.server_tag,
             date=date, time=time, zone=zone, server=server,
             internal_ips=internal_ips, external_ip=self.external_ip,
             group=self.group, bkp_path=self.bkp_path,
             log_file=str(self.logger.log_file))
 
-        text = self.OP_RESULTS_NO_HTML[detected_level].format(
+        text = self.OP_RESULTS_NO_HTML[level].format(
             op_type=self.OP_TYPES[self.op_type], server_tag=self.server_tag,
             date=date, time=time, zone=zone, server=server,
             internal_ips=internal_ips, external_ip=self.external_ip,
@@ -315,8 +322,12 @@ class Mailer:
         mail['From'] = from_info_str
         mail['To'] = to_infos_str
         mail['Cc'] = cc_infos_str
-        mail['Subject'] = '[INFO] {op_type} results'.format(
-            op_type=self.OP_TYPES[self.op_type].upper())
+        mail['Subject'] = (
+            '[INFO] {op_type} results: {op_code} at {group}'
+            ''.format(op_type=self.OP_TYPES[self.op_type].upper(),
+                      op_code=self.OP_CODES.get(level, level),
+                      group=self.group,)
+            )
 
         # Record the MIME types of both parts - text/plain and text/html.
         part1 = MIMEText(text, 'plain')
