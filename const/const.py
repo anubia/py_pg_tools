@@ -905,7 +905,7 @@ class Queries:
         "ALTER DATABASE {dbname} OWNER TO {new_role};"
     )
     CLONE_PG_DB = (
-        'CREATE DATABASE {dbname} '
+        'CREATE DATABASE "{dbname}" '
         'WITH TEMPLATE {original_dbname} OWNER {user};'
     )
     DISALLOW_CONN_TO_PG_DB = (
