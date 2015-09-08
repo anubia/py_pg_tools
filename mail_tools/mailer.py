@@ -270,16 +270,10 @@ class Mailer:
 
         # Get server name and IP addresses data
         server = IpAddress.get_hostname(self.logger)
-
-        internal_ips = ''
         netifaces = IpAddress.get_netifaces_ips(self.logger)
-        if netifaces:
-            last_index = len(netifaces) - 1
-        for index, netiface in enumerate(netifaces):
-            internal_ips += '{} > {}'.format(netiface['netiface'],
-                                             netiface['ip'])
-            if index != last_index:
-                internal_ips += ', '
+        pairs = lambda dic: '{} > {}'.format(dic.get('netiface', False),
+                                             dic.get('ip', False))
+        internal_ips = ', '.join(map(pairs, netifaces))
 
         # Email full info template, for: John Doe <john.doe@email.com>
         ADDR_TMPLT = '{} <{}>'
